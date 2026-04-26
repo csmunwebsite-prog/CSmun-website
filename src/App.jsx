@@ -1,121 +1,111 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
+    <div className="app-wrapper">
+      {/* Navbar */}
+      <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
+        <div className="container nav-container">
+          <a href="#" className="nav-logo">CSMUN 2026</a>
+          <ul className="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#committees">Committees</a></li>
+            <li><a href="#secretariat">Secretariat</a></li>
+            <li><a href="#register">Register</a></li>
           </ul>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+      </nav>
+
+      {/* Hero Section */}
+      <header className="hero">
+        <div className="container hero-content animate-fade-in">
+          <h1>Diplomacy in Action.</h1>
+          <p>Join the sixth edition of the Chaitanya School Model United Nations. Empowering global thinkers to lead through dialogue and consensus.</p>
+          <div className="cta-group">
+            <a href="#register" className="btn btn-primary">Register Now</a>
+            <a href="#about" className="btn btn-secondary">Learn More</a>
+          </div>
+        </div>
+      </header>
+
+      {/* About Section */}
+      <section id="about" className="section bg-light">
+        <div className="container">
+          <div className="section-title">
+            <h2>About CSMUN</h2>
+          </div>
+          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto' }}>
+            <p>CSMUN is more than just a simulation; it's a platform for the next generation of leaders to refine their negotiation, public speaking, and critical thinking skills. This year, we delve into pressing global issues with renewed vigor and commitment to diplomatic excellence.</p>
+          </div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      {/* Committees Section */}
+      <section id="committees" className="section">
+        <div className="container">
+          <div className="section-title">
+            <h2>Our Committees</h2>
+          </div>
+          <div className="committee-grid">
+            <div className="committee-card">
+              <h3>UNSC</h3>
+              <p>United Nations Security Council: Addressing international peace and security in an ever-changing geopolitical landscape.</p>
+            </div>
+            <div className="committee-card">
+              <h3>UNHRC</h3>
+              <p>Human Rights Council: Championing the fundamental rights of every individual across the globe.</p>
+            </div>
+            <div className="committee-card">
+              <h3>UNGA</h3>
+              <p>General Assembly: The main deliberative, policymaking, and representative organ of the UN.</p>
+            </div>
+            <div className="committee-card">
+              <h3>DISEC</h3>
+              <p>Disarmament and International Security: Tackling threats to global stability and the proliferation of weapons.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer>
+        <div className="container">
+          <div className="footer-content">
+            <div>
+              <h3>CSMUN 2026</h3>
+              <p>Empowering the diplomats of tomorrow.</p>
+            </div>
+            <div>
+              <h4>Quick Links</h4>
+              <ul style={{ listStyle: 'none', opacity: 0.8 }}>
+                <li><a href="#about" style={{ color: 'white', textDecoration: 'none' }}>About</a></li>
+                <li><a href="#committees" style={{ color: 'white', textDecoration: 'none' }}>Committees</a></li>
+                <li><a href="#register" style={{ color: 'white', textDecoration: 'none' }}>Registration</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4>Contact Us</h4>
+              <p>Chaitanya School, Gandhinagar</p>
+              <p>Email: mun@chaitanyaschool.edu</p>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p>&copy; 2026 Chaitanya School MUN. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }
 
