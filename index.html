@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSMUN 2026 — Model United Nations Conference</title>
+  <meta name="description"
+    content="Join CSMUN 2026 — a premier Model United Nations conference fostering diplomacy, debate, and global awareness among future leaders." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" href="assets/logo.png" />
+</head>
+
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#" class="nav-brand">
+        <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        <span class="nav-brand-text">CS<span>MUN</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#committees">Committees</a></li>
+        <li><a href="#schedule">Schedule</a></li>
+        <li><a href="#letter">Secretary General</a></li>
+        <li><a href="#register" class="btn btn-primary nav-cta">Register Now</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <img src="assets/hero.png" alt="United Nations Assembly Hall" />
+    </div>
+    <div class="hero-overlay"></div>
+
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-badge glass-light">
+          <span class="dot"></span>
+          Registration Open
+        </div>
+
+        <h1 class="hero-title">
+          <span class="line">Shaping the</span>
+          <span class="line"><span class="gold-text">Future</span> of</span>
+          <span class="line">Diplomacy</span>
+        </h1>
+
+        <p class="hero-description">
+          CSMUN 2026 brings together the brightest young minds to debate, negotiate, and resolve the most pressing
+          global challenges of our time.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#register" class="btn btn-primary" id="heroRegisterBtn">Register as Delegate</a>
+          <a href="#committees" class="btn btn-outline" id="heroExploreBtn">Explore Committees</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-number" id="statDelegates">300+</div>
+            <div class="hero-stat-label">Delegates</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">6</div>
+            <div class="hero-stat-label">Committees</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-number">3</div>
+            <div class="hero-stat-label">Days</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-card glass">
+          <div class="hero-card-label">📅 Save the Date</div>
+          <div class="hero-card-date">August 15 – 17, 2026</div>
+          <div class="hero-card-venue">
+            📍 &nbsp;CS Academy, Main Auditorium
+          </div>
+          <div class="hero-card-divider"></div>
+          <div class="hero-card-committees">
+            <div class="committee-tag">
+              <span class="tag-icon blue">🌐</span>
+              UNGA – Disarmament & Security
+            </div>
+            <div class="committee-tag">
+              <span class="tag-icon gold">⚖️</span>
+              UNHRC – Digital Privacy
+            </div>
+            <div class="committee-tag">
+              <span class="tag-icon green">🌍</span>
+              UNEP – Climate Adaptation
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-image-wrapper reveal">
+        <img src="assets/hero.png" alt="CSMUN Conference" />
+        <div class="about-image-overlay"></div>
+        <div class="about-image-badge glass-light">Est. 2019</div>
+      </div>
+
+      <div class="about-text reveal">
+        <div class="section-label">About CSMUN</div>
+        <h2 class="section-title">Where Young Leaders <span class="gold-text">Find Their Voice</span></h2>
+        <p class="section-subtitle">
+          CSMUN is a premier Model United Nations conference that empowers students to step into the shoes of world
+          leaders. Through rigorous debate, collaborative negotiation, and thoughtful resolution-drafting, delegates
+          develop critical thinking, public speaking, and leadership skills that last a lifetime.
+        </p>
+
+        <div class="about-features">
+          <div class="about-feature">
+            <div class="about-feature-icon">🎤</div>
+            <div class="about-feature-text">
+              <h4>Expert Chairs</h4>
+              <p>Experienced MUN veterans guide every session</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">🏆</div>
+            <div class="about-feature-text">
+              <h4>Awards & Recognition</h4>
+              <p>Best Delegate, Outstanding Delegate, and more</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">🤝</div>
+            <div class="about-feature-text">
+              <h4>Networking</h4>
+              <p>Connect with delegates from across the region</p>
+            </div>
+          </div>
+          <div class="about-feature">
+            <div class="about-feature-icon">📚</div>
+            <div class="about-feature-text">
+              <h4>Study Guides</h4>
+              <p>Comprehensive background guides for prep</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMITTEES ===== -->
+  <section class="committees" id="committees">
+    <!-- decorative orbs -->
+    <div class="glow-orb gold" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
+    <div class="glow-orb blue" style="width: 350px; height: 350px; bottom: -80px; right: -80px;"></div>
+
+    <div class="container">
+      <div class="committees-header reveal">
+        <div class="section-label">Our Committees</div>
+        <h2 class="section-title">Debate. Negotiate. <span class="gold-text">Resolve.</span></h2>
+        <p class="section-subtitle">Choose from our carefully curated committees, each tackling some of the world's most
+          significant challenges.</p>
+      </div>
+
+      <div class="committees-grid">
+        <!-- Committee 1 -->
+        <div class="committee-card glass reveal" id="committee-unga">
+          <div class="committee-icon icon-blue">🌐</div>
+          <h3>UNGA</h3>
+          <div class="committee-full-name">United Nations General Assembly</div>
+          <p>The chief deliberative, policymaking, and representative organ of the United Nations, addressing the most
+            pressing global issues.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"Addressing the Proliferation of Autonomous Weapons Systems"</div>
+          </div>
+        </div>
+
+        <!-- Committee 2 -->
+        <div class="committee-card glass reveal" id="committee-unhrc">
+          <div class="committee-icon icon-gold">⚖️</div>
+          <h3>UNHRC</h3>
+          <div class="committee-full-name">United Nations Human Rights Council</div>
+          <p>Responsible for strengthening the promotion and protection of human rights around the globe and addressing
+            situations of violations.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"Safeguarding Digital Privacy in the Age of Mass Surveillance"</div>
+          </div>
+        </div>
+
+        <!-- Committee 3 -->
+        <div class="committee-card glass reveal" id="committee-unep">
+          <div class="committee-icon icon-green">🌍</div>
+          <h3>UNEP</h3>
+          <div class="committee-full-name">United Nations Environment Programme</div>
+          <p>The leading global environmental authority that sets the environmental agenda and promotes sustainable
+            development.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"Financing Climate Adaptation in Developing Nations"</div>
+          </div>
+        </div>
+
+        <!-- Committee 4 -->
+        <div class="committee-card glass reveal" id="committee-unsc">
+          <div class="committee-icon icon-blue">🛡️</div>
+          <h3>UNSC</h3>
+          <div class="committee-full-name">United Nations Security Council</div>
+          <p>The most powerful body of the UN, primarily responsible for the maintenance of international peace and
+            security.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"De-escalation of Geopolitical Tensions in the Indo-Pacific"</div>
+          </div>
+        </div>
+
+        <!-- Committee 5 -->
+        <div class="committee-card glass reveal" id="committee-ecosoc">
+          <div class="committee-icon icon-gold">📊</div>
+          <h3>ECOSOC</h3>
+          <div class="committee-full-name">Economic and Social Council</div>
+          <p>Coordinates the economic and social work of the UN, promoting international economic cooperation and
+            development.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"Bridging the Global Digital Divide for Equitable Development"</div>
+          </div>
+        </div>
+
+        <!-- Committee 6 -->
+        <div class="committee-card glass reveal" id="committee-ip">
+          <div class="committee-icon icon-green">🇮🇳</div>
+          <h3>IP</h3>
+          <div class="committee-full-name">Indian Parliament — Lok Sabha</div>
+          <p>A dynamic simulation of India's lower house, debating critical national policies with the intensity of real
+            parliamentary sessions.</p>
+          <div class="committee-agenda">
+            <div class="committee-agenda-label">Agenda</div>
+            <div class="committee-agenda-text">"Reforming India's Education System for the 21st Century"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TIMELINE / SCHEDULE ===== -->
+  <section class="timeline-section" id="schedule">
+    <div class="container">
+      <div class="timeline-header reveal">
+        <div class="section-label">Conference Schedule</div>
+        <h2 class="section-title">Three Days of <span class="gold-text">Intense Diplomacy</span></h2>
+        <p class="section-subtitle">From opening ceremonies to the final gavel, every moment is crafted to challenge and
+          inspire.</p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item reveal">
+          <div class="timeline-marker">🎪</div>
+          <div class="timeline-content glass-light">
+            <div class="timeline-time">Day 1 — August 15</div>
+            <h3>Opening Ceremony & Committee Session I</h3>
+            <p>Keynote address, delegate orientation, and the first round of committee sessions. Set the tone for three
+              transformative days.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-marker">🔥</div>
+          <div class="timeline-content glass-light">
+            <div class="timeline-time">Day 2 — August 16</div>
+            <h3>Committee Sessions II & III</h3>
+            <p>Deep-dive into agendas with moderated and unmoderated caucuses. Alliances form, working papers take
+              shape, and debates intensify.</p>
+          </div>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-marker">🏆</div>
+          <div class="timeline-content glass-light">
+            <div class="timeline-time">Day 3 — August 17</div>
+            <h3>Final Session & Closing Ceremony</h3>
+            <p>Draft resolutions go to vote. Award ceremony celebrates the best delegates, diplomats, and rising stars
+              of CSMUN 2026.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SECRETARY GENERAL LETTER ===== -->
+  <section class="letter-section" id="letter">
+    <div class="container">
+      <div class="letter-container glass reveal">
+        <div class="letter-quote">"</div>
+        <p class="letter-text">
+          Dear Future Delegates,<br /><br />
+          In a world grappling with unprecedented challenges — from geopolitical unrest to climate crises — the need for
+          informed, empathetic, and courageous leaders has never been greater. CSMUN 2026 is not just a simulation; it
+          is a crucible where your ideas will be tested, your convictions challenged, and your voice
+          amplified.<br /><br />
+          Whether you are a seasoned MUNner or stepping into committee for the first time, I promise you an experience
+          that will push your boundaries and expand your horizons. Together, let us shape a future worthy of the world
+          we wish to inherit.
+        </p>
+        <div class="letter-author">
+          <div class="letter-avatar">SG</div>
+          <div class="letter-author-info">
+            <h4>The Secretary General</h4>
+            <p>CSMUN 2026</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== REGISTER CTA ===== -->
+  <section class="register-cta" id="register">
+    <div class="container">
+      <div class="register-cta-box glass reveal">
+        <div class="section-label">Registration Open</div>
+        <h2>Ready to Make <span class="gold-text">History?</span></h2>
+        <p>Secure your seat at the most anticipated MUN conference of 2026. Limited delegate spots available — register
+          today.</p>
+        <a href="#" class="btn btn-primary" id="registerBtn">Register Now →</a>
+        <div class="register-cta-info">
+          <span>📅 August 15 – 17, 2026</span>
+          <span>📍 CS Academy, Main Auditorium</span>
+          <span>🎟️ Limited Seats</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-about">
+          <div class="footer-brand">
+            <img src="assets/logo.png" alt="CSMUN Logo" />
+            <span class="footer-brand-name">CSMUN</span>
+          </div>
+          <p class="footer-description">
+            CS Academy's flagship Model United Nations conference — empowering the next generation of global leaders
+            through diplomacy and debate.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#committees">Committees</a></li>
+            <li><a href="#schedule">Schedule</a></li>
+            <li><a href="#register">Register</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Study Guides</a></li>
+            <li><a href="#">Rules of Procedure</a></li>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Past Conferences</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:csmun@csacademy.in">csmun@csacademy.in</a></li>
+            <li><a href="#">CS Academy, Chennai</a></li>
+            <li><a href="#">+91 98765 43210</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link" aria-label="Instagram" id="socialInstagram">📸</a>
+          <a href="#" class="footer-social-link" aria-label="Twitter" id="socialTwitter">🐦</a>
+          <a href="#" class="footer-social-link" aria-label="LinkedIn" id="socialLinkedin">💼</a>
+          <a href="#" class="footer-social-link" aria-label="Email" id="socialEmail">✉️</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="main.js"></script>
+</body>
+
+</html>

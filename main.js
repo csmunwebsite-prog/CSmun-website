@@ -1,0 +1,149 @@
+// ===== CSMUN 2026 — Main JavaScript =====
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ── Navbar scroll effect ──
+    const navbar = document.getElementById('navbar');
+    const handleScroll = () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 60);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    // ── Mobile nav toggle ──
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+
+    navToggle.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        // Animate hamburger → X
+        const spans = navToggle.querySelectorAll('span');
+        if (navLinks.classList.contains('active')) {
+            spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+            spans[1].style.opacity = '0';
+            spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+        } else {
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        }
+    });
+
+    // Close mobile nav when a link is clicked
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('active');
+            const spans = navToggle.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+        });
+    });
+
+    // ── Scroll reveal animations ──
+    const revealElements = document.querySelectorAll('.reveal');
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // ── Counter animation for hero stats ──
+    function animateCounter(element, target, suffix = '') {
+        let current = 0;
+        const duration = 2000;
+        const step = target / (duration / 16);
+        const isDecimal = String(target).includes('.');
+
+        function update() {
+            current += step;
+            if (current >= target) {
+                current = target;
+                element.textContent = (isDecimal ? target.toFixed(1) : Math.floor(target)) + suffix;
+                return;
+            }
+            element.textContent = (isDecimal ? current.toFixed(1) : Math.floor(current)) + suffix;
+            requestAnimationFrame(update);
+        }
+
+        update();
+    }
+
+    const statDelegates = document.getElementById('statDelegates');
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(statDelegates, 300, '+');
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
+    if (statDelegates) statsObserver.observe(statDelegates);
+
+    // ── Smooth scroll for anchor links ──
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            e.preventDefault();
+            const target = document.querySelector(targetId);
+            if (target) {
+                const offsetTop = target.offsetTop - 80;
+                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+            }
+        });
+    });
+
+    // ── Parallax effect on hero background ──
+    const heroBg = document.querySelector('.hero-bg img');
+    if (heroBg) {
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            if (scrolled < window.innerHeight) {
+                heroBg.style.transform = `scale(1.1) translateY(${scrolled * 0.3}px)`;
+            }
+        }, { passive: true });
+    }
+
+    // ── Committee cards hover tilt effect ──
+    const cards = document.querySelectorAll('.committee-card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+        });
+    });
+
+    // ── Countdown timer (optional, shows days until event) ──
+    const eventDate = new Date('2026-08-15T09:00:00+05:30');
+    function updateCountdown() {
+        const now = new Date();
+        const diff = eventDate - now;
+        if (diff <= 0) return;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        // Could display this somewhere if needed
+    }
+    updateCountdown();
+
+});
