@@ -24,16 +24,18 @@
 
   <!-- ===== NAVBAR ===== -->
   <nav class="navbar" id="navbar">
-    <div class="container">
+    <div class="container-wide">
       <a href="#" class="nav-brand">
-        <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        <div class="nav-logo-wrapper">
+          <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        </div>
         <span class="nav-brand-text">CS<span>MUN</span></span>
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="#about">About</a></li>
         <li><a href="#committees">Committees</a></li>
-        <li><a href="#schedule">Schedule</a></li>
-        <li><a href="#letter">Secretary General</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="#letter">SG Message</a></li>
         <li><a href="#register" class="btn btn-primary nav-cta">Register Now</a></li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
@@ -60,7 +62,7 @@
 
         <h1 class="hero-title">
           <span class="line">Shaping the</span>
-          <span class="line"><span class="gold-text">Future</span> of</span>
+          <span class="line"><span class="accent-text">Future</span> of</span>
           <span class="line">Diplomacy</span>
         </h1>
 
@@ -100,11 +102,11 @@
           <div class="hero-card-divider"></div>
           <div class="hero-card-committees">
             <div class="committee-tag">
-              <span class="tag-icon blue">🌐</span>
+              <span class="tag-icon silver">🌐</span>
               UNGA – Disarmament & Security
             </div>
             <div class="committee-tag">
-              <span class="tag-icon gold">⚖️</span>
+              <span class="tag-icon red">⚖️</span>
               UNHRC – Digital Privacy
             </div>
             <div class="committee-tag">
@@ -128,7 +130,7 @@
 
       <div class="about-text reveal">
         <div class="section-label">About CSMUN</div>
-        <h2 class="section-title">Where Young Leaders <span class="gold-text">Find Their Voice</span></h2>
+        <h2 class="section-title">Where Young Leaders <span class="accent-text">Find Their Voice</span></h2>
         <p class="section-subtitle">
           CSMUN is a premier Model United Nations conference that empowers students to step into the shoes of world
           leaders. Through rigorous debate, collaborative negotiation, and thoughtful resolution-drafting, delegates
@@ -172,13 +174,13 @@
   <!-- ===== COMMITTEES ===== -->
   <section class="committees" id="committees">
     <!-- decorative orbs -->
-    <div class="glow-orb gold" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
-    <div class="glow-orb blue" style="width: 350px; height: 350px; bottom: -80px; right: -80px;"></div>
+    <div class="glow-orb red" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
+    <div class="glow-orb navy" style="width: 350px; height: 350px; bottom: -80px; right: -80px;"></div>
 
     <div class="container">
       <div class="committees-header reveal">
         <div class="section-label">Our Committees</div>
-        <h2 class="section-title">Debate. Negotiate. <span class="gold-text">Resolve.</span></h2>
+        <h2 class="section-title">Debate. Negotiate. <span class="accent-text">Resolve.</span></h2>
         <p class="section-subtitle">Choose from our carefully curated committees, each tackling some of the world's most
           significant challenges.</p>
       </div>
@@ -186,7 +188,7 @@
       <div class="committees-grid">
         <!-- Committee 1 -->
         <div class="committee-card glass reveal" id="committee-unga">
-          <div class="committee-icon icon-blue">🌐</div>
+          <div class="committee-icon icon-silver">🌐</div>
           <h3>UNGA</h3>
           <div class="committee-full-name">United Nations General Assembly</div>
           <p>The chief deliberative, policymaking, and representative organ of the United Nations, addressing the most
@@ -199,7 +201,7 @@
 
         <!-- Committee 2 -->
         <div class="committee-card glass reveal" id="committee-unhrc">
-          <div class="committee-icon icon-gold">⚖️</div>
+          <div class="committee-icon icon-red">⚖️</div>
           <h3>UNHRC</h3>
           <div class="committee-full-name">United Nations Human Rights Council</div>
           <p>Responsible for strengthening the promotion and protection of human rights around the globe and addressing
@@ -225,7 +227,7 @@
 
         <!-- Committee 4 -->
         <div class="committee-card glass reveal" id="committee-unsc">
-          <div class="committee-icon icon-blue">🛡️</div>
+          <div class="committee-icon icon-silver">🛡️</div>
           <h3>UNSC</h3>
           <div class="committee-full-name">United Nations Security Council</div>
           <p>The most powerful body of the UN, primarily responsible for the maintenance of international peace and
@@ -238,7 +240,7 @@
 
         <!-- Committee 5 -->
         <div class="committee-card glass reveal" id="committee-ecosoc">
-          <div class="committee-icon icon-gold">📊</div>
+          <div class="committee-icon icon-red">📊</div>
           <h3>ECOSOC</h3>
           <div class="committee-full-name">Economic and Social Council</div>
           <p>Coordinates the economic and social work of the UN, promoting international economic cooperation and
@@ -270,7 +272,7 @@
     <div class="container">
       <div class="timeline-header reveal">
         <div class="section-label">Conference Schedule</div>
-        <h2 class="section-title">Three Days of <span class="gold-text">Intense Diplomacy</span></h2>
+        <h2 class="section-title">Three Days of <span class="accent-text">Intense Diplomacy</span></h2>
         <p class="section-subtitle">From opening ceremonies to the final gavel, every moment is crafted to challenge and
           inspire.</p>
       </div>
@@ -340,7 +342,7 @@
     <div class="container">
       <div class="register-cta-box glass reveal">
         <div class="section-label">Registration Open</div>
-        <h2>Ready to Make <span class="gold-text">History?</span></h2>
+        <h2>Ready to Make <span class="accent-text">History?</span></h2>
         <p>Secure your seat at the most anticipated MUN conference of 2026. Limited delegate spots available — register
           today.</p>
         <a href="#" class="btn btn-primary" id="registerBtn">Register Now →</a>
@@ -359,8 +361,10 @@
       <div class="footer-top">
         <div class="footer-about">
           <div class="footer-brand">
-            <img src="assets/logo.png" alt="CSMUN Logo" />
-            <span class="footer-brand-name">CSMUN</span>
+            <div class="nav-logo-wrapper" style="width: 36px; height: 36px;">
+              <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+            </div>
+            <span class="footer-brand-name">CS<span>MUN</span></span>
           </div>
           <p class="footer-description">
             CS Academy's flagship Model United Nations conference — empowering the next generation of global leaders

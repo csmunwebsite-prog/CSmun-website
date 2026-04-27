@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resources — CSMUN 2026</title>
+  <meta name="description" content="Access all essential documents, study guides, and rules of procedure for CSMUN 2026." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="index.css" />
+  <style>
+    /* Specific styles for Resources Page */
+    .resources-hero {
+      padding: var(--space-5xl) 0 var(--space-3xl);
+      background: radial-gradient(circle at top right, rgba(139, 30, 30, 0.1), transparent 40%);
+      text-align: center;
+    }
+
+    .search-section {
+      max-width: 600px;
+      margin: 0 auto var(--space-4xl);
+      padding: 0 var(--space-md);
+    }
+
+    .search-bar {
+      width: 100%;
+      padding: 16px 24px;
+      padding-left: 50px;
+      border-radius: var(--radius-full);
+      background: var(--white-05);
+      border: 1px solid var(--white-10);
+      color: var(--white);
+      font-family: var(--ff-body);
+      font-size: 1rem;
+      transition: all var(--duration-normal) var(--ease-out);
+    }
+
+    .search-bar:focus {
+      outline: none;
+      border-color: var(--red-500);
+      background: var(--white-10);
+      box-shadow: 0 0 20px rgba(139, 30, 30, 0.2);
+    }
+
+    .category-filters {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-4xl);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 20px;
+      border-radius: var(--radius-full);
+      background: var(--white-05);
+      border: 1px solid var(--white-10);
+      color: var(--white-70);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--red-500);
+      color: var(--white);
+      border-color: var(--red-500);
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: var(--space-xl);
+      margin-bottom: var(--space-5xl);
+    }
+
+    .resource-card {
+      padding: var(--space-xl);
+      transition: transform var(--duration-normal) var(--ease-out);
+    }
+
+    .resource-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .resource-type {
+      font-family: var(--ff-accent);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--red-400);
+      margin-bottom: var(--space-sm);
+    }
+
+    .resource-title {
+      font-family: var(--ff-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: var(--space-md);
+    }
+
+    .resource-desc {
+      font-size: 0.9rem;
+      color: var(--white-50);
+      margin-bottom: var(--space-xl);
+      line-height: 1.6;
+    }
+
+    .resource-actions {
+      display: flex;
+      gap: var(--space-md);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container-wide">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-logo-wrapper">
+          <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        </div>
+        <span class="nav-brand-text">CS<span>MUN</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#committees">Committees</a></li>
+        <li><a href="#" class="active">Resources</a></li>
+        <li><a href="index.html#register" class="btn btn-primary nav-cta">Register Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="resources-hero">
+    <div class="container">
+      <div class="section-label reveal">Resource Portal</div>
+      <h1 class="section-title reveal">Essential <span class="accent-text">Documents</span></h1>
+      <p class="section-subtitle reveal" style="margin: 0 auto var(--space-2xl);">
+        Everything you need to prepare for academic excellence at CSMUN 2026.
+      </p>
+
+      <div class="search-section reveal">
+        <input type="text" class="search-bar" placeholder="Search for guides, matrixes, or rules..." id="resourceSearch" />
+      </div>
+
+      <div class="category-filters reveal">
+        <button class="filter-btn active" data-filter="all">All Resources</button>
+        <button class="filter-btn" data-filter="guide">Study Guides</button>
+        <button class="filter-btn" data-filter="procedure">Procedure</button>
+        <button class="filter-btn" data-filter="matrix">Matrices</button>
+        <button class="filter-btn" data-filter="guideline">Guidelines</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== CONTENT ===== -->
+  <section class="resources-content">
+    <div class="container">
+      <div class="resource-grid" id="resourceGrid">
+        <!-- Resource Card 1 -->
+        <div class="resource-card glass reveal" data-category="procedure">
+          <div class="resource-type">Procedure</div>
+          <h3 class="resource-title">Rules of Procedure (RoP)</h3>
+          <p class="resource-desc">The official guide to the parliamentary procedures practiced at CSMUN 2026.</p>
+          <div class="resource-actions">
+            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
+            <a href="#" class="btn btn-outline btn-small">View Online</a>
+          </div>
+        </div>
+
+        <!-- Resource Card 2 -->
+        <div class="resource-card glass reveal" data-category="guide">
+          <div class="resource-type">Study Guide</div>
+          <h3 class="resource-title">UNGA Study Guide</h3>
+          <p class="resource-desc">Background research and agenda details for the General Assembly committee.</p>
+          <div class="resource-actions">
+            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
+          </div>
+        </div>
+
+        <!-- Resource Card 3 -->
+        <div class="resource-card glass reveal" data-category="guideline">
+          <div class="resource-type">Guideline</div>
+          <h3 class="resource-title">Position Paper Guidelines</h3>
+          <p class="resource-desc">Instructions on how to draft and submit your position papers for evaluating awards.</p>
+          <div class="resource-actions">
+            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
+          </div>
+        </div>
+
+        <!-- Resource Card 4 -->
+        <div class="resource-card glass reveal" data-category="matrix">
+          <div class="resource-type">Matrix</div>
+          <h3 class="resource-title">Delegate Country Matrix</h3>
+          <p class="resource-desc">Full list of allocated countries across all six committees.</p>
+          <div class="resource-actions">
+            <a href="#" class="btn btn-primary btn-small">View Matrix</a>
+          </div>
+        </div>
+
+        <!-- More cards can be added here -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
+        <div class="footer-socials">
+          <a href="#" class="footer-social-link">📸</a>
+          <a href="#" class="footer-social-link">🐦</a>
+          <a href="#" class="footer-social-link">💼</a>
+          <a href="#" class="footer-social-link">✉️</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+  <script>
+    // Search and Filter Logic
+    const searchBar = document.getElementById('resourceSearch');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.resource-card');
+
+    function filterResources() {
+      const searchTerm = searchBar.value.toLowerCase();
+      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.resource-title').textContent.toLowerCase();
+        const category = card.dataset.category;
+        const matchesSearch = title.includes(searchTerm);
+        const matchesFilter = activeFilter === 'all' || category === activeFilter;
+
+        if (matchesSearch && matchesFilter) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    searchBar.addEventListener('input', filterResources);
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterResources();
+      });
+    });
+  </script>
+</body>
+
+</html>
