@@ -5,7 +5,7 @@ export function ProtectedRoute({ children, allowedRoles }) {
   const { currentUser, userRole } = useAuth();
 
   if (!currentUser) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/app/login" />;
   }
 
   if (allowedRoles && !allowedRoles.includes(userRole)) {

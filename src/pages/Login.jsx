@@ -13,8 +13,9 @@ export default function Login() {
     try {
       setError('');
       setLoading(true);
-      await loginWithGoogle(role);
-      // Navigation is handled by App.jsx Route logic automatically
+      const result = await loginWithGoogle(role);
+      // Navigate to the appropriate dashboard after successful login
+      navigate(role === 'mentor' ? '/app/mentor' : '/app/delegate', { replace: true });
     } catch (err) {
       setError('Failed to log in with Google: ' + err.message);
     }
