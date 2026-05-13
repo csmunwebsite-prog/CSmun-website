@@ -17,6 +17,7 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [profileComplete, setProfileComplete] = useState(false);
   const [loading, setLoading] = useState(true);
 
   async function loginWithGoogle(selectedRole) {
@@ -29,9 +30,12 @@ export function AuthProvider({ children }) {
     const docSnap = await getDoc(docRef);
     
     let finalRole = selectedRole;
+    let isProfileComplete = false;
+
     if (docSnap.exists()) {
-      // If user exists, optionally respect their existing role instead of overriding
+      // If user exists, respect their existing role
       finalRole = docSnap.data().role;
+      isProfileComplete = docSnap.data().profileComplete || false;
     } else {
       // Store new user data in Firestore
       await setDoc(docRef, {
@@ -39,12 +43,15 @@ export function AuthProvider({ children }) {
         email: user.email,
         role: finalRole,
         name: user.displayName,
+        profileComplete: false,
         createdAt: new Date().toISOString()
       });
+      isProfileComplete = false;
     }
 
     setUserRole(finalRole);
-    return result;
+    setProfileComplete(isProfileComplete);
+    return { result, isProfileComplete };
   }
 
   function logout() {
@@ -53,20 +60,28 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (user) {
-        // Fetch role from Firestore
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserRole(docSnap.data().role);
+      try {
+        setCurrentUser(user);
+        if (user) {
+          // Fetch role and profile status from Firestore
+          const docRef = doc(db, "users", user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setUserRole(docSnap.data().role);
+            setProfileComplete(docSnap.data().profileComplete || false);
+          } else {
+            setUserRole(null);
+            setProfileComplete(false);
+          }
         } else {
           setUserRole(null);
+          setProfileComplete(false);
         }
-      } else {
-        setUserRole(null);
+      } catch (err) {
+        console.error("Error in auth state change:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return unsubscribe;
@@ -75,6 +90,8 @@ export function AuthProvider({ children }) {
   const value = {
     currentUser,
     userRole,
+    profileComplete,
+    setProfileComplete,
     loginWithGoogle,
     logout
   };

@@ -2,27 +2,47 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Login from './pages/Login';
+import CompleteProfile from './pages/CompleteProfile';
+import Profile from './pages/Profile';
 import DelegateDashboard from './pages/delegate/DelegateDashboard';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import './App.css';
 
 function AppRoutes() {
-  const { currentUser, userRole } = useAuth();
+  const { currentUser, userRole, profileComplete } = useAuth();
 
   return (
     <Routes>
-      {/* Default /app route: if logged in, redirect to dashboard; else show login */}
+      {/* Default /app route: smart redirect based on auth & profile state */}
       <Route
         path="/app"
         element={
-          currentUser ? (
-            <Navigate to={userRole === 'mentor' ? '/app/mentor' : '/app/delegate'} replace />
-          ) : (
+          !currentUser ? (
             <Navigate to="/app/login" replace />
+          ) : !profileComplete ? (
+            <Navigate to="/app/complete-profile" replace />
+          ) : (
+            <Navigate to={userRole === 'mentor' ? '/app/mentor' : '/app/delegate'} replace />
           )
         }
       />
       <Route path="/app/login" element={<Login />} />
+      <Route
+        path="/app/complete-profile"
+        element={
+          <ProtectedRoute skipProfileCheck>
+            <CompleteProfile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/profile"
+        element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/app/delegate"
         element={

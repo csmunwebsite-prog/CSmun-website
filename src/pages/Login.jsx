@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -6,16 +6,22 @@ export default function Login() {
   const [role, setRole] = useState('delegate');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, currentUser } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/app', { replace: true });
+    }
+  }, [currentUser, navigate]);
 
   async function handleGoogleLogin() {
     try {
       setError('');
       setLoading(true);
-      const result = await loginWithGoogle(role);
-      // Navigate to the appropriate dashboard after successful login
-      navigate(role === 'mentor' ? '/app/mentor' : '/app/delegate', { replace: true });
+      const { isProfileComplete } = await loginWithGoogle(role);
+      // Navigate to /app which will handle the smart redirect
+      navigate('/app', { replace: true });
     } catch (err) {
       setError('Failed to log in with Google: ' + err.message);
     }

@@ -324,6 +324,38 @@ ul {
     font-size: 0.8rem !important;
 }
 
+.nav-profile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 6px 12px;
+    background: var(--white-05);
+    border: 1px solid var(--white-10);
+    border-radius: var(--radius-full);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.nav-profile:hover {
+    background: var(--white-10);
+    border-color: var(--white-20);
+    transform: translateY(-2px);
+}
+
+.nav-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid var(--red-500);
+}
+
+.nav-user-name {
+    font-family: var(--ff-accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--white);
+}
+
 .nav-toggle {
     display: none;
     flex-direction: column;

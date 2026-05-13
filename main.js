@@ -1,6 +1,51 @@
-// ===== CSMUN 2026 — Main JavaScript =====
+import { auth } from './src/firebase.js';
+import { onAuthStateChanged } from 'firebase/auth';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ── Auth state check for registration buttons ──
+    onAuthStateChanged(auth, (user) => {
+        const authNavItem = document.getElementById('auth-nav-item');
+        const heroBtn = document.getElementById('heroRegisterBtn');
+        const mainRegBtn = document.getElementById('registerBtn');
+
+        if (user) {
+            // Update Navbar to show Profile
+            if (authNavItem) {
+                authNavItem.innerHTML = `
+                    <a href="/app/profile" class="nav-profile-link">
+                        <div class="nav-profile">
+                            <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User')}" alt="Profile" class="nav-avatar" />
+                            <span class="nav-user-name">${(user.displayName || 'Account').split(' ')[0]}</span>
+                        </div>
+                    </a>
+                `;
+            }
+
+            // Update other CTA buttons to "Go to Dashboard"
+            if (heroBtn) {
+                heroBtn.textContent = 'Go to Dashboard →';
+                heroBtn.href = '/app';
+            }
+            if (mainRegBtn) {
+                mainRegBtn.textContent = 'Go to Dashboard →';
+                mainRegBtn.href = '/app';
+            }
+        } else {
+            // Restore Register Buttons if logged out
+            if (authNavItem) {
+                authNavItem.innerHTML = `<a href="/app" class="btn btn-primary nav-cta" id="navRegisterBtn">Register Now</a>`;
+            }
+            if (heroBtn) {
+                heroBtn.textContent = 'Register as Delegate';
+                heroBtn.href = '/app';
+            }
+            if (mainRegBtn) {
+                mainRegBtn.textContent = 'Register Now →';
+                mainRegBtn.href = '/app';
+            }
+        }
+    });
 
     // ── Navbar scroll effect ──
     const navbar = document.getElementById('navbar');
