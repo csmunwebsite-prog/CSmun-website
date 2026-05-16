@@ -21,8 +21,10 @@ function AppRoutes() {
             <Navigate to="/app/login" replace />
           ) : !profileComplete ? (
             <Navigate to="/app/complete-profile" replace />
+          ) : userRole === 'mentor' ? (
+            <Navigate to="/app/mentor" replace />
           ) : (
-            <Navigate to={userRole === 'mentor' ? '/app/mentor' : '/app/delegate'} replace />
+            <Navigate to="/app/delegate" replace />
           )
         }
       />

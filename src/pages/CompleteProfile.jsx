@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 
 export default function CompleteProfile() {
-  const { currentUser, userRole, profileComplete, setProfileComplete } = useAuth();
+  const { currentUser, userRole, profileComplete, setProfileComplete, updateUserProfile } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,20 +34,20 @@ export default function CompleteProfile() {
       setError('');
       setLoading(true);
 
-      const docRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(docRef, {
+      await updateUserProfile({
+        name: trimmedName,
         certificateName: trimmedName,
         grade: grade,
         profileComplete: true,
       });
 
-      setProfileComplete(true);
-      // The redirect will be handled by the layout/ProtectedRoute or we can do it here
-      navigate(userRole === 'mentor' ? '/app/mentor' : '/app/delegate', { replace: true });
+      // No need to navigate here; the useEffect above will trigger when profileComplete becomes true
     } catch (err) {
+      console.error("Error saving profile:", err);
       setError('Failed to save your details: ' + err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

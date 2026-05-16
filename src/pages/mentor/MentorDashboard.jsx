@@ -4,7 +4,7 @@ import { db } from '../../firebase';
 import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function MentorDashboard() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, userData, logout } = useAuth();
   const [delegates, setDelegates] = useState([]);
   const [uploads, setUploads] = useState([]);
   const [meetings, setMeetings] = useState([]);
@@ -57,7 +57,10 @@ export default function MentorDashboard() {
   return (
     <div className="dashboard-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2>Mentor Dashboard</h2>
+        <div>
+          <h2 style={{ marginBottom: '0.25rem' }}>Welcome, {userData?.name || (currentUser?.displayName || 'Mentor').split(' ')[0]}!</h2>
+          <p style={{ color: '#666', fontSize: '0.9rem' }}>Mentor Portal — Resource Management & Grading</p>
+        </div>
         <button onClick={logout} className="btn btn-secondary">Log Out</button>
       </header>
 

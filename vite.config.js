@@ -14,8 +14,9 @@ export default defineConfig({
       configureServer(server) {
         server.middlewares.use((req, res, next) => {
           // If path starts with /app and is not a file request, serve app.html
-          if (req.url.startsWith('/app') && !path.extname(req.url)) {
-            req.url = '/app.html';
+          const url = req.url.split('?')[0];
+          if (url.startsWith('/app') && !path.extname(url)) {
+            req.url = '/app.html' + (req.url.includes('?') ? '?' + req.url.split('?')[1] : '');
           }
           next();
         });

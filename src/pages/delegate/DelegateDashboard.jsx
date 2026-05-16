@@ -11,7 +11,7 @@ const TRAINING_VIDEOS = [
 ];
 
 export default function DelegateDashboard() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, userData, logout } = useAuth();
   const [completedVideos, setCompletedVideos] = useState([]);
   const [uploadType, setUploadType] = useState('position_paper');
   const [file, setFile] = useState(null);
@@ -66,6 +66,7 @@ export default function DelegateDashboard() {
         await addDoc(collection(db, 'uploads'), {
           uid: currentUser.uid,
           delegateEmail: currentUser.email,
+          delegateName: userData?.name || 'Delegate',
           type: uploadType,
           fileName: file.name,
           url: downloadURL,
@@ -85,7 +86,10 @@ export default function DelegateDashboard() {
   return (
     <div className="dashboard-container" style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h2>Delegate Dashboard</h2>
+        <div>
+          <h2 style={{ marginBottom: '0.25rem' }}>Welcome, {userData?.name || (currentUser?.displayName || 'Delegate').split(' ')[0]}!</h2>
+          <p style={{ color: '#666', fontSize: '0.9rem' }}>Delegate Portal — {userData?.grade ? `Grade ${userData.grade}` : 'Profile Incomplete'}</p>
+        </div>
         <button onClick={logout} className="btn btn-secondary">Log Out</button>
       </header>
 
