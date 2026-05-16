@@ -34,12 +34,20 @@ export default function CompleteProfile() {
       setError('');
       setLoading(true);
 
-      await updateUserProfile({
-        name: trimmedName,
-        certificateName: trimmedName,
-        grade: grade,
-        profileComplete: true,
-      });
+      // Create a timeout to prevent the button from being stuck forever
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Request timed out. Please check your connection.")), 10000)
+      );
+
+      await Promise.race([
+        updateUserProfile({
+          name: trimmedName,
+          certificateName: trimmedName,
+          grade: grade,
+          profileComplete: true,
+        }),
+        timeoutPromise
+      ]);
 
       // No need to navigate here; the useEffect above will trigger when profileComplete becomes true
     } catch (err) {
