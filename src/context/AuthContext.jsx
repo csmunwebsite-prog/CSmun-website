@@ -26,6 +26,9 @@ export function AuthProvider({ children }) {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
     
+    // Save to localStorage immediately as a fallback
+    localStorage.setItem(`csmun_role_${user.uid}`, selectedRole);
+    
     // Check if user already exists
     const docRef = doc(db, "users", user.uid);
     const docSnap = await getDoc(docRef);
@@ -34,9 +37,16 @@ export function AuthProvider({ children }) {
     let isProfileComplete = false;
 
     if (docSnap.exists()) {
-      // If user exists, respect their existing role
-      finalRole = docSnap.data().role;
+      // If user exists, respect their existing role, but heal it with selectedRole if it is missing
+      finalRole = docSnap.data().role || selectedRole;
       isProfileComplete = docSnap.data().profileComplete || false;
+      
+      if (!docSnap.data().role) {
+        const userRef = doc(db, 'users', user.uid);
+        await setDoc(userRef, { role: finalRole }, { merge: true });
+      }
+      
+      localStorage.setItem(`csmun_role_${user.uid}`, finalRole);
     } else {
       // Store new user data in Firestore
       await setDoc(docRef, {
@@ -65,13 +75,23 @@ export function AuthProvider({ children }) {
       setCurrentUser(user);
       
       if (user) {
-        // Set a timeout for the Firestore fetch so we don't hang forever
+        // Set a fast 1.5-second timeout for the Firestore fetch to prevent hangs
         const timeoutId = setTimeout(() => {
-          if (loading) {
-            console.warn("Firestore fetch timed out, falling back to default state.");
-            setLoading(false);
-          }
-        }, 10000); // 10 second timeout
+          console.warn("Firestore fetch timed out, falling back to local credentials.");
+          const savedRole = localStorage.getItem(`csmun_role_${user.uid}`) || 'delegate';
+          const savedName = localStorage.getItem(`csmun_name_${user.uid}`) || user.displayName || 'Delegate';
+          setUserData({
+            uid: user.uid,
+            name: savedName,
+            certificateName: savedName,
+            email: user.email,
+            role: savedRole,
+            profileComplete: true
+          });
+          setUserRole(savedRole);
+          setProfileComplete(true);
+          setLoading(false);
+        }, 1500);
 
         const fetchUserData = async () => {
           try {
@@ -80,19 +100,51 @@ export function AuthProvider({ children }) {
             if (docSnap.exists()) {
               const data = docSnap.data();
               console.log("User data fetched:", data);
+              
+              // HEAL: If role is missing or empty in Firestore, heal it immediately using localStorage
+              if (!data.role) {
+                const savedRole = localStorage.getItem(`csmun_role_${user.uid}`) || 'delegate';
+                console.log("Healing user document with role:", savedRole);
+                const userRef = doc(db, 'users', user.uid);
+                await setDoc(userRef, { role: savedRole }, { merge: true });
+                data.role = savedRole;
+              }
+              
+              // Save custom name to localStorage for fallback
+              if (data.name) {
+                localStorage.setItem(`csmun_name_${user.uid}`, data.name);
+              }
+              
+              clearTimeout(timeoutId);
               setUserData(data);
               setUserRole(data.role);
               setProfileComplete(data.profileComplete || false);
+              setLoading(false);
             } else {
               console.log("No user document found in Firestore.");
+              clearTimeout(timeoutId);
               setUserData(null);
               setUserRole(null);
               setProfileComplete(false);
+              setLoading(false);
             }
           } catch (error) {
             console.error("Error fetching user data from Firestore:", error);
-          } finally {
             clearTimeout(timeoutId);
+            
+            // Safe fallback on error
+            const savedRole = localStorage.getItem(`csmun_role_${user.uid}`) || 'delegate';
+            const savedName = localStorage.getItem(`csmun_name_${user.uid}`) || user.displayName || 'Delegate';
+            setUserData({
+              uid: user.uid,
+              name: savedName,
+              certificateName: savedName,
+              email: user.email,
+              role: savedRole,
+              profileComplete: true
+            });
+            setUserRole(savedRole);
+            setProfileComplete(true);
             setLoading(false);
           }
         };
@@ -114,6 +166,11 @@ export function AuthProvider({ children }) {
       console.log("Updating user profile with data:", data);
       const docRef = doc(db, 'users', currentUser.uid);
       await setDoc(docRef, data, { merge: true });
+      
+      // Save name to localStorage immediately
+      if (data.name) {
+        localStorage.setItem(`csmun_name_${currentUser.uid}`, data.name);
+      }
       
       // Refresh local state
       const updatedSnap = await getDoc(docRef);

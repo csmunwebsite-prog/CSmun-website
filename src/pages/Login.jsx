@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [role, setRole] = useState('delegate');
+  const [mentorCode, setMentorCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { loginWithGoogle, currentUser } = useAuth();
@@ -16,6 +17,18 @@ export default function Login() {
   }, [currentUser, navigate]);
 
   async function handleGoogleLogin() {
+    if (role === 'mentor') {
+      const trimmedCode = mentorCode.trim();
+      if (!trimmedCode) {
+        setError('Mentor authorization code is required to sign in as a Mentor.');
+        return;
+      }
+      if (trimmedCode !== 'csmunvi2026') {
+        setError('Invalid Mentor authorization code. Access Denied.');
+        return;
+      }
+    }
+
     try {
       setError('');
       setLoading(true);
@@ -29,47 +42,198 @@ export default function Login() {
   }
 
   return (
-    <div className="auth-container" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0f2f5' }}>
-      <div className="auth-card" style={{ padding: '2rem', background: 'white', borderRadius: '10px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', maxWidth: '400px', width: '100%' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Login to CSMUN</h2>
+    <div className="auth-container" style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      background: 'linear-gradient(135deg, #0a0c16 0%, #12172a 50%, #0a0c16 100%)',
+      fontFamily: "'Inter', sans-serif",
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '2rem 1.5rem'
+    }}>
+      {/* Decorative Blur Spheres */}
+      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(139, 30, 30, 0.15)', filter: 'blur(100px)', borderRadius: '50%', top: '15%', left: '10%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '350px', height: '350px', background: 'rgba(26, 32, 58, 0.35)', filter: 'blur(120px)', borderRadius: '50%', bottom: '15%', right: '10%', pointerEvents: 'none' }}></div>
+
+      <div className="auth-card" style={{ 
+        padding: '3rem 2.5rem', 
+        background: 'rgba(255, 255, 255, 0.03)', 
+        backdropFilter: 'blur(20px)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        borderRadius: '24px', 
+        boxShadow: '0 16px 48px rgba(0,0,0,0.4)', 
+        maxWidth: '440px', 
+        width: '100%',
+        position: 'relative',
+        zIndex: 2
+      }}>
+        <h2 style={{ 
+          textAlign: 'center', 
+          marginBottom: '1rem',
+          color: '#ffffff',
+          fontFamily: "'Outfit', sans-serif",
+          fontWeight: '800',
+          fontSize: '2rem',
+          background: 'linear-gradient(90deg, #ffffff 0%, #cbd5e1 50%, #a72828 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          Login to CSMUN
+        </h2>
+        <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem', marginBottom: '2rem' }}>
+          Welcome back! Please select your portal role and sign in.
+        </p>
         
-        {error && <div className="alert alert-danger" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
-        
-        <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Select Your Role:</label>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            <label style={{ cursor: 'pointer' }}>
-              <input 
-                type="radio" 
-                value="delegate" 
-                checked={role === 'delegate'} 
-                onChange={(e) => setRole(e.target.value)} 
-                style={{ marginRight: '0.5rem' }}
-              /> Delegate
-            </label>
-            <label style={{ cursor: 'pointer' }}>
-              <input 
-                type="radio" 
-                value="mentor" 
-                checked={role === 'mentor'} 
-                onChange={(e) => setRole(e.target.value)} 
-                style={{ marginRight: '0.5rem' }}
-              /> Mentor
-            </label>
+        {error && (
+          <div className="alert alert-danger" style={{ 
+            color: '#ef4444', 
+            backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+            border: '1px solid rgba(239, 68, 68, 0.2)', 
+            padding: '0.85rem', 
+            borderRadius: '8px', 
+            marginBottom: '1.5rem', 
+            textAlign: 'center',
+            fontSize: '0.9rem',
+            fontWeight: '600'
+          }}>
+            {error}
           </div>
-          <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.5rem', textAlign: 'center' }}>
-            If you already have an account, your previous role will be used.
-          </p>
+        )}
+        
+        <div className="form-group" style={{ marginBottom: '2.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'center' }}>
+            Select Your Portal Role:
+          </label>
+          
+          {/* Custom Capsule Toggle Tabs */}
+          <div style={{ 
+            display: 'flex', 
+            background: 'rgba(0, 0, 0, 0.3)', 
+            padding: '4px', 
+            borderRadius: '30px', 
+            border: '1px solid rgba(255, 255, 255, 0.08)' 
+          }}>
+            <button
+              onClick={() => setRole('delegate')}
+              style={{
+                flex: 1,
+                padding: '0.75rem 1rem',
+                border: 'none',
+                borderRadius: '26px',
+                background: role === 'delegate' ? 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)' : 'transparent',
+                color: role === 'delegate' ? '#ffffff' : '#94a3b8',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '0.9rem',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+            >
+              Delegate
+            </button>
+            <button
+              onClick={() => setRole('mentor')}
+              style={{
+                flex: 1,
+                padding: '0.75rem 1rem',
+                border: 'none',
+                borderRadius: '26px',
+                background: role === 'mentor' ? 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)' : 'transparent',
+                color: role === 'mentor' ? '#ffffff' : '#94a3b8',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '0.9rem',
+                textTransform: 'uppercase',
+                letterSpacing: '1px'
+              }}
+            >
+              Mentor
+            </button>
+          </div>
         </div>
+
+        {role === 'mentor' && (
+          <div style={{
+            marginBottom: '2rem',
+            animation: 'fadeIn 0.4s ease-out forwards',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.6rem'
+          }}>
+            <label style={{ display: 'block', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
+              🔑 Mentor Authorization Code:
+            </label>
+            <input 
+              type="password"
+              placeholder="Enter mentor code"
+              value={mentorCode}
+              onChange={(e) => setMentorCode(e.target.value)}
+              style={{
+                width: '100%', 
+                padding: '0.85rem 1.2rem', 
+                borderRadius: '30px', 
+                border: '1px solid rgba(255,255,255,0.1)', 
+                background: 'rgba(0, 0, 0, 0.4)', 
+                color: '#ffffff',
+                fontSize: '0.95rem',
+                outline: 'none',
+                textAlign: 'center',
+                letterSpacing: '2px',
+                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
+                e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                e.target.style.boxShadow = 'none';
+              }}
+            />
+          </div>
+        )}
 
         <button 
           onClick={handleGoogleLogin} 
           disabled={loading} 
-          className="btn btn-primary" 
-          style={{ width: '100%', padding: '0.75rem', border: 'none', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+          style={{ 
+            width: '100%', 
+            padding: '1rem', 
+            border: '1px solid rgba(255, 255, 255, 0.15)', 
+            borderRadius: '30px', 
+            background: 'rgba(255, 255, 255, 0.05)', 
+            color: '#ffffff',
+            fontWeight: '700',
+            cursor: loading ? 'not-allowed' : 'pointer', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '0.75rem',
+            fontSize: '0.95rem',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading) {
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }
+          }}
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style={{ width: '20px' }} />
-          Sign in with Google
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" style={{ width: '20px', height: '20px' }} />
+          {loading ? 'Signing in...' : 'Sign in with Google'}
         </button>
       </div>
     </div>

@@ -43,12 +43,12 @@ export default function Navbar() {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <img 
-              src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.certificateName || currentUser.displayName || 'User')}`} 
+              src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
               alt="Profile" 
               className="app-nav-avatar" 
             />
             <span className="app-nav-user-name">
-              {(userData?.certificateName || currentUser.displayName || 'Account').split(' ')[0]}
+              {(userData?.name || userData?.certificateName || currentUser.displayName || 'Account').split(' ')[0]}
             </span>
             <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
           </button>
@@ -56,7 +56,7 @@ export default function Navbar() {
           {isDropdownOpen && (
             <div className="app-profile-dropdown">
               <div className="dropdown-header">
-                <p className="dropdown-user-name">{userData?.certificateName || currentUser.displayName || 'User'}</p>
+                <p className="dropdown-user-name">{userData?.name || userData?.certificateName || currentUser.displayName || 'User'}</p>
                 <p className="dropdown-user-email">{currentUser.email}</p>
               </div>
               <div className="dropdown-divider"></div>

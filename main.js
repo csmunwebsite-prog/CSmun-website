@@ -1,26 +1,51 @@
-import { auth } from './src/firebase.js';
+import { auth, db } from './src/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // ── Auth state check for registration buttons ──
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
         const authNavItem = document.getElementById('auth-nav-item');
         const heroBtn = document.getElementById('heroRegisterBtn');
         const mainRegBtn = document.getElementById('registerBtn');
 
         if (user) {
-            // Update Navbar to show Profile
-            if (authNavItem) {
-                authNavItem.innerHTML = `
-                    <a href="/app/profile" class="nav-profile-link">
-                        <div class="nav-profile">
-                            <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.displayName || 'User')}" alt="Profile" class="nav-avatar" />
-                            <span class="nav-user-name">${(user.displayName || 'Account').split(' ')[0]}</span>
-                        </div>
-                    </a>
-                `;
+            // 1. Render initial placeholder immediately using auth info
+            let displayNameToShow = (user.displayName || 'Account').split(' ')[0];
+            
+            const renderProfile = (nameText) => {
+                if (authNavItem) {
+                    authNavItem.innerHTML = `
+                        <a href="/app/profile" class="nav-profile-link" style="text-decoration: none;">
+                            <div class="nav-profile">
+                                <img src="${user.photoURL || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(nameText)}" alt="Profile" class="nav-avatar" />
+                                <span class="nav-user-name">${nameText}</span>
+                            </div>
+                        </a>
+                    `;
+                }
+            };
+
+            renderProfile(displayNameToShow);
+
+            // 2. Fetch official name and grade from Firestore
+            try {
+                const userDocRef = doc(db, 'users', user.uid);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    const data = userSnap.data();
+                    const finalName = data.name || data.certificateName || user.displayName || 'Account';
+                    const firstName = finalName.split(' ')[0];
+                    const gradeStr = data.grade ? ` (Gr. ${data.grade})` : (data.role === 'mentor' ? ' (Mentor)' : '');
+                    displayNameToShow = firstName + gradeStr;
+                }
+            } catch (err) {
+                console.error("Error fetching user profile for homepage nav:", err);
             }
+
+            // 3. Re-render with beautiful user-entered details from Firestore
+            renderProfile(displayNameToShow);
 
             // Update other CTA buttons to "Go to Dashboard"
             if (heroBtn) {

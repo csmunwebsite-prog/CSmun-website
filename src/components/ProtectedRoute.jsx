@@ -15,9 +15,12 @@ export function ProtectedRoute({ children, allowedRoles, skipProfileCheck }) {
 
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     console.warn(`Access denied for role: ${userRole}. Required: ${allowedRoles}`);
-    // If they have the wrong role but are complete, send to their actual home to avoid loops
     if (profileComplete) {
-      return <Navigate to={userRole === 'mentor' ? '/app/mentor' : '/app/delegate'} replace />;
+      if (userRole === 'mentor') return <Navigate to="/app/mentor" replace />;
+      if (userRole === 'delegate') return <Navigate to="/app/delegate" replace />;
+      // If role is missing, redirect to login page where they can re-assert it
+      console.warn("User has complete profile but missing role. Redirecting to login.");
+      return <Navigate to="/app/login" replace />;
     }
     return <Navigate to="/app" />;
   }
