@@ -4,6 +4,133 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, addDoc, serverTimestamp, query, where, onSnapshot } from 'firebase/firestore';
 
+const HomeIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+  </svg>
+);
+
+const SettingsIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+  </svg>
+);
+
+const LogOutIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+    <polyline points="16 17 21 12 16 7"></polyline>
+    <line x1="21" y1="12" x2="9" y2="12"></line>
+  </svg>
+);
+
+const GraduationCapIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+  </svg>
+);
+
+const SchoolIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+    <line x1="9" y1="22" x2="9" y2="16"></line>
+    <path d="M9 16h6v6"></path>
+    <line x1="8" y1="6" x2="8" y2="6.01"></line>
+    <line x1="16" y1="6" x2="16" y2="6.01"></line>
+    <line x1="8" y1="10" x2="8" y2="10.01"></line>
+    <line x1="16" y1="10" x2="16" y2="10.01"></line>
+  </svg>
+);
+
+const MapPinIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+    <circle cx="12" cy="10" r="3"></circle>
+  </svg>
+);
+
+const FileIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+  </svg>
+);
+
+const TvIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+    <polyline points="17 2 12 7 7 2"></polyline>
+  </svg>
+);
+
+const BoltIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>
+);
+
+const CalendarIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+    <line x1="16" y1="2" x2="16" y2="6"></line>
+    <line x1="8" y1="2" x2="8" y2="6"></line>
+    <line x1="3" y1="10" x2="21" y2="10"></line>
+  </svg>
+);
+
+const UploadIcon = ({ style }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="17 8 12 3 7 8"></polyline>
+    <line x1="12" y1="3" x2="12" y2="15"></line>
+  </svg>
+);
+
+const LinkIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+  </svg>
+);
+
+const FullscreenIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+  </svg>
+);
+
+const ExitFullscreenIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M4 14h6v6m10-6h-6v6M4 10h6V4m10 6h-6V4"></path>
+  </svg>
+);
+
+const PlayIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+  </svg>
+);
+
+const AlertIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <circle cx="12" cy="12" r="10"></circle>
+    <line x1="12" y1="8" x2="12" y2="12"></line>
+    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+  </svg>
+);
+
+const SuccessIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+  </svg>
+);
+
 const TRAINING_VIDEOS = [
   { id: 'v1', title: 'Opening Speech Guide', url: 'https://www.youtube.com/embed/F7CRCt0Td7A', youtubeId: 'F7CRCt0Td7A', deadline: 'May 20, 2026' },
   { id: 'v2', title: 'Resolution Debate Procedure', url: 'https://www.youtube.com/embed/RpSqJTaiBJI', youtubeId: 'RpSqJTaiBJI', deadline: 'May 24, 2026' },
@@ -577,7 +704,11 @@ export default function DelegateDashboard() {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 30, 30, 0.15)';
               }}
             >
-              📚 View Academic Notes
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              View Academic Notes
             </button>
             <button 
               onClick={() => window.location.href = '/'}
@@ -601,7 +732,7 @@ export default function DelegateDashboard() {
                 e.currentTarget.style.borderColor = '#cbd5e1';
               }}
             >
-              🏠 Home
+              <HomeIcon style={{ marginRight: '0.35rem' }} /> Home
             </button>
             <button 
               onClick={() => navigate('/app/profile')}
@@ -614,7 +745,10 @@ export default function DelegateDashboard() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '0.85rem'
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#f1f5f9';
@@ -625,7 +759,7 @@ export default function DelegateDashboard() {
                 e.currentTarget.style.borderColor = '#cbd5e1';
               }}
             >
-              ⚙️ Profile
+              <SettingsIcon /> Profile
             </button>
             <button 
               onClick={logout} 
@@ -638,7 +772,10 @@ export default function DelegateDashboard() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '0.85rem'
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#8b1e1e';
@@ -649,7 +786,7 @@ export default function DelegateDashboard() {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              🚪 Log Out
+              <LogOutIcon /> Log Out
             </button>
           </div>
         </header>
@@ -713,7 +850,7 @@ export default function DelegateDashboard() {
                 gap: '0.3rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
               }}>
-                🎓 {userData?.grade ? `Grade ${userData.grade}` : 'N/A'}
+                <GraduationCapIcon /> {userData?.grade ? `Grade ${userData.grade}` : 'N/A'}
               </span>
               {userData?.stream && (
                 <span style={{ 
@@ -729,7 +866,7 @@ export default function DelegateDashboard() {
                   gap: '0.3rem',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                 }}>
-                  🏫 {userData.stream}
+                  <SchoolIcon /> {userData.stream}
                 </span>
               )}
               {userData?.section && (
@@ -746,7 +883,7 @@ export default function DelegateDashboard() {
                   gap: '0.3rem',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                 }}>
-                  📍 Sec {userData.section.toUpperCase()}
+                  <MapPinIcon /> Sec {userData.section.toUpperCase()}
                 </span>
               )}
             </div>
@@ -763,11 +900,11 @@ export default function DelegateDashboard() {
               fontWeight: '600'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span>📄</span>
+                <FileIcon style={{ color: '#64748b' }} />
                 <strong>{uploads.length}</strong> Submissions
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <span>📺</span>
+                <TvIcon style={{ color: '#64748b' }} />
                 <strong>{completedVideos.length}</strong> Videos Done
               </div>
             </div>
@@ -796,11 +933,11 @@ export default function DelegateDashboard() {
                   borderRadius: '20px', 
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '0.25rem',
+                  gap: '0.35rem',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
                   marginBottom: '1rem'
                 }}>
-                  ⚡️ ACTIVE STATUS
+                  <BoltIcon /> ACTIVE STATUS
                 </span>
                 <h3 style={{ 
                   fontFamily: "'Outfit', sans-serif", 
@@ -853,7 +990,7 @@ export default function DelegateDashboard() {
             flexDirection: 'column'
           }}>
             <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>📺</span> Training Videos
+              <TvIcon style={{ width: '18px', height: '18px', color: '#8b1e1e' }} /> Training Videos
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
               Watch essential MUN training videos to prepare for your committee.
@@ -1052,7 +1189,7 @@ export default function DelegateDashboard() {
                         alignItems: 'center',
                         gap: '0.35rem'
                       }}>
-                        🗓 Deadline: {video.deadline}
+                        <CalendarIcon /> Deadline: {video.deadline}
                       </span>
                     </div>
                   </div>
@@ -1070,7 +1207,7 @@ export default function DelegateDashboard() {
             boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
           }}>
             <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>📤</span> Document Submissions
+              <UploadIcon style={{ width: '18px', height: '18px', color: '#8b1e1e' }} /> Document Submissions
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
               Submit position papers or draft resolutions to receive scoring.
@@ -1122,7 +1259,7 @@ export default function DelegateDashboard() {
                     onFocus={(e) => e.target.style.borderColor = '#8b1e1e'}
                     onBlur={(e) => e.target.style.borderColor = '#cbd5e1'}
                   />
-                  <span style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', fontSize: '1rem', pointerEvents: 'none' }}>🔗</span>
+                  <span style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', display: 'flex', alignItems: 'center', color: '#64748b' }}><LinkIcon /></span>
                 </div>
                 <span style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '0.1rem', lineHeight: '1.4' }}>
                   💡 Make sure link sharing settings in Google Drive are set to <strong>"Anyone with the link can view"</strong> so your mentors can grade it.
@@ -1241,7 +1378,7 @@ export default function DelegateDashboard() {
               onMouseEnter={(e) => e.currentTarget.style.color = '#8b1e1e'}
               onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
             >
-              {isFullScreenViewer ? '🗗 Exit Fullscreen' : '🖵 Fullscreen'}
+              {isFullScreenViewer ? <><ExitFullscreenIcon style={{ marginRight: '0.25rem' }} /> Exit Fullscreen</> : <><FullscreenIcon style={{ marginRight: '0.25rem' }} /> Fullscreen</>}
             </button>
 
             {/* Close Button */}
@@ -1281,8 +1418,8 @@ export default function DelegateDashboard() {
               minWidth: 0,
               transition: 'all 0.3s ease'
             }}>
-              <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.6rem', color: '#0a2342', fontWeight: '800', margin: 0 }}>
-                🎥 {activeVideo.title}
+              <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.6rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <PlayIcon style={{ width: '22px', height: '22px', color: '#8b1e1e' }} /> {activeVideo.title}
               </h3>
               
               <div 
@@ -1754,11 +1891,13 @@ export default function DelegateDashboard() {
                     padding: '4px 10px', 
                     borderRadius: '20px', 
                     display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
                     alignSelf: 'start',
                     marginBottom: '1rem',
                     letterSpacing: '0.5px'
                   }}>
-                    ⏸️ VIDEO PAUSED (AT {activeCheckpoint.timestampLabel})
+                    <AlertIcon /> VIDEO PAUSED (AT {activeCheckpoint.timestampLabel})
                   </span>
 
                   <form onSubmit={handleCheckpointSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -1805,14 +1944,14 @@ export default function DelegateDashboard() {
                     </div>
 
                     {quizError && (
-                      <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        ⚠️ {quizError}
+                      <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <AlertIcon /> {quizError}
                       </div>
                     )}
 
                     {quizSuccess && (
-                      <div style={{ color: '#16a34a', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        🎉 Correct! Continuing playback...
+                      <div style={{ color: '#16a34a', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                        <SuccessIcon /> Correct! Continuing playback...
                       </div>
                     )}
 
@@ -1849,7 +1988,9 @@ export default function DelegateDashboard() {
                 <div style={{ textAlign: 'center', padding: '1rem' }}>
                   {completedVideos.includes(activeVideo.id) ? (
                     <>
-                      <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🎉</span>
+                      <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: '#d1fae5', color: '#10b981', marginBottom: '1rem' }}>
+                        <SuccessIcon style={{ width: '40px', height: '40px' }} />
+                      </div>
                       <h4 style={{ color: '#16a34a', fontSize: '1.2rem', fontWeight: '800', margin: '0 0 0.5rem 0' }}>Module Completed!</h4>
                       <p style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '1.5rem' }}>
                         Excellent job! You have successfully answered all mid-video checkpoints and fully completed this training module!
@@ -1882,7 +2023,9 @@ export default function DelegateDashboard() {
                     </>
                   ) : (
                     <>
-                      <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '0.5rem' }}>📺</span>
+                      <div style={{ display: 'inline-flex', padding: '0.75rem', borderRadius: '50%', background: '#eff6ff', color: '#3b82f6', marginBottom: '0.5rem' }}>
+                        <TvIcon style={{ width: '30px', height: '30px' }} />
+                      </div>
                       <h4 style={{ color: '#0a2342', fontSize: '1.1rem', fontWeight: '800', margin: '0 0 0.5rem 0' }}>Active Playback</h4>
                       <p style={{ color: '#64748b', fontSize: '0.85rem', lineHeight: '1.5', margin: '0 0 1.5rem 0' }}>
                         Watch the video in full. Playback will pause at <strong>1:50</strong> and <strong>2:50</strong>. Answer correctly to unlock this module!

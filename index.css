@@ -1197,13 +1197,39 @@ ul {
 
 .reveal {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s var(--ease-out);
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
+}
+
+/* Directional Fly-Ins */
+.reveal-up {
+    transform: translateY(120px);
+}
+
+.reveal-down {
+    transform: translateY(-120px);
+}
+
+.reveal-left {
+    transform: translateX(-150px);
+}
+
+.reveal-right {
+    transform: translateX(150px);
+}
+
+.reveal-zoom {
+    transform: scale(0.85) translateY(50px);
+}
+
+/* Fallback default if no direction specified */
+.reveal:not(.reveal-up):not(.reveal-down):not(.reveal-left):not(.reveal-right):not(.reveal-zoom) {
+    transform: translateY(100px);
 }
 
 .reveal.active {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(0, 0) scale(1) !important;
 }
 
 /* ===== DECORATIVE ELEMENTS ===== */

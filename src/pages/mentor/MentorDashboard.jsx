@@ -4,6 +4,119 @@ import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
 import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 
+const HomeIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+    <polyline points="9 22 9 12 15 12 15 22"></polyline>
+  </svg>
+);
+
+const SettingsIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+  </svg>
+);
+
+const LogOutIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+    <polyline points="16 17 21 12 16 7"></polyline>
+    <line x1="21" y1="12" x2="9" y2="12"></line>
+  </svg>
+);
+
+const GraduationCapIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+    <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+  </svg>
+);
+
+const BriefcaseIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+  </svg>
+);
+
+const UsersIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+);
+
+const BoltIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+  </svg>
+);
+
+const PlusIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
+const SearchIcon = ({ style }) => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <circle cx="11" cy="11" r="8"></circle>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+);
+
+const VideoIcon = ({ style }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M23 7l-7 5 7 5V7z"></path>
+    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+  </svg>
+);
+
+const MinusIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
+const UploadIcon = ({ style }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="17 8 12 3 7 8"></polyline>
+    <line x1="12" y1="3" x2="12" y2="15"></line>
+  </svg>
+);
+
+const FileIcon = ({ style }) => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+    <line x1="16" y1="13" x2="8" y2="13"></line>
+    <line x1="16" y1="17" x2="8" y2="17"></line>
+  </svg>
+);
+
+const TrashIcon = ({ style }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
+const HandshakeIcon = ({ style }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+);
+
 export default function MentorDashboard() {
   const { currentUser, userData, logout } = useAuth();
   const navigate = useNavigate();
@@ -336,7 +449,11 @@ export default function MentorDashboard() {
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 30, 30, 0.15)';
               }}
             >
-              📚 View Academic Notes
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              View Academic Notes
             </button>
             <button 
               onClick={() => window.location.href = '/'}
@@ -360,7 +477,7 @@ export default function MentorDashboard() {
                 e.currentTarget.style.borderColor = '#cbd5e1';
               }}
             >
-              🏠 Home
+              <HomeIcon style={{ marginRight: '0.35rem' }} /> Home
             </button>
             <button 
               onClick={() => navigate('/app/profile')}
@@ -373,7 +490,10 @@ export default function MentorDashboard() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '0.85rem'
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = '#f1f5f9';
@@ -384,7 +504,7 @@ export default function MentorDashboard() {
                 e.currentTarget.style.borderColor = '#cbd5e1';
               }}
             >
-              ⚙️ Profile
+              <SettingsIcon /> Profile
             </button>
             <button 
               onClick={logout} 
@@ -397,7 +517,10 @@ export default function MentorDashboard() {
                 fontWeight: '600',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                fontSize: '0.85rem'
+                fontSize: '0.85rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = '#8b1e1e';
@@ -408,7 +531,7 @@ export default function MentorDashboard() {
                 e.currentTarget.style.background = 'transparent';
               }}
             >
-              🚪 Log Out
+              <LogOutIcon /> Log Out
             </button>
           </div>
         </header>
@@ -475,37 +598,53 @@ export default function MentorDashboard() {
               {userData?.name || currentUser?.displayName || 'Mentor'}
             </h3>
 
-            {/* Rounded Badges */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
               <span style={{ 
                 background: '#ffffff', 
                 border: '1px solid #cbd5e1', 
-                padding: '0.5rem 1rem', 
+                padding: '0.4rem 0.85rem', 
                 borderRadius: '30px', 
-                fontSize: '0.85rem', 
+                fontSize: '0.8rem', 
                 fontWeight: '600', 
                 color: '#334155', 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '0.35rem',
+                gap: '0.3rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
               }}>
-                💼 {userData?.committee || 'No Committee'}
+                <GraduationCapIcon /> {userData?.grade ? `Grade ${userData.grade}` : 'N/A'}
               </span>
+              {userData?.committee && (
+                <span style={{ 
+                  background: '#ffffff', 
+                  border: '1px solid #cbd5e1', 
+                  padding: '0.4rem 0.85rem', 
+                  borderRadius: '30px', 
+                  fontSize: '0.8rem', 
+                  fontWeight: '600', 
+                  color: '#334155', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.3rem',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                }}>
+                  <BriefcaseIcon /> {userData.committee}
+                </span>
+              )}
               <span style={{ 
                 background: '#ffffff', 
                 border: '1px solid #cbd5e1', 
-                padding: '0.5rem 1rem', 
+                padding: '0.4rem 0.85rem', 
                 borderRadius: '30px', 
-                fontSize: '0.85rem', 
+                fontSize: '0.8rem', 
                 fontWeight: '600', 
-                color: '#8b1e1e', 
+                color: '#334155', 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '0.35rem',
+                gap: '0.3rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
               }}>
-                👥 Delegate No. : {trackedDelegates.length}
+                <UsersIcon /> {trackedDelegates.length} Delegates
               </span>
             </div>
           </div>
@@ -534,11 +673,11 @@ export default function MentorDashboard() {
                 borderRadius: '20px', 
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.25rem',
+                gap: '0.35rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
                 marginBottom: '1rem'
               }}>
-                ⚡️ MENTOR SPACE
+                <BoltIcon /> MENTOR SPACE
               </span>
               <h3 style={{ 
                 fontFamily: "'Outfit', sans-serif", 
@@ -575,20 +714,15 @@ export default function MentorDashboard() {
             boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
           }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-                <div>
-                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span>👥</span> Your Delegates
-                  </h3>
-                  <p style={{ color: '#64748b', fontSize: '0.85rem', margin: '0.25rem 0 0 0' }}>
-                    Delegates in your committee that you track.
-                  </p>
-                </div>
+                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <UsersIcon style={{ color: '#8b1e1e' }} /> Your Delegates
+                </h3>
                 
                 <button 
                   onClick={() => setShowAddModal(true)}
                   style={{ 
-                    padding: '0.5rem 1.25rem', 
-                    borderRadius: '30px', 
+                    padding: '0.55rem 1.25rem', 
+                    borderRadius: '20px', 
                     background: 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)', 
                     color: '#ffffff', 
                     border: 'none', 
@@ -604,7 +738,7 @@ export default function MentorDashboard() {
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                  <span>➕</span> Add Delegates
+                  <PlusIcon /> Add Delegates
                 </button>
               </div>
 
@@ -665,7 +799,7 @@ export default function MentorDashboard() {
                               color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#64748b',
                               border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`
                             }}>
-                              🎥 {del.completedVideosCount || 0} / 3
+                              <VideoIcon /> {del.completedVideosCount || 0} / 3
                             </span>
                           </td>
                           <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -685,7 +819,7 @@ export default function MentorDashboard() {
                               onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)'}
                               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
-                              ➖ Release
+                              <MinusIcon /> Release
                             </button>
                           </td>
                         </tr>
@@ -704,12 +838,14 @@ export default function MentorDashboard() {
               padding: '2rem',
               boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
             }}>
-              <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span>📤</span> Submissions & Evaluation
-              </h3>
-              <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                Grade and score papers submitted by your tracked delegates. Enter 1-10 to save.
-              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <UploadIcon style={{ color: '#8b1e1e' }} /> Submissions & Evaluation
+                </h3>
+                <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+                  Grade and score papers submitted by your tracked delegates. Enter 1-10 to save.
+                </p>
+              </div>
 
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', color: '#334155', textAlign: 'left', fontSize: '0.85rem' }}>
@@ -732,9 +868,22 @@ export default function MentorDashboard() {
                             href={up.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            style={{ color: '#8b1e1e', fontWeight: '700', textDecoration: 'underline' }}
+                            style={{ 
+                              padding: '0.4rem 0.85rem', 
+                              borderRadius: '20px', 
+                              background: '#eff6ff', 
+                              border: '1px solid #bfdbfe',
+                              color: '#1e40af', 
+                              textDecoration: 'none', 
+                              fontWeight: '700', 
+                              fontSize: '0.75rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.25rem',
+                              transition: 'all 0.2s ease'
+                            }}
                           >
-                            📄 View File
+                            <FileIcon style={{ width: '12px', height: '12px' }} /> View File
                           </a>
                         </td>
                         <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right' }}>
@@ -803,7 +952,7 @@ export default function MentorDashboard() {
                             }}
                             title="Delete Submission"
                           >
-                            🗑️
+                            <TrashIcon />
                           </button>
                         </td>
                       </tr>
@@ -868,7 +1017,7 @@ export default function MentorDashboard() {
             </button>
 
             <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.5rem', color: '#8b1e1e', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <span>➕</span> Add Committee Delegates
+              <PlusIcon style={{ width: '18px', height: '18px', color: '#8b1e1e' }} /> Add Committee Delegates
             </h3>
             <p style={{ color: '#475569', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
               Select available delegates in <strong>{userData.committee}</strong> to add them to your dashboard.
@@ -880,14 +1029,13 @@ export default function MentorDashboard() {
                 flexDirection: 'column', 
                 alignItems: 'center', 
                 justifyContent: 'center', 
-                padding: '3rem 1.5rem',
-                border: '1px dashed #cbd5e1',
-                borderRadius: '12px',
-                background: '#f8fafc',
+                padding: '4rem 2rem',
                 textAlign: 'center'
               }}>
-                <span style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>🤝</span>
-                <strong style={{ color: '#334155', fontSize: '0.95rem', display: 'block' }}>All Delegates Tracked</strong>
+                <div style={{ display: 'inline-flex', padding: '1rem', borderRadius: '50%', background: '#f1f5f9', color: '#64748b', marginBottom: '1rem' }}>
+                  <SearchIcon />
+                </div>
+                <h4 style={{ color: '#475569', fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem' }}>No Tracked Delegates</h4>
                 <span style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '0.25rem' }}>
                   There are no untracked delegates remaining in {userData.committee}.
                 </span>
@@ -911,22 +1059,19 @@ export default function MentorDashboard() {
                     <div>
                       <strong style={{ fontSize: '0.95rem', color: '#0a2342', display: 'block' }}>{del.name || 'Setup Pending'}</strong>
                       <span style={{ color: '#64748b', fontSize: '0.8rem', display: 'block' }}>{del.email}</span>
-                      {(del.grade || del.section || del.stream) && (
-                        <span style={{ fontSize: '0.75rem', color: '#8b1e1e', fontWeight: '700', marginTop: '0.2rem', display: 'inline-block', marginRight: '0.5rem' }}>
-                          Grade {del.grade || '?'}{del.section ? `-${del.section.toUpperCase()}` : ''} {del.stream ? `• ${del.stream}` : ''}
-                        </span>
-                      )}
                       <span style={{ 
-                        fontSize: '0.7rem', 
+                        fontSize: '0.75rem', 
                         color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#475569', 
                         fontWeight: '800', 
                         background: del.completedVideosCount === 3 ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9', 
-                        padding: '2px 8px', 
-                        borderRadius: '10px', 
+                        padding: '4px 10px', 
+                        borderRadius: '12px', 
                         border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
-                        display: 'inline-block' 
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem' 
                       }}>
-                        🎥 {del.completedVideosCount || 0}/3 Done
+                        <VideoIcon /> {del.completedVideosCount || 0}/3 Done
                       </span>
                     </div>
                     <button 
@@ -941,12 +1086,15 @@ export default function MentorDashboard() {
                         fontWeight: '700', 
                         fontSize: '0.85rem',
                         transition: 'all 0.2s ease',
-                        boxShadow: '0 4px 10px rgba(139, 30, 30, 0.15)'
+                        boxShadow: '0 4px 10px rgba(139, 30, 30, 0.15)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.25rem'
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(1.15)'}
                       onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
                     >
-                      ➕ Track
+                      <PlusIcon /> Track
                     </button>
                   </div>
                 ))}
