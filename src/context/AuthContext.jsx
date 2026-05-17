@@ -22,47 +22,89 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   async function loginWithGoogle(selectedRole) {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    
-    // Save to localStorage immediately as a fallback
-    localStorage.setItem(`csmun_role_${user.uid}`, selectedRole);
-    
-    // Check if user already exists
-    const docRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(docRef);
-    
-    let finalRole = selectedRole;
-    let isProfileComplete = false;
-
-    if (docSnap.exists()) {
-      // If user exists, respect their existing role, but heal it with selectedRole if it is missing
-      finalRole = docSnap.data().role || selectedRole;
-      isProfileComplete = docSnap.data().profileComplete || false;
-      
-      if (!docSnap.data().role) {
-        const userRef = doc(db, 'users', user.uid);
-        await setDoc(userRef, { role: finalRole }, { merge: true });
-      }
-      
-      localStorage.setItem(`csmun_role_${user.uid}`, finalRole);
-    } else {
-      // Store new user data in Firestore
-      await setDoc(docRef, {
-        uid: user.uid,
-        email: user.email,
-        role: finalRole,
-        name: user.displayName,
-        profileComplete: false,
-        createdAt: new Date().toISOString()
+    // 1. Proactively clear any stale or corrupt Firebase Auth session data to prevent state-mismatch bugs
+    try {
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.includes('firebase') || key.includes('auth')) {
+          sessionStorage.removeItem(key);
+        }
       });
-      isProfileComplete = false;
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('firebase') || key.includes('auth')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (e) {
+      console.warn("Storage clearing warning:", e);
     }
 
-    setUserRole(finalRole);
-    setProfileComplete(isProfileComplete);
-    return { result, isProfileComplete };
+    const provider = new GoogleAuthProvider();
+    // Force account selection so they don't get trapped in a stale Google session
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      
+      // Save to localStorage immediately as a fallback
+      localStorage.setItem(`csmun_role_${user.uid}`, selectedRole);
+      
+      // Check if user already exists
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
+      
+      let finalRole = selectedRole;
+      let isProfileComplete = false;
+
+      if (docSnap.exists()) {
+        finalRole = docSnap.data().role || selectedRole;
+        isProfileComplete = docSnap.data().profileComplete || false;
+        
+        if (!docSnap.data().role) {
+          const userRef = doc(db, 'users', user.uid);
+          await setDoc(userRef, { role: finalRole }, { merge: true });
+        }
+        
+        localStorage.setItem(`csmun_role_${user.uid}`, finalRole);
+      } else {
+        await setDoc(docRef, {
+          uid: user.uid,
+          email: user.email,
+          role: finalRole,
+          name: user.displayName,
+          profileComplete: false,
+          createdAt: new Date().toISOString()
+        });
+        isProfileComplete = false;
+      }
+
+      setUserRole(finalRole);
+      setProfileComplete(isProfileComplete);
+      return { result, isProfileComplete };
+    } catch (error) {
+      console.error("Firebase Sign-In Error Details:", error);
+      
+      // Check for storage partitioning or Brave Shields / Safari third-party cookie block
+      const isStorageIssue = 
+        error.message?.includes('missing initial state') || 
+        error.message?.includes('sessionStorage') ||
+        error.message?.includes('storage-partitioned') ||
+        error.code === 'auth/web-storage-unsupported';
+
+      if (isStorageIssue) {
+        alert(
+          "⚠️ Secure Sign-In Blocked by Browser:\n\n" +
+          "Your browser is blocking access to local storage/session data, which is required by Google Sign-In.\n\n" +
+          "How to fix this:\n" +
+          "1. If you are using Brave, please click the Shield icon in your URL bar and toggle off Brave Shields for CSMUN.\n" +
+          "2. If you are using Safari, go to Safari Preferences -> Privacy and temporarily uncheck 'Prevent Cross-Site Tracking'.\n" +
+          "3. Try signing in using a private/incognito window or a different browser (Chrome/Firefox)."
+        );
+      } else {
+        alert("Sign-in failed: " + (error.message || "Unknown error occurred. Please try again."));
+      }
+      throw error;
+    }
   }
 
   function logout() {

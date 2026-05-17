@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
-import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 
 export default function MentorDashboard() {
   const { currentUser, userData, logout } = useAuth();
@@ -21,6 +21,14 @@ export default function MentorDashboard() {
 
     try {
       setLoadingData(true);
+      
+      // Fetch all delegate progress records
+      const progressSnapshot = await getDocs(collection(db, 'delegateProgress'));
+      const progressMap = {};
+      progressSnapshot.forEach(doc => {
+        progressMap[doc.id] = doc.data().completedVideos || [];
+      });
+
       // Fetch delegates in the same committee
       const qDelegates = query(
         collection(db, 'users'), 
@@ -28,7 +36,11 @@ export default function MentorDashboard() {
         where('committee', '==', userData.committee)
       );
       const delSnapshot = await getDocs(qDelegates);
-      const committeeDels = delSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const committeeDels = delSnapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        ...doc.data(),
+        completedVideosCount: (progressMap[doc.id] || []).length
+      }));
 
       // Separate into tracked by current mentor vs available (no mentorId)
       const tracked = committeeDels.filter(del => del.mentorId === currentUser.uid);
@@ -119,12 +131,29 @@ export default function MentorDashboard() {
   const rankUpload = async (uploadId, rank) => {
     try {
       setError('');
+      const scoreNum = parseInt(rank, 10);
+      if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 10) {
+        throw new Error("Score must be between 0 and 10.");
+      }
       const uploadRef = doc(db, 'uploads', uploadId);
-      await updateDoc(uploadRef, { rank: parseInt(rank, 10) });
+      await updateDoc(uploadRef, { rank: scoreNum });
       fetchData();
     } catch (err) {
       console.error("Error ranking document:", err);
       setError("Failed to update rank: " + err.message);
+    }
+  };
+
+  const deleteUpload = async (uploadId) => {
+    if (!window.confirm("🗑️ Are you sure you want to delete this document submission? This action will permanently remove it from delegate files and scores.")) return;
+    try {
+      setError('');
+      const uploadRef = doc(db, 'uploads', uploadId);
+      await deleteDoc(uploadRef);
+      fetchData();
+    } catch (err) {
+      console.error("Error deleting document:", err);
+      setError("Failed to delete document: " + err.message);
     }
   };
 
@@ -580,13 +609,14 @@ export default function MentorDashboard() {
                         <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Stream</th>
                         <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Email</th>
                         <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Contact No.</th>
+                        <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', whiteSpace: 'nowrap' }}>Videos Watched</th>
                         <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', textAlign: 'right', whiteSpace: 'nowrap' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {trackedDelegates.map(del => (
                         <tr key={del.id} style={{ borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s ease' }}>
-                          <td style={{ padding: '0.85rem 0.75rem', whiteSpace: 'nowrap' }}>
+                           <td style={{ padding: '0.85rem 0.75rem', whiteSpace: 'nowrap' }}>
                             <strong style={{ color: '#0a2342', display: 'block' }}>{del.name || 'Setup Pending'}</strong>
                           </td>
                           <td style={{ padding: '0.85rem 0.75rem', color: '#475569', whiteSpace: 'nowrap' }}>{del.grade ? `Grade ${del.grade}` : 'N/A'}</td>
@@ -594,6 +624,22 @@ export default function MentorDashboard() {
                           <td style={{ padding: '0.85rem 0.75rem', color: '#475569', whiteSpace: 'nowrap' }}>{del.stream || 'N/A'}</td>
                           <td style={{ padding: '0.85rem 0.75rem', color: '#475569', fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{del.email}</td>
                           <td style={{ padding: '0.85rem 0.75rem', color: '#475569', whiteSpace: 'nowrap' }}>{del.contactNo || 'N/A'}</td>
+                          <td style={{ padding: '0.85rem 0.75rem', whiteSpace: 'nowrap' }}>
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              padding: '0.25rem 0.65rem',
+                              borderRadius: '20px',
+                              fontSize: '0.75rem',
+                              fontWeight: '800',
+                              background: del.completedVideosCount === 3 ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9',
+                              color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#64748b',
+                              border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`
+                            }}>
+                              🎥 {del.completedVideosCount || 0} / 3
+                            </span>
+                          </td>
                           <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
                             <button 
                               onClick={() => removeDelegateFromTrack(del.id)}
@@ -644,8 +690,8 @@ export default function MentorDashboard() {
                       <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700' }}>Delegate</th>
                       <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700' }}>Document Type</th>
                       <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700' }}>Document Link</th>
-                      <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700' }}>Current Score</th>
-                      <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', textAlign: 'right' }}>Evaluate Score</th>
+                      <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', textAlign: 'right' }}>Score (out of 10)</th>
+                      <th style={{ padding: '0.75rem', color: '#475569', fontWeight: '700', textAlign: 'right' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -663,30 +709,74 @@ export default function MentorDashboard() {
                             📄 View File
                           </a>
                         </td>
-                        <td style={{ padding: '0.85rem 0.75rem', color: up.rank ? '#16a34a' : '#64748b', fontWeight: '700' }}>
-                          {up.rank ? `Score: #${up.rank}` : 'Unscored'}
+                        <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right' }}>
+                          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                            <input 
+                              key={`${up.id}_${up.rank !== undefined && up.rank !== null ? up.rank : 'unscored'}`}
+                              type="number" 
+                              min="0" 
+                              max="10" 
+                              placeholder="0-10" 
+                              defaultValue={up.rank !== undefined && up.rank !== null ? up.rank : ''}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.currentTarget.blur();
+                                }
+                              }}
+                              onBlur={async (e) => {
+                                const val = e.target.value;
+                                if (val !== '') {
+                                  const scoreNum = parseInt(val, 10);
+                                  if (!isNaN(scoreNum) && scoreNum >= 0 && scoreNum <= 10) {
+                                    if (scoreNum !== up.rank) {
+                                      await rankUpload(up.id, scoreNum);
+                                    }
+                                  }
+                                }
+                              }}
+                              style={{ 
+                                width: '70px', 
+                                padding: '0.4rem',
+                                borderRadius: '6px',
+                                border: up.rank !== undefined && up.rank !== null ? '1.5px solid #16a34a' : '1px solid #cbd5e1',
+                                background: up.rank !== undefined && up.rank !== null ? '#f0fdf4' : '#ffffff',
+                                color: up.rank !== undefined && up.rank !== null ? '#16a34a' : '#1e293b',
+                                outline: 'none',
+                                textAlign: 'center',
+                                fontWeight: '700',
+                                fontSize: '0.85rem'
+                              }}
+                            />
+                          </div>
                         </td>
                         <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right' }}>
-                          <input 
-                            type="number" 
-                            min="1" 
-                            placeholder="Score" 
-                            defaultValue={up.rank || ''}
-                            onBlur={(e) => {
-                              if (e.target.value) rankUpload(up.id, e.target.value);
+                          <button
+                            onClick={() => deleteUpload(up.id)}
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              fontSize: '1.1rem',
+                              padding: '0.25rem',
+                              borderRadius: '4px',
+                              transition: 'all 0.2s ease',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
                             }}
-                            style={{ 
-                              width: '80px', 
-                              padding: '0.4rem',
-                              borderRadius: '6px',
-                              border: '1px solid #cbd5e1',
-                              background: '#ffffff',
-                              color: '#1e293b',
-                              outline: 'none',
-                              textAlign: 'center',
-                              fontWeight: '700'
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = '#fee2e2';
+                              e.currentTarget.style.transform = 'scale(1.1)';
                             }}
-                          />
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'transparent';
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                            title="Delete Submission"
+                          >
+                            🗑️
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -794,10 +884,22 @@ export default function MentorDashboard() {
                       <strong style={{ fontSize: '0.95rem', color: '#0a2342', display: 'block' }}>{del.name || 'Setup Pending'}</strong>
                       <span style={{ color: '#64748b', fontSize: '0.8rem', display: 'block' }}>{del.email}</span>
                       {(del.grade || del.section || del.stream) && (
-                        <span style={{ fontSize: '0.75rem', color: '#8b1e1e', fontWeight: '700', marginTop: '0.2rem', display: 'inline-block' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#8b1e1e', fontWeight: '700', marginTop: '0.2rem', display: 'inline-block', marginRight: '0.5rem' }}>
                           Grade {del.grade || '?'}{del.section ? `-${del.section.toUpperCase()}` : ''} {del.stream ? `• ${del.stream}` : ''}
                         </span>
                       )}
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#475569', 
+                        fontWeight: '800', 
+                        background: del.completedVideosCount === 3 ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9', 
+                        padding: '2px 8px', 
+                        borderRadius: '10px', 
+                        border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
+                        display: 'inline-block' 
+                      }}>
+                        🎥 {del.completedVideosCount || 0}/3 Done
+                      </span>
                     </div>
                     <button 
                       onClick={() => addDelegateToTrack(del.id)}

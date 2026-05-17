@@ -17,16 +17,14 @@ export default function Login() {
   }, [currentUser, navigate]);
 
   async function handleGoogleLogin() {
-    if (role === 'mentor') {
-      const trimmedCode = mentorCode.trim();
-      if (!trimmedCode) {
-        setError('Mentor authorization code is required to sign in as a Mentor.');
-        return;
-      }
-      if (trimmedCode !== 'csmunvi2026') {
-        setError('Invalid Mentor authorization code. Access Denied.');
-        return;
-      }
+    const trimmedCode = mentorCode.trim();
+    if (!trimmedCode) {
+      setError(`${role === 'mentor' ? 'Mentor' : 'Delegate'} access code is required.`);
+      return;
+    }
+    if (trimmedCode !== 'csmunvi2026') {
+      setError(`Invalid ${role === 'mentor' ? 'Mentor' : 'Delegate'} access code. Access Denied.`);
+      return;
     }
 
     try {
@@ -156,46 +154,44 @@ export default function Login() {
           </div>
         </div>
 
-        {role === 'mentor' && (
-          <div style={{
-            marginBottom: '2rem',
-            animation: 'fadeIn 0.4s ease-out forwards',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.6rem'
-          }}>
-            <label style={{ display: 'block', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
-              🔑 Mentor Authorization Code:
-            </label>
-            <input 
-              type="password"
-              placeholder="Enter mentor code"
-              value={mentorCode}
-              onChange={(e) => setMentorCode(e.target.value)}
-              style={{
-                width: '100%', 
-                padding: '0.85rem 1.2rem', 
-                borderRadius: '30px', 
-                border: '1px solid rgba(255,255,255,0.1)', 
-                background: 'rgba(0, 0, 0, 0.4)', 
-                color: '#ffffff',
-                fontSize: '0.95rem',
-                outline: 'none',
-                textAlign: 'center',
-                letterSpacing: '2px',
-                transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
-                e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.2)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-                e.target.style.boxShadow = 'none';
-              }}
-            />
-          </div>
-        )}
+        <div style={{
+          marginBottom: '2rem',
+          animation: 'fadeIn 0.4s ease-out forwards',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.6rem'
+        }}>
+          <label style={{ display: 'block', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
+            🔑 {role === 'mentor' ? 'Mentor Access Code' : 'Delegate Access Code'}:
+          </label>
+          <input 
+            type="password"
+            placeholder={role === 'mentor' ? "Enter mentor code" : "Enter delegate code"}
+            value={mentorCode}
+            onChange={(e) => setMentorCode(e.target.value)}
+            style={{
+              width: '100%', 
+              padding: '0.85rem 1.2rem', 
+              borderRadius: '30px', 
+              border: '1px solid rgba(255,255,255,0.1)', 
+              background: 'rgba(0, 0, 0, 0.4)', 
+              color: '#ffffff',
+              fontSize: '0.95rem',
+              outline: 'none',
+              textAlign: 'center',
+              letterSpacing: '2px',
+              transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+            }}
+            onFocus={(e) => {
+              e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
+              e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.2)';
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.target.style.boxShadow = 'none';
+            }}
+          />
+        </div>
 
         <button 
           onClick={handleGoogleLogin} 
