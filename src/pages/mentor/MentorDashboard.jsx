@@ -372,12 +372,19 @@ export default function MentorDashboard() {
           </div>
         )}
 
-        {/* Dashboard Content: Two-column layout matching the user's screenshot */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '1.5rem' }}>
+        {/* Top Row: Profile Card and Committee Space Card side-by-side with equal height */}
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          gap: '2rem', 
+          marginTop: '1.5rem',
+          alignItems: 'stretch' 
+        }}>
           
-          {/* Left Column: Premium Profile Card */}
+          {/* Left Box: Premium Profile Card */}
           <div style={{ 
-            flex: '0 0 280px',
+            flex: '1 1 280px',
+            maxWidth: '320px',
             background: '#f4f6fe',
             border: '1px solid #cbd5e1',
             borderRadius: '24px',
@@ -385,7 +392,7 @@ export default function MentorDashboard() {
             boxShadow: '0 4px 20px rgba(10, 35, 66, 0.02)',
             display: 'flex',
             flexDirection: 'column',
-            alignSelf: 'start'
+            justifyContent: 'center'
           }}>
             <span style={{ 
               fontSize: '0.75rem', 
@@ -412,7 +419,7 @@ export default function MentorDashboard() {
             </h3>
 
             {/* Rounded Badges */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
               <span style={{ 
                 background: '#ffffff', 
                 border: '1px solid #cbd5e1', 
@@ -441,87 +448,75 @@ export default function MentorDashboard() {
                 gap: '0.35rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
               }}>
-                ⚡️ Committee Leader
+                👥 Delegate No. : {trackedDelegates.length}
               </span>
             </div>
+          </div>
 
-            {/* Stats Separating Blocks */}
-            <div style={{ borderTop: '1px solid #cbd5e1', paddingTop: '1.5rem', marginTop: 'auto', textAlign: 'center' }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '0.5rem' }}>
-                TRACKED DELEGATES
+          {/* Right Box: Committee Space Info Card */}
+          <div style={{ 
+            flex: '2 1 500px',
+            background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
+            border: '1px solid #cbd5e1',
+            borderRadius: '24px',
+            padding: '2rem 2.5rem',
+            boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1.5rem'
+          }}>
+            <div>
+              <span style={{ 
+                background: '#ffffff', 
+                color: '#2563eb', 
+                fontSize: '0.75rem', 
+                fontWeight: '800', 
+                padding: '4px 12px', 
+                borderRadius: '20px', 
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
+                marginBottom: '1rem'
+              }}>
+                ⚡️ MENTOR SPACE
               </span>
-              <strong style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0a2342', display: 'block', marginBottom: '0.25rem' }}>
-                {trackedDelegates.length}
-              </strong>
-              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>delegates</span>
-              <div style={{ marginTop: '0.5rem', background: '#dbeafe', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.5rem auto 0 auto' }}>
-                👥
+              <h3 style={{ 
+                fontFamily: "'Outfit', sans-serif", 
+                fontSize: '1.6rem', 
+                color: '#0a2342', 
+                margin: '0 0 0.5rem 0',
+                fontWeight: '800'
+              }}>
+                {userData?.committee || 'No Committee Assigned'}
+              </h3>
+              <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0, maxWidth: '480px', lineHeight: '1.5' }}>
+                Manage and evaluate delegates who are part of your committee. View document submissions and assign progress rank scores.
+              </p>
+            </div>
+
+            {/* White rounded momentum capsule elements */}
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <div style={{ background: '#ffffff', padding: '1rem 1.25rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
+                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>TRACKING</span>
+                <strong style={{ fontSize: '1.2rem', color: '#0a2342', display: 'block', marginTop: '0.25rem' }}>{trackedDelegates.length}</strong>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Dynamic Widgets Grid */}
-          <div style={{ flex: '2 1 600px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            
-            {/* Wide Momentum Pastel Gradient Card (Top Row) */}
-            <div style={{ 
-              background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
-              borderRadius: '24px',
-              padding: '2rem 2.5rem',
-              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '1.5rem'
-            }}>
-              <div>
-                <span style={{ 
-                  background: '#ffffff', 
-                  color: '#2563eb', 
-                  fontSize: '0.75rem', 
-                  fontWeight: '800', 
-                  padding: '4px 12px', 
-                  borderRadius: '20px', 
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.25rem',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-                  marginBottom: '1rem'
-                }}>
-                  ⚡️ MENTOR SPACE
-                </span>
-                <h3 style={{ 
-                  fontFamily: "'Outfit', sans-serif", 
-                  fontSize: '1.6rem', 
-                  color: '#0a2342', 
-                  margin: '0 0 0.5rem 0',
-                  fontWeight: '800'
-                }}>
-                  {userData?.committee || 'No Committee Assigned'}
-                </h3>
-                <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0, maxWidth: '480px', lineHeight: '1.5' }}>
-                  Manage and evaluate delegates who are part of your committee. View document submissions and assign progress rank scores.
-                </p>
-              </div>
+        </div>
 
-              {/* White rounded momentum capsule elements */}
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ background: '#ffffff', padding: '1rem 1.25rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>TRACKING</span>
-                  <strong style={{ fontSize: '1.2rem', color: '#0a2342', display: 'block', marginTop: '0.25rem' }}>{trackedDelegates.length}</strong>
-                </div>
-              </div>
-            </div>
-
-            {/* Tracked Delegates Table Card */}
-            <div style={{ 
-              background: '#ffffff', 
-              border: '1px solid #cbd5e1',
-              borderRadius: '24px',
-              padding: '2rem',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
-            }}>
+        {/* Bottom Row: Tracked Delegates Table Card (Full Width) */}
+        <div style={{ marginTop: '2rem' }}>
+          <div style={{ 
+            background: '#ffffff', 
+            border: '1px solid #cbd5e1',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
+          }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                   <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -708,10 +703,7 @@ export default function MentorDashboard() {
             </div>
 
           </div>
-
         </div>
-
-      </div>
 
       {/* Add Delegates Modal Overlay */}
       {showAddModal && (

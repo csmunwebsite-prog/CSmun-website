@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { db, storage } from '../../firebase';
@@ -6,96 +6,42 @@ import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, addDoc, serverT
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const TRAINING_VIDEOS = [
-  { id: 'v1', title: 'Opening Speech Guide', url: 'https://www.youtube.com/embed/F7CRCt0Td7A' },
-  { id: 'v2', title: 'Resolution Debate Procedure', url: 'https://www.youtube.com/embed/RpSqJTaiBJI' },
-  { id: 'v3', title: 'How to Write a Position Paper', url: 'https://www.youtube.com/embed/rP1hD1vN5bY' }
+  { id: 'v1', title: 'Opening Speech Guide', url: 'https://www.youtube.com/embed/F7CRCt0Td7A', youtubeId: 'F7CRCt0Td7A', deadline: 'May 20, 2026' },
+  { id: 'v2', title: 'Resolution Debate Procedure', url: 'https://www.youtube.com/embed/RpSqJTaiBJI', youtubeId: 'RpSqJTaiBJI', deadline: 'May 24, 2026' },
+  { id: 'v3', title: 'How to Write a Position Paper', url: 'https://www.youtube.com/embed/rP1hD1vN5bY', youtubeId: 'rP1hD1vN5bY', deadline: 'May 28, 2026' }
 ];
 
-const VIDEO_CHECKPOINTS = {
-  v1: [
-    {
-      id: 'v1_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "In an MUN opening speech, what should your hook or opening sentence ideally do?",
-      options: [
-        "Grab the committee's attention with a statistic, quote, or strong statement",
-        "Read the entire country profile document",
-        "Make a personal joke about another delegate",
-        "Say 'Hello everyone, I don't know what to say'"
-      ],
-      correct: "Grab the committee's attention with a statistic, quote, or strong statement"
-    },
-    {
-      id: 'v1_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "How long is a standard MUN opening speech typically limited to?",
-      options: [
-        "60 to 90 seconds",
-        "10 to 15 minutes",
-        "5 seconds",
-        "Unlimited time"
-      ],
-      correct: "60 to 90 seconds"
-    }
-  ],
-  v2: [
-    {
-      id: 'v2_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "What is a 'Sponsor' of a draft resolution?",
-      options: [
-        "A country that actively wrote and supports the resolution",
-        "A country that is paying money for the room",
-        "A delegate who is absent",
-        "The chair of the committee"
-      ],
-      correct: "A country that actively wrote and supports the resolution"
-    },
-    {
-      id: 'v2_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "What does a 'Motion to introduce a draft resolution' require to pass?",
-      options: [
-        "Approval by the Chair and a simple majority of the committee",
-        "Unanimous agreement of all nations",
-        "Payment of fee",
-        "No votes at all"
-      ],
-      correct: "Approval by the Chair and a simple majority of the committee"
-    }
-  ],
-  v3: [
-    {
-      id: 'v3_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "Which section is crucial to include in the opening of a Position Paper?",
-      options: [
-        "A background analysis of the topic from your country's viewpoint",
-        "Your favorite food list",
-        "A critique of other delegates' outfits",
-        "A greeting to your friends"
-      ],
-      correct: "A background analysis of the topic from your country's viewpoint"
-    },
-    {
-      id: 'v3_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "What should the final section of a Position Paper propose?",
-      options: [
-        "Specific, actionable solutions and draft policy recommendations",
-        "A complaint about the session length",
-        "No solutions at all",
-        "A request to change committees"
-      ],
-      correct: "Specific, actionable solutions and draft policy recommendations"
-    }
-  ]
+const VIDEO_QUIZZES = {
+  v1: {
+    question: "What is the primary focus of an MUN Opening Speech?",
+    options: [
+      "To introduce your nation's policy and main concerns on the agenda",
+      "To challenge the chairs",
+      "To write a resolution",
+      "To socialize with delegates"
+    ],
+    correct: "To introduce your nation's policy and main concerns on the agenda"
+  },
+  v2: {
+    question: "During resolution debates, what does the delegate prioritize explaining?",
+    options: [
+      "The clauses, policies, and actions of the proposed draft resolution",
+      "Criticizing the host nation",
+      "Submitting a personal complaint",
+      "Leaving the committee room"
+    ],
+    correct: "The clauses, policies, and actions of the proposed draft resolution"
+  },
+  v3: {
+    question: "What is the primary purpose of a Position Paper in MUN?",
+    options: [
+      "To outline your country's policy on the agenda topic",
+      "To criticize other countries",
+      "To draft a final resolution",
+      "To write a speech for the opening ceremony"
+    ],
+    correct: "To outline your country's policy on the agenda topic"
+  }
 };
 
 export default function DelegateDashboard() {
@@ -116,13 +62,6 @@ export default function DelegateDashboard() {
   const [quizError, setQuizError] = useState('');
   const [quizSuccess, setQuizSuccess] = useState(false);
   const [isFullScreenViewer, setIsFullScreenViewer] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isMouseActive, setIsMouseActive] = useState(true);
-
-  // High-performance dynamic YT state tracking
-  const [answeredCheckpoints, setAnsweredCheckpoints] = useState([]);
-  const [activeCheckpoint, setActiveCheckpoint] = useState(null);
-  const [ytPlayer, setYtPlayer] = useState(null);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -143,139 +82,13 @@ export default function DelegateDashboard() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setCompletedVideos(docSnap.data().completedVideos || []);
-          setAnsweredCheckpoints(docSnap.data().answeredCheckpoints || []);
         } else {
-          await setDoc(docRef, { completedVideos: [], answeredCheckpoints: [] });
+          await setDoc(docRef, { completedVideos: [] });
         }
       }
     };
     fetchProgress();
   }, [currentUser]);
-
-  // Load YouTube Player Iframe API Script
-  useEffect(() => {
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-  }, []);
-
-  // Set up high-performance tracking for playback timestamps
-  useEffect(() => {
-    if (!activeVideo) {
-      if (ytPlayer) {
-        try {
-          ytPlayer.destroy();
-        } catch (e) {
-          console.error("Error destroying player:", e);
-        }
-      }
-      setYtPlayer(null);
-      setActiveCheckpoint(null);
-      return;
-    }
-
-    let intervalId;
-
-    const initPlayer = () => {
-      const videoId = activeVideo.url.split('/').pop().split('?')[0];
-      
-      const player = new window.YT.Player('csmun-yt-player', {
-        height: '100%',
-        width: '100%',
-        videoId: videoId,
-        playerVars: {
-          enablejsapi: 1,
-          rel: 0,
-          modestbranding: 1,
-          fs: 0 // Disable cross-origin fullscreen button inside the YouTube player
-        },
-        events: {
-          onReady: () => {
-            setYtPlayer(player);
-            
-            // Check video time progress every 500ms
-            intervalId = setInterval(() => {
-              try {
-                if (player && typeof player.getCurrentTime === 'function' && player.getPlayerState() === 1) {
-                  const currentTime = player.getCurrentTime();
-                  const checkpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
-                  
-                  // Check if they crossed any checkpoint they haven't answered yet
-                  const pendingCP = checkpoints.find(cp => 
-                    currentTime >= cp.timestamp && 
-                    !answeredCheckpoints.includes(cp.id)
-                  );
-                  
-                  if (pendingCP) {
-                    player.pauseVideo();
-                    setActiveCheckpoint(pendingCP);
-                    setSelectedQuizOption('');
-                    setQuizError('');
-                    setQuizSuccess(false);
-                    setIsSidebarOpen(true); // Automatically slide sidebar open when question triggers!
-                    setIsMouseActive(true); // Keep controls visible!
-                  }
-                }
-              } catch (err) {
-                console.error("Playback tracking error:", err);
-              }
-            }, 500);
-          }
-        }
-      });
-    };
-
-    if (window.YT && window.YT.Player) {
-      initPlayer();
-    } else {
-      window.onYouTubeIframeAPIReady = () => {
-        initPlayer();
-      };
-    }
-
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [activeVideo, answeredCheckpoints]);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) {
-        setIsFullScreenViewer(false);
-      }
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!activeVideo) return;
-    
-    let timeoutId;
-    const handleMouseMove = () => {
-      setIsMouseActive(true);
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        // If the video is paused at a checkpoint question, do NOT hide the top controls!
-        if (!activeCheckpoint) {
-          setIsMouseActive(false);
-        }
-      }, 2000);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    handleMouseMove(); // Initial trigger
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      clearTimeout(timeoutId);
-    };
-  }, [activeVideo, activeCheckpoint]);
 
   useEffect(() => {
     const fetchMentorName = async () => {
@@ -316,29 +129,17 @@ export default function DelegateDashboard() {
   const resetVideoProgress = async (videoId) => {
     try {
       const updatedCompleted = completedVideos.filter(id => id !== videoId);
-      const updatedAnswered = answeredCheckpoints.filter(id => !id.startsWith(videoId));
-      
       setCompletedVideos(updatedCompleted);
-      setAnsweredCheckpoints(updatedAnswered);
 
       const docRef = doc(db, 'delegateProgress', currentUser.uid);
       await setDoc(docRef, {
-        completedVideos: updatedCompleted,
-        answeredCheckpoints: updatedAnswered
+        completedVideos: updatedCompleted
       }, { merge: true });
       
-      // Reset active checkpoint in state if this video is active in player
       if (activeVideo && activeVideo.id === videoId) {
-        setActiveCheckpoint(null);
         setSelectedQuizOption('');
         setQuizError('');
         setQuizSuccess(false);
-        
-        // Seek back to 0 and play!
-        if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
-          ytPlayer.seekTo(0);
-          ytPlayer.playVideo();
-        }
       }
     } catch (err) {
       console.error("Error resetting video progress:", err);
@@ -346,63 +147,24 @@ export default function DelegateDashboard() {
   };
 
   const toggleModalFullscreen = () => {
-    const modalElement = document.getElementById('csmun-video-modal-container');
-    if (!modalElement) return;
-
-    if (!document.fullscreenElement) {
-      modalElement.requestFullscreen().then(() => {
-        setIsFullScreenViewer(true);
-      }).catch(err => {
-        console.error("Error enabling fullscreen:", err);
-        setIsFullScreenViewer(true); // Fallback to CSS fullscreen
-      });
-    } else {
-      document.exitFullscreen().then(() => {
-        setIsFullScreenViewer(false);
-      }).catch(err => {
-        console.error("Error exiting fullscreen:", err);
-        setIsFullScreenViewer(false);
-      });
-    }
+    setIsFullScreenViewer(!isFullScreenViewer);
   };
 
-  const handleCheckpointSubmit = async (e) => {
+  const handleQuizSubmit = async (e) => {
     e.preventDefault();
-    if (!activeVideo || !activeCheckpoint) return;
+    if (!activeVideo) return;
     
-    if (selectedQuizOption === activeCheckpoint.correct) {
+    const quiz = VIDEO_QUIZZES[activeVideo.id];
+    if (selectedQuizOption === quiz.correct) {
       setQuizError('');
       setQuizSuccess(true);
       
-      const newAnswered = [...answeredCheckpoints, activeCheckpoint.id];
-      setAnsweredCheckpoints(newAnswered);
+      await markCompleted(activeVideo.id);
       
-      // Update Firestore
-      const docRef = doc(db, 'delegateProgress', currentUser.uid);
-      await updateDoc(docRef, {
-        answeredCheckpoints: arrayUnion(activeCheckpoint.id)
-      });
-
-      // Check if all checkpoints for this video are completed
-      const allVideoCheckpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
-      const hasUnfinished = allVideoCheckpoints.some(cp => !newAnswered.includes(cp.id));
-      
-      if (!hasUnfinished) {
-        // Complete the video!
-        await markCompleted(activeVideo.id);
-      }
-
       setTimeout(() => {
         setQuizSuccess(false);
         setSelectedQuizOption('');
-        setActiveCheckpoint(null);
-        setIsSidebarOpen(false); // Automatically slide sidebar closed and return to full-bleed video player!
-        
-        // Resume YouTube video playback
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-          ytPlayer.playVideo();
-        }
-      }, 1500);
+      }, 2000);
     } else {
       setQuizSuccess(false);
       setQuizError('Incorrect answer. Please review the video and try again!');
@@ -570,20 +332,25 @@ export default function DelegateDashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content: Two-column layout matching the user's screenshot */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '1.5rem' }}>
+        {/* TOP ROW: Profile Card & Committee Card Side-by-Side with Matching Height */}
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          gap: '2rem', 
+          marginTop: '1.5rem',
+          alignItems: 'stretch' // Force matching heights!
+        }}>
           
-          {/* Left Column: Premium Profile Card */}
+          {/* Left Column: Premium Profile Card with Sleek, Compressed Height */}
           <div style={{ 
-            flex: '0 0 280px',
+            flex: '1 1 280px', // Stretchable flex width
             background: '#f4f6fe',
             border: '1px solid #cbd5e1',
             borderRadius: '24px',
-            padding: '1.5rem',
+            padding: '1.25rem', // Compressed padding
             boxShadow: '0 4px 20px rgba(10, 35, 66, 0.02)',
             display: 'flex',
-            flexDirection: 'column',
-            alignSelf: 'start'
+            flexDirection: 'column' // Height matches via flexbox stretch
           }}>
             <span style={{ 
               fontSize: '0.75rem', 
@@ -593,16 +360,16 @@ export default function DelegateDashboard() {
               letterSpacing: '1px', 
               display: 'block', 
               textAlign: 'center', 
-              marginBottom: '1rem' 
+              marginBottom: '0.4rem' // Reduced margin
             }}>
               CSMUN VI 2026 DELEGATE
             </span>
 
             <h3 style={{ 
-              fontSize: '1.6rem', 
+              fontSize: '1.5rem', // Sleeker font size
               fontWeight: '800', 
               color: '#0a2342', 
-              margin: '0 0 1.5rem 0', 
+              margin: '0 0 0.75rem 0', // Compressed margin
               fontFamily: "'Outfit', sans-serif", 
               textAlign: 'center' 
             }}>
@@ -610,18 +377,18 @@ export default function DelegateDashboard() {
             </h3>
 
             {/* Rounded Badges */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
               <span style={{ 
                 background: '#ffffff', 
                 border: '1px solid #cbd5e1', 
-                padding: '0.5rem 1rem', 
+                padding: '0.4rem 0.85rem', 
                 borderRadius: '30px', 
-                fontSize: '0.85rem', 
+                fontSize: '0.8rem', 
                 fontWeight: '600', 
                 color: '#334155', 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '0.35rem',
+                gap: '0.3rem',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
               }}>
                 🎓 {userData?.grade ? `Grade ${userData.grade}` : 'N/A'}
@@ -630,14 +397,14 @@ export default function DelegateDashboard() {
                 <span style={{ 
                   background: '#ffffff', 
                   border: '1px solid #cbd5e1', 
-                  padding: '0.5rem 1rem', 
+                  padding: '0.4rem 0.85rem', 
                   borderRadius: '30px', 
-                  fontSize: '0.85rem', 
+                  fontSize: '0.8rem', 
                   fontWeight: '600', 
                   color: '#334155', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.35rem',
+                  gap: '0.3rem',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                 }}>
                   🏫 {userData.stream}
@@ -647,14 +414,14 @@ export default function DelegateDashboard() {
                 <span style={{ 
                   background: '#ffffff', 
                   border: '1px solid #cbd5e1', 
-                  padding: '0.5rem 1rem', 
+                  padding: '0.4rem 0.85rem', 
                   borderRadius: '30px', 
-                  fontSize: '0.85rem', 
+                  fontSize: '0.8rem', 
                   fontWeight: '600', 
                   color: '#334155', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.35rem',
+                  gap: '0.3rem',
                   boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
                 }}>
                   📍 Sec {userData.section.toUpperCase()}
@@ -662,50 +429,41 @@ export default function DelegateDashboard() {
               )}
             </div>
 
-            {/* Stats Separating Blocks (matching streak sections) */}
-            <div style={{ display: 'flex', borderTop: '1px solid #cbd5e1', paddingTop: '1.5rem', marginTop: 'auto' }}>
-              <div style={{ flex: 1, textAlign: 'center', borderRight: '1px solid #cbd5e1' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '0.5rem' }}>
-                  SUBMISSIONS
-                </span>
-                <strong style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0a2342', display: 'block', marginBottom: '0.25rem' }}>
-                  {uploads.length}
-                </strong>
-                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>papers</span>
-                <div style={{ marginTop: '0.5rem', background: '#fef3c7', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.5rem auto 0 auto' }}>
-                  📄
-                </div>
+            {/* Compact Stats Row - Highly professional single line to match user's screenshot height */}
+            <div style={{ 
+              display: 'flex', 
+              borderTop: '1px solid #cbd5e1', 
+              paddingTop: '0.85rem', 
+              marginTop: 'auto',
+              justifyContent: 'space-between',
+              fontSize: '0.75rem',
+              color: '#475569',
+              fontWeight: '600'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span>📄</span>
+                <strong>{uploads.length}</strong> Submissions
               </div>
-              <div style={{ flex: 1, textAlign: 'center' }}>
-                <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '0.5rem' }}>
-                  VIDEOS DONE
-                </span>
-                <strong style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0a2342', display: 'block', marginBottom: '0.25rem' }}>
-                  {completedVideos.length}
-                </strong>
-                <span style={{ fontSize: '0.75rem', color: '#64748b' }}>videos</span>
-                <div style={{ marginTop: '0.5rem', background: '#dbeafe', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0.5rem auto 0 auto' }}>
-                  📺
-                </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span>📺</span>
+                <strong>{completedVideos.length}</strong> Videos Done
               </div>
             </div>
           </div>
 
-          {/* Right Column: Dynamic Widgets Grid */}
-          <div style={{ flex: '2 1 600px', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            
-            {/* Wide Momentum Pastel Gradient Card (Top Row) */}
-            <div style={{ 
-              background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
-              borderRadius: '24px',
-              padding: '2rem 2.5rem',
-              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '1.5rem'
-            }}>
+          {/* Committee Card (Top Right) */}
+          <div style={{ 
+            flex: '2 1 600px',
+            background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
+            borderRadius: '24px',
+            padding: '2rem 2.5rem',
+            boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1.5rem'
+          }}>
               <div>
                 <span style={{ 
                   background: '#ffffff', 
@@ -751,270 +509,154 @@ export default function DelegateDashboard() {
                   <strong style={{ fontSize: '1.1rem', color: '#0a2342', display: 'block', marginTop: '0.25rem' }}>{userData?.section?.toUpperCase() || 'N/A'}</strong>
                 </div>
               </div>
+          </div>
+        </div>
+
+        {/* BOTTOM ROW: Fully Stretched Document Submissions and Training Progress Cards stacked vertically */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '2rem', 
+          marginTop: '2rem' 
+        }}>
+          
+          {/* Training Videos (Card 2) */}
+          <div style={{ 
+            background: '#ffffff', 
+            border: '1px solid #cbd5e1',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.01)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>📺</span> Training Videos
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
+              Watch essential MUN training videos to prepare for your committee.
+            </p>
+
+            {/* Progress bar */}
+            <div style={{ position: 'relative', background: '#f1f5f9', borderRadius: '10px', height: '20px', margin: '0.5rem 0 1.5rem 0', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+              <div style={{ 
+                background: 'linear-gradient(90deg, #8b1e1e 0%, #c24646 100%)', 
+                height: '100%', 
+                borderRadius: '10px', 
+                width: `${progressPercentage}%`, 
+                transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}></div>
+              <span style={{ position: 'absolute', right: '10px', top: '1px', fontSize: '0.75rem', fontWeight: 'bold', color: progressPercentage > 5 ? '#ffffff' : '#334155' }}>
+                {progressPercentage}%
+              </span>
             </div>
 
-            {/* Bottom Row grid: Submissions (Card 1) & Resources (Card 2) */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-              
-              {/* Document Upload (Card 1) */}
-              <div style={{ 
-                background: '#ffffff', 
-                border: '1px solid #cbd5e1',
-                borderRadius: '24px',
-                padding: '2rem',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
-              }}>
-                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📤</span> Document Submissions
-                </h3>
-                <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-                  Submit position papers or draft resolutions to receive scoring.
-                </p>
-                
-                <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                  <div>
-                    <label style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.8rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Document Type</label>
-                    <select 
-                      value={uploadType} 
-                      onChange={(e) => setUploadType(e.target.value)} 
-                      style={{ 
-                        width: '100%', 
-                        padding: '0.8rem', 
-                        borderRadius: '8px', 
-                        border: '1px solid #cbd5e1', 
-                        background: '#ffffff', 
-                        color: '#1e293b',
-                        fontSize: '0.9rem',
-                        outline: 'none',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <option value="position_paper">Position Paper</option>
-                      <option value="draft_resolution">Draft Resolution</option>
-                    </select>
-                  </div>
-                  
-                  <div style={{
-                    border: '2px dashed #cbd5e1',
-                    borderRadius: '12px',
-                    padding: '1.5rem',
-                    textAlign: 'center',
-                    background: '#f8fafc',
-                    cursor: 'pointer',
-                    position: 'relative'
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+              {TRAINING_VIDEOS.map((video, idx) => {
+                const isUnlocked = idx === 0 || completedVideos.includes(TRAINING_VIDEOS[idx - 1].id);
+                return (
+                  <div key={video.id} style={{ 
+                    background: '#f8fafc', 
+                    border: '1px solid #e2e8f0', 
+                    borderRadius: '16px',
+                    padding: '1.25rem',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1.25rem',
+                    cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                    opacity: isUnlocked ? 1 : 0.55,
+                    filter: isUnlocked ? 'none' : 'grayscale(70%)',
+                    pointerEvents: isUnlocked ? 'auto' : 'none'
                   }}
-                  onDragOver={(e) => e.preventDefault()}
-                  >
-                    <input 
-                      type="file" 
-                      onChange={(e) => setFile(e.target.files[0])} 
-                      style={{ 
-                        position: 'absolute',
-                        top: 0, left: 0, width: '100%', height: '100%',
-                        opacity: 0, cursor: 'pointer'
-                      }} 
-                    />
-                    <span style={{ fontSize: '1.8rem', display: 'block', marginBottom: '0.25rem' }}>📄</span>
-                    <span style={{ display: 'block', color: file ? '#8b1e1e' : '#334155', fontWeight: file ? '700' : '500', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {file ? file.name : 'Drag here or choose file'}
-                    </span>
-                    <span style={{ display: 'block', fontSize: '0.7rem', color: '#64748b', marginTop: '0.25rem' }}>
-                      PDF, DOCX, or text files
-                    </span>
-                  </div>
-
-                  {uploadProgress > 0 && uploadProgress < 100 && (
-                    <div style={{ width: '100%', background: '#f1f5f9', borderRadius: '10px', height: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
-                      <div style={{ background: '#8b1e1e', height: '100%', width: `${uploadProgress}%` }}></div>
-                    </div>
-                  )}
-
-                  <button 
-                    type="submit" 
-                    disabled={!file || (uploadProgress > 0 && uploadProgress < 100)} 
-                    style={{ 
-                      width: '100%', 
-                      padding: '0.85rem', 
-                      borderRadius: '30px', 
-                      background: !file ? '#e2e8f0' : 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)', 
-                      color: !file ? '#94a3b8' : '#ffffff', 
-                      border: 'none', 
-                      cursor: !file ? 'not-allowed' : 'pointer', 
-                      fontWeight: '700', 
-                      fontSize: '0.9rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '1px',
-                      transition: 'all 0.3s ease',
-                      boxShadow: file ? '0 4px 12px rgba(139, 30, 30, 0.15)' : 'none'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (file) e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
-                      if (file) e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                  >
-                    {uploadProgress > 0 && uploadProgress < 100 ? 'Uploading...' : 'Submit Paper'}
-                  </button>
-                  
-                  {uploadMessage && (
-                    <p style={{ 
-                      textAlign: 'center',
-                      fontWeight: '600',
-                      color: uploadMessage.includes('success') ? '#16a34a' : '#ef4444',
-                      fontSize: '0.85rem',
-                      margin: 0 
-                    }}>
-                      {uploadMessage}
-                    </p>
-                  )}
-                </form>
-              </div>
-
-              {/* Training Progress (Card 2) */}
-              <div style={{ 
-                background: '#ffffff', 
-                border: '1px solid #cbd5e1',
-                borderRadius: '24px',
-                padding: '2rem',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.01)',
-                display: 'flex',
-                flexDirection: 'column'
-              }}>
-                <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>📺</span> Training Progress
-                </h3>
-                <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                  Watch essential MUN training videos to prepare for your committee.
-                </p>
-
-                {/* Progress bar */}
-                <div style={{ position: 'relative', background: '#f1f5f9', borderRadius: '10px', height: '20px', margin: '0.5rem 0 1.5rem 0', overflow: 'hidden', border: '1px solid #cbd5e1' }}>
-                  <div style={{ 
-                    background: 'linear-gradient(90deg, #8b1e1e 0%, #c24646 100%)', 
-                    height: '100%', 
-                    borderRadius: '10px', 
-                    width: `${progressPercentage}%`, 
-                    transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
-                  }}></div>
-                  <span style={{ position: 'absolute', right: '10px', top: '1px', fontSize: '0.75rem', fontWeight: 'bold', color: progressPercentage > 5 ? '#ffffff' : '#334155' }}>
-                    {progressPercentage}%
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                  {TRAINING_VIDEOS.map(video => (
-                    <div key={video.id} style={{ 
-                      background: '#f8fafc', 
-                      border: '1px solid #e2e8f0', 
-                      borderRadius: '16px',
-                      padding: '1.25rem',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1rem',
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => setActiveVideo(video)}
-                    onMouseEnter={(e) => {
+                  onClick={() => {
+                    if (isUnlocked) setActiveVideo(video);
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isUnlocked) {
                       e.currentTarget.style.borderColor = 'rgba(139, 30, 30, 0.3)';
                       e.currentTarget.style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={(e) => {
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (isUnlocked) {
                       e.currentTarget.style.borderColor = '#e2e8f0';
                       e.currentTarget.style.transform = 'translateY(0)';
-                    }}
-                    >
-                      {/* Premium Video Thumbnail Icon */}
+                    }
+                  }}
+                  >
+                    {/* Premium YouTube Video Thumbnail */}
+                    <div style={{
+                      width: '100px',
+                      height: '65px',
+                      borderRadius: '12px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      flexShrink: 0,
+                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                    }}>
+                      <img 
+                        src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`} 
+                        alt={video.title} 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover'
+                        }}
+                      />
                       <div style={{
-                        width: '80px',
-                        height: '60px',
-                        borderRadius: '8px',
-                        background: 'linear-gradient(135deg, #1e293b 0%, #0a2342 100%)',
+                        position: 'absolute',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.2)',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        color: '#ffffff',
-                        fontSize: '1.5rem',
-                        flexShrink: 0,
-                        boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                        position: 'relative'
+                        justifyContent: 'center'
                       }}>
-                        📺
                         <div style={{
-                          position: 'absolute',
-                          width: '24px',
-                          height: '24px',
+                          width: '28px',
+                          height: '28px',
                           borderRadius: '50%',
                           background: '#8b1e1e',
                           color: '#ffffff',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '0.65rem',
-                          bottom: '-4px',
-                          right: '-4px',
+                          fontSize: '0.75rem',
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
                           border: '2px solid #ffffff'
                         }}>
-                          ▶
+                          {isUnlocked ? '▶' : '🔒'}
                         </div>
                       </div>
+                    </div>
 
-                      <div style={{ flex: 1 }}>
-                        <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a2342', margin: '0 0 0.25rem 0' }}>{video.title}</h4>
-                        <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>
-                          2 Checkpoints (1:50 & 2:50)
-                        </span>
-                        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                         {completedVideos.includes(video.id) ? (
-                           <>
-                             <span style={{ 
-                               background: '#dcfce7', 
-                               color: '#16a34a', 
-                               fontSize: '0.75rem', 
-                               fontWeight: '700', 
-                               padding: '4px 10px', 
-                               borderRadius: '20px',
-                               display: 'inline-flex',
-                               alignItems: 'center',
-                               gap: '0.25rem'
-                             }}>
-                               ✓ Done
-                             </span>
-                             <button
-                               onClick={(e) => {
-                                 e.stopPropagation(); // Prevent opening player immediately
-                                 resetVideoProgress(video.id);
-                               }}
-                               style={{
-                                 background: '#fee2e2',
-                                 border: '1px solid #fee2e2',
-                                 color: '#8b1e1e',
-                                 cursor: 'pointer',
-                                 fontSize: '0.7rem',
-                                 fontWeight: '700',
-                                 padding: '4px 8px',
-                                 borderRadius: '12px',
-                                 transition: 'all 0.2s ease',
-                                 boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-                               }}
-                               onMouseEnter={(e) => {
-                                 e.currentTarget.style.background = '#8b1e1e';
-                                 e.currentTarget.style.color = '#ffffff';
-                               }}
-                               onMouseLeave={(e) => {
-                                 e.currentTarget.style.background = '#fee2e2';
-                                 e.currentTarget.style.color = '#8b1e1e';
-                               }}
-                               title="Reset progress to test again"
-                             >
-                               Reset
-                             </button>
-                           </>
-                         ) : (
+                    {/* Middle: Video info */}
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a2342', margin: '0 0 0.25rem 0' }}>{video.title}</h4>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>
+                        2 Checkpoints (1:50 & 2:50)
+                      </span>
+                      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                       {!isUnlocked ? (
+                         <span style={{ 
+                           background: '#f1f5f9', 
+                           color: '#64748b', 
+                           fontSize: '0.75rem', 
+                           fontWeight: '700', 
+                           padding: '4px 10px', 
+                           borderRadius: '20px',
+                           display: 'inline-flex',
+                           alignItems: 'center',
+                           gap: '0.25rem',
+                           border: '1px solid #cbd5e1'
+                         }}>
+                           🔒 Locked
+                         </span>
+                       ) : completedVideos.includes(video.id) ? (
+                         <>
                            <span style={{ 
-                             background: 'rgba(139, 30, 30, 0.08)', 
-                             color: '#8b1e1e', 
+                             background: '#dcfce7', 
+                             color: '#16a34a', 
                              fontSize: '0.75rem', 
                              fontWeight: '700', 
                              padding: '4px 10px', 
@@ -1023,23 +665,198 @@ export default function DelegateDashboard() {
                              alignItems: 'center',
                              gap: '0.25rem'
                            }}>
-                             ▶ Watch
+                             ✓ Done
                            </span>
-                         )}
-                       </div>
-                      </div>
+                           <button
+                             onClick={(e) => {
+                               e.stopPropagation(); // Prevent opening player immediately
+                               resetVideoProgress(video.id);
+                             }}
+                             style={{
+                               background: '#fee2e2',
+                               border: '1px solid #fee2e2',
+                               color: '#8b1e1e',
+                               cursor: 'pointer',
+                               fontSize: '0.7rem',
+                               fontWeight: '700',
+                               padding: '4px 8px',
+                               borderRadius: '12px',
+                               transition: 'all 0.2s ease',
+                               boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                               pointerEvents: 'auto'
+                             }}
+                             onMouseEnter={(e) => {
+                               e.currentTarget.style.background = '#8b1e1e';
+                               e.currentTarget.style.color = '#ffffff';
+                             }}
+                             onMouseLeave={(e) => {
+                               e.currentTarget.style.background = '#fee2e2';
+                               e.currentTarget.style.color = '#8b1e1e';
+                             }}
+                             title="Reset progress to test again"
+                           >
+                             Reset
+                           </button>
+                         </>
+                       ) : (
+                         <span style={{ 
+                           background: 'rgba(139, 30, 30, 0.08)', 
+                           color: '#8b1e1e', 
+                           fontSize: '0.75rem', 
+                           fontWeight: '700', 
+                           padding: '4px 10px', 
+                           borderRadius: '20px',
+                           display: 'inline-flex',
+                           alignItems: 'center',
+                           gap: '0.25rem'
+                         }}>
+                           ▶ Watch
+                         </span>
+                       )}
+                     </div>
                     </div>
-                  ))}
-                </div>
+
+                    {/* Right: Deadline Indicator */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', marginLeft: 'auto', flexShrink: 0 }}>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        fontWeight: '800', 
+                        color: '#ef4444', 
+                        background: 'rgba(239, 68, 68, 0.06)', 
+                        padding: '6px 12px', 
+                        borderRadius: '20px',
+                        border: '1px solid rgba(239, 68, 68, 0.12)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
+                      }}>
+                        🗓 Deadline: {video.deadline}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Document Upload (Card 1) */}
+          <div style={{ 
+            background: '#ffffff', 
+            border: '1px solid #cbd5e1',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.01)'
+          }}>
+            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span>📤</span> Document Submissions
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              Submit position papers or draft resolutions to receive scoring.
+            </p>
+            
+            <form onSubmit={handleUpload} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.35rem', fontSize: '0.8rem', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Document Type</label>
+                <select 
+                  value={uploadType} 
+                  onChange={(e) => setUploadType(e.target.value)} 
+                  style={{ 
+                    width: '100%', 
+                    padding: '0.8rem', 
+                    borderRadius: '8px', 
+                    border: '1px solid #cbd5e1', 
+                    background: '#ffffff', 
+                    color: '#1e293b',
+                    fontSize: '0.9rem',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="position_paper">Position Paper</option>
+                  <option value="draft_resolution">Draft Resolution</option>
+                </select>
+              </div>
+              
+              <div style={{
+                border: '2px dashed #cbd5e1',
+                borderRadius: '12px',
+                padding: '1.5rem',
+                textAlign: 'center',
+                background: '#f8fafc',
+                cursor: 'pointer',
+                position: 'relative'
+              }}
+              onDragOver={(e) => e.preventDefault()}
+              >
+                <input 
+                  type="file" 
+                  onChange={(e) => setFile(e.target.files[0])} 
+                  style={{ 
+                    position: 'absolute',
+                    top: 0, left: 0, width: '100%', height: '100%',
+                    opacity: 0, cursor: 'pointer'
+                  }} 
+                />
+                <span style={{ fontSize: '1.8rem', display: 'block', marginBottom: '0.25rem' }}>📄</span>
+                <span style={{ display: 'block', color: file ? '#8b1e1e' : '#334155', fontWeight: file ? '700' : '500', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {file ? file.name : 'Drag here or choose file'}
+                </span>
+                <span style={{ display: 'block', fontSize: '0.7rem', color: '#64748b', marginTop: '0.25rem' }}>
+                  PDF, DOCX, or text files
+                </span>
               </div>
 
-            </div>
+              {uploadProgress > 0 && uploadProgress < 100 && (
+                <div style={{ width: '100%', background: '#f1f5f9', borderRadius: '10px', height: '8px', overflow: 'hidden', border: '1px solid #e2e8f0' }}>
+                  <div style={{ background: '#8b1e1e', height: '100%', width: `${uploadProgress}%` }}></div>
+                </div>
+              )}
 
+              <button 
+                type="submit" 
+                disabled={!file || (uploadProgress > 0 && uploadProgress < 100)} 
+                style={{ 
+                  width: '100%', 
+                  padding: '0.85rem', 
+                  borderRadius: '30px', 
+                  background: !file ? '#e2e8f0' : 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)', 
+                  color: !file ? '#94a3b8' : '#ffffff', 
+                  border: 'none', 
+                  cursor: !file ? 'not-allowed' : 'pointer', 
+                  fontWeight: '700', 
+                  fontSize: '0.9rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  transition: 'all 0.3s ease',
+                  boxShadow: file ? '0 4px 12px rgba(139, 30, 30, 0.15)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (file) e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  if (file) e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                {uploadProgress > 0 && uploadProgress < 100 ? 'Uploading...' : 'Submit Paper'}
+              </button>
+              
+              {uploadMessage && (
+                <p style={{ 
+                  textAlign: 'center',
+                  fontWeight: '600',
+                  color: uploadMessage.includes('success') ? '#16a34a' : '#ef4444',
+                  fontSize: '0.85rem',
+                  margin: 0 
+                }}>
+                  {uploadMessage}
+                </p>
+              )}
+            </form>
           </div>
 
         </div>
 
-      </div>
+          </div>
 
       {/* Premium Video Viewer Overlay / Modal */}
       {activeVideo && (
@@ -1055,12 +872,12 @@ export default function DelegateDashboard() {
           padding: isFullScreenViewer ? '0' : '2rem',
           transition: 'all 0.3s ease'
         }}>
-          <div id="csmun-video-modal-container" style={{
+          <div style={{
             background: '#ffffff',
             border: isFullScreenViewer ? 'none' : '1px solid #cbd5e1',
             borderRadius: isFullScreenViewer ? '0' : '24px',
-            padding: isFullScreenViewer ? '3.5rem 2rem 2rem 2rem' : '2rem',
-            maxWidth: isFullScreenViewer ? '100vw' : '1240px', // Wider to make the video prominent
+            padding: isFullScreenViewer ? '3.5rem 2.5rem 2.5rem 2.5rem' : '2.5rem',
+            maxWidth: isFullScreenViewer ? '100vw' : '1000px',
             width: '100%',
             height: isFullScreenViewer ? '100vh' : 'auto',
             maxHeight: isFullScreenViewer ? '100vh' : '90vh',
@@ -1069,40 +886,10 @@ export default function DelegateDashboard() {
             position: 'relative',
             display: 'flex',
             gap: '2rem',
-            flexWrap: 'nowrap', // Force side-by-side columns to avoid wrapping underneath
+            flexWrap: 'wrap',
             alignContent: 'start',
-            alignItems: 'stretch', // Stretch both columns to take full height in fullscreen!
             transition: 'all 0.3s ease'
           }}>
-            {/* Toggle Sidebar Button */}
-            <button 
-              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '13.5rem',
-                background: 'transparent',
-                border: 'none',
-                color: '#64748b',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                opacity: isMouseActive ? 1 : 0,
-                pointerEvents: isMouseActive ? 'auto' : 'none',
-                zIndex: 10
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#8b1e1e'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
-            >
-              {isSidebarOpen ? '📁 Hide Sidebar' : '📂 Show Sidebar'}
-            </button>
-
             {/* Toggle Full Screen / Theater Mode Button */}
             <button 
               onClick={toggleModalFullscreen}
@@ -1115,16 +902,13 @@ export default function DelegateDashboard() {
                 color: '#64748b',
                 fontSize: '0.9rem',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'color 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.35rem',
                 fontWeight: '700',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                opacity: isMouseActive ? 1 : 0,
-                pointerEvents: isMouseActive ? 'auto' : 'none',
-                zIndex: 10
+                letterSpacing: '0.5px'
               }}
               onMouseEnter={(e) => e.currentTarget.style.color = '#8b1e1e'}
               onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
@@ -1140,7 +924,6 @@ export default function DelegateDashboard() {
                 setQuizError('');
                 setQuizSuccess(false);
                 setIsFullScreenViewer(false);
-                setIsSidebarOpen(false);
               }}
               style={{
                 position: 'absolute',
@@ -1151,11 +934,8 @@ export default function DelegateDashboard() {
                 color: '#64748b',
                 fontSize: '1.75rem',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                lineHeight: '1',
-                opacity: isMouseActive ? 1 : 0,
-                pointerEvents: isMouseActive ? 'auto' : 'none',
-                zIndex: 10
+                transition: 'color 0.2s ease',
+                lineHeight: '1'
               }}
               onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
               onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
@@ -1163,257 +943,160 @@ export default function DelegateDashboard() {
               ×
             </button>
 
-            {/* Video Player Column - 72% cinematic width or 100% full bleed */}
-            <div style={{ 
-              flex: isSidebarOpen ? (isFullScreenViewer ? '1 1 72%' : '2 1 65%') : '1 1 100%', 
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '1rem', 
-              minWidth: 0,
-              height: isFullScreenViewer ? 'calc(100vh - 5.5rem)' : 'auto',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-            }}>
-              <h3 style={{ 
-                fontFamily: "'Outfit', sans-serif", 
-                fontSize: '1.6rem', 
-                color: '#0a2342', 
-                fontWeight: '800', 
-                margin: 0,
-                opacity: isMouseActive ? 1 : 0,
-                transition: 'all 0.3s ease'
-              }}>
+            {/* Video Player Column */}
+            <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.6rem', color: '#0a2342', fontWeight: '800', margin: 0 }}>
                 🎥 {activeVideo.title}
               </h3>
               
               <div style={{ 
                 position: 'relative',
-                width: '100%',
-                height: isFullScreenViewer ? 'calc(100vh - 12rem)' : 0,
-                paddingBottom: isFullScreenViewer ? 0 : '56.25%',
+                paddingBottom: '56.25%', /* 16:9 Aspect Ratio */
+                height: 0,
                 overflow: 'hidden',
                 borderRadius: '16px',
                 background: '#000000',
-                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                flex: isFullScreenViewer ? 1 : 'none'
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
               }}>
-                {/* Dynamically replaced with YouTube Player API Iframe */}
-                <div id="csmun-yt-player" style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  border: 'none'
-                }}></div>
+                <iframe 
+                  src={activeVideo.url}
+                  title={activeVideo.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    border: 'none'
+                  }}
+                />
               </div>
-              <p style={{ 
-                color: '#475569', 
-                fontSize: '0.85rem', 
-                lineHeight: '1.4', 
-                margin: 0,
-                opacity: isMouseActive ? 1 : 0,
-                transition: 'all 0.3s ease'
-              }}>
-                Watch this training video. Conceptual checkpoint quizzes will automatically pop up and pause playback at <strong>1:50</strong> and <strong>2:50</strong>. Answer them correctly to resume and unlock this module!
+              <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: '1.5', margin: 0 }}>
+                Watch this video in full to understand the key concept, then answer the checkpoint question on the right side to successfully mark this module as completed.
               </p>
             </div>
 
-            {/* Quiz Checkpoint Column - Compact sliding sidebar panel */}
+            {/* Quiz Checkpoint Column */}
             <div style={{ 
-              flex: isSidebarOpen ? (isFullScreenViewer ? '0 0 28%' : '1 1 35%') : '0 0 0px', 
+              flex: '1 1 340px', 
               background: '#f8fafc', 
-              border: isSidebarOpen ? '1px solid #cbd5e1' : 'none', 
+              border: '1px solid #cbd5e1', 
               borderRadius: '20px', 
-              padding: isSidebarOpen ? '1.25rem' : 0,
-              margin: 0,
+              padding: '1.75rem',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
-              minWidth: isSidebarOpen ? '280px' : 0,
-              width: isSidebarOpen ? 'auto' : 0,
-              height: isFullScreenViewer ? 'calc(100vh - 5.5rem)' : 'auto',
-              boxSizing: 'border-box',
-              opacity: isSidebarOpen ? 1 : 0,
-              transform: isSidebarOpen ? 'translateX(0)' : 'translateX(50px)',
-              overflow: 'hidden',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+              justifyContent: 'center'
             }}>
-              {activeCheckpoint ? (
-                <>
-                  <span style={{ 
-                    background: '#fee2e2', 
-                    color: '#8b1e1e', 
-                    fontSize: '0.7rem', 
-                    fontWeight: '800', 
-                    padding: '4px 10px', 
-                    borderRadius: '20px', 
-                    display: 'inline-flex',
-                    alignSelf: 'start',
-                    marginBottom: '1rem',
-                    letterSpacing: '0.5px'
-                  }}>
-                    ⏸️ VIDEO PAUSED (AT {activeCheckpoint.timestampLabel})
-                  </span>
+              <span style={{ 
+                background: '#fee2e2', 
+                color: '#8b1e1e', 
+                fontSize: '0.7rem', 
+                fontWeight: '800', 
+                padding: '4px 10px', 
+                borderRadius: '20px', 
+                display: 'inline-flex',
+                alignSelf: 'start',
+                marginBottom: '1rem',
+                letterSpacing: '0.5px'
+              }}>
+                📝 QUIZ CHECKPOINT
+              </span>
 
-                  <form onSubmit={handleCheckpointSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <h4 style={{ fontSize: '1rem', color: '#0a2342', fontWeight: '800', margin: 0, lineHeight: '1.4' }}>
-                      {activeCheckpoint.question}
-                    </h4>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {activeCheckpoint.options.map((opt, idx) => {
-                        const isSelected = selectedQuizOption === opt;
-                        return (
-                          <label 
-                            key={idx} 
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.75rem',
-                              padding: '0.85rem 1rem',
-                              background: isSelected ? 'rgba(139, 30, 30, 0.05)' : '#ffffff',
-                              border: isSelected ? '1.5px solid #8b1e1e' : '1px solid #cbd5e1',
-                              borderRadius: '12px',
-                              cursor: 'pointer',
-                              fontSize: '0.85rem',
-                              fontWeight: '600',
-                              color: isSelected ? '#8b1e1e' : '#334155',
-                              transition: 'all 0.2s ease'
-                            }}
-                          >
-                            <input 
-                              type="radio" 
-                              name="checkpointOption" 
-                              value={opt} 
-                              checked={isSelected}
-                              onChange={() => setSelectedQuizOption(opt)}
-                              style={{ 
-                                accentColor: '#8b1e1e',
-                                cursor: 'pointer'
-                              }}
-                            />
-                            {opt}
-                          </label>
-                        );
-                      })}
-                    </div>
-
-                    {quizError && (
-                      <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        ⚠️ {quizError}
-                      </div>
-                    )}
-
-                    {quizSuccess && (
-                      <div style={{ color: '#16a34a', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                        🎉 Correct! Continuing video playback...
-                      </div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={!selectedQuizOption}
-                      style={{
-                        width: '100%',
-                        padding: '0.85rem',
-                        borderRadius: '30px',
-                        background: !selectedQuizOption ? '#cbd5e1' : 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)',
-                        color: !selectedQuizOption ? '#94a3b8' : '#ffffff',
-                        border: 'none',
-                        cursor: !selectedQuizOption ? 'not-allowed' : 'pointer',
-                        fontWeight: '700',
-                        fontSize: '0.85rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                        transition: 'all 0.3s ease',
-                        boxShadow: selectedQuizOption ? '0 4px 12px rgba(139, 30, 30, 0.15)' : 'none'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (selectedQuizOption) e.currentTarget.style.transform = 'translateY(-2px)';
-                      }}
-                      onMouseLeave={(e) => {
-                        if (selectedQuizOption) e.currentTarget.style.transform = 'translateY(0)';
-                      }}
-                    >
-                      Submit & Resume
-                    </button>
-                  </form>
-                </>
+              {completedVideos.includes(activeVideo.id) ? (
+                <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                  <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🎉</span>
+                  <h4 style={{ color: '#16a34a', fontSize: '1.2rem', fontWeight: '800', margin: '0 0 0.5rem 0' }}>Checkpoint Passed!</h4>
+                  <p style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.5', margin: 0 }}>
+                    You have successfully answered the checkpoint question and unlocked this training module. Good job!
+                  </p>
+                </div>
               ) : (
-                <div style={{ textAlign: 'center', padding: '1rem' }}>
-                  {completedVideos.includes(activeVideo.id) ? (
-                      <>
-                        <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }}>🎉</span>
-                        <h4 style={{ color: '#16a34a', fontSize: '1.2rem', fontWeight: '800', margin: '0 0 0.5rem 0' }}>Module Unlocked!</h4>
-                        <p style={{ color: '#475569', fontSize: '0.85rem', lineHeight: '1.5', marginBottom: '1.5rem' }}>
-                          Congratulations! You have successfully answered all mid-video checkpoints and completed this training module!
-                        </p>
-                        <button
-                          onClick={() => resetVideoProgress(activeVideo.id)}
+                <form onSubmit={handleQuizSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                  <h4 style={{ fontSize: '1rem', color: '#0a2342', fontWeight: '800', margin: 0, lineHeight: '1.4' }}>
+                    {VIDEO_QUIZZES[activeVideo.id].question}
+                  </h4>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    {VIDEO_QUIZZES[activeVideo.id].options.map((opt, idx) => {
+                      const isSelected = selectedQuizOption === opt;
+                      return (
+                        <label 
+                          key={idx} 
                           style={{
-                            padding: '0.6rem 1.25rem',
-                            borderRadius: '20px',
-                            background: '#fee2e2',
-                            color: '#8b1e1e',
-                            border: '1px solid #fee2e2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            padding: '0.85rem 1rem',
+                            background: isSelected ? 'rgba(139, 30, 30, 0.05)' : '#ffffff',
+                            border: isSelected ? '1.5px solid #8b1e1e' : '1px solid #cbd5e1',
+                            borderRadius: '12px',
                             cursor: 'pointer',
-                            fontWeight: '700',
-                            fontSize: '0.75rem',
-                            transition: 'all 0.2s ease',
-                            boxShadow: '0 4px 12px rgba(139,30,30,0.1)'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#8b1e1e';
-                            e.currentTarget.style.color = '#ffffff';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#fee2e2';
-                            e.currentTarget.style.color = '#8b1e1e';
+                            fontSize: '0.85rem',
+                            fontWeight: '600',
+                            color: isSelected ? '#8b1e1e' : '#334155',
+                            transition: 'all 0.2s ease'
                           }}
                         >
-                          Mark as Incomplete / Reset Progress
-                        </button>
-                      </>
-                  ) : (
-                    <>
-                      <span style={{ fontSize: '1.75rem', display: 'block', marginBottom: '0.5rem' }}>📺</span>
-                      <h4 style={{ color: '#0a2342', fontSize: '1rem', fontWeight: '800', margin: '0 0 0.25rem 0' }}>Active Playback</h4>
-                      <p style={{ color: '#64748b', fontSize: '0.8rem', lineHeight: '1.4', margin: 0 }}>
-                        Watch the video! Playback will pause at <strong>1:50</strong> and <strong>2:50</strong>.
-                      </p>
-                      
-                      {/* Checkpoint Timeline Indicator */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1.5rem', alignItems: 'center' }}>
-                        <div style={{ 
-                          background: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '#dcfce7' : '#fee2e2',
-                          color: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '#16a34a' : '#8b1e1e',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '10px',
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          border: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '1px solid #16a34a' : '1px solid #8b1e1e',
-                          width: '100%',
-                          maxWidth: '200px'
-                        }}>
-                          {answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '✓ Checkpoint 1 (1:50)' : '⏳ Checkpoint 1 (1:50)'}
-                        </div>
-                        <div style={{ 
-                          background: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '#dcfce7' : '#fee2e2',
-                          color: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '#16a34a' : '#8b1e1e',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '10px',
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          border: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '1px solid #16a34a' : '1px solid #8b1e1e',
-                          width: '100%',
-                          maxWidth: '200px'
-                        }}>
-                          {answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '✓ Checkpoint 2 (2:50)' : '⏳ Checkpoint 2 (2:50)'}
-                        </div>
-                      </div>
-                    </>
+                          <input 
+                            type="radio" 
+                            name="quizOption" 
+                            value={opt} 
+                            checked={isSelected}
+                            onChange={() => setSelectedQuizOption(opt)}
+                            style={{ 
+                              accentColor: '#8b1e1e',
+                              cursor: 'pointer'
+                            }}
+                          />
+                          {opt}
+                        </label>
+                      );
+                    })}
+                  </div>
+
+                  {quizError && (
+                    <div style={{ color: '#ef4444', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      ⚠️ {quizError}
+                    </div>
                   )}
-                </div>
+
+                  {quizSuccess && (
+                    <div style={{ color: '#16a34a', fontSize: '0.8rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      🎉 Correct! Module completed!
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={!selectedQuizOption}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem',
+                      borderRadius: '30px',
+                      background: !selectedQuizOption ? '#cbd5e1' : 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)',
+                      color: !selectedQuizOption ? '#94a3b8' : '#ffffff',
+                      border: 'none',
+                      cursor: !selectedQuizOption ? 'not-allowed' : 'pointer',
+                      fontWeight: '700',
+                      fontSize: '0.85rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      transition: 'all 0.3s ease',
+                      boxShadow: selectedQuizOption ? '0 4px 12px rgba(139, 30, 30, 0.15)' : 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedQuizOption) e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedQuizOption) e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    Submit Answer
+                  </button>
+                </form>
               )}
             </div>
 
