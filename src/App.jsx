@@ -7,6 +7,7 @@ import CompleteProfile from './pages/CompleteProfile';
 import Profile from './pages/Profile';
 import DelegateDashboard from './pages/delegate/DelegateDashboard';
 import MentorDashboard from './pages/mentor/MentorDashboard';
+import Notes from './pages/Notes';
 import './App.css';
 
 class ErrorBoundary extends Component {
@@ -63,6 +64,7 @@ function AppRoutes() {
         }
       />
       <Route path="/app/login" element={<Login />} />
+      <Route path="/app/notes" element={<Notes />} />
       <Route
         path="/app/complete-profile"
         element={

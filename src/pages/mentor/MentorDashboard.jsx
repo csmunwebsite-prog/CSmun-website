@@ -311,6 +311,34 @@ export default function MentorDashboard() {
           
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <button 
+              onClick={() => navigate('/app/notes')}
+              style={{ 
+                padding: '0.65rem 1.5rem', 
+                borderRadius: '30px', 
+                background: 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)',
+                border: 'none',
+                color: '#ffffff',
+                fontWeight: '700',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                fontSize: '0.85rem',
+                boxShadow: '0 4px 12px rgba(139, 30, 30, 0.15)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 30, 30, 0.25)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 30, 30, 0.15)';
+              }}
+            >
+              📚 View Academic Notes
+            </button>
+            <button 
               onClick={() => window.location.href = '/'}
               style={{ 
                 padding: '0.65rem 1.5rem', 
