@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import '../../index.css';
 
 // ===== PREMIUM SVG ICON COMPONENTS =====
 
@@ -120,7 +121,7 @@ const ShuffleIcon = ({ size = 28, color = "currentColor" }) => (
 );
 
 export default function Notes() {
-  const { currentUser } = useAuth();
+  const { currentUser, userData } = useAuth();
   const navigate = useNavigate();
   const [selectedTopicIndex, setSelectedTopicIndex] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -1196,81 +1197,97 @@ export default function Notes() {
       fontFamily: "'Inter', sans-serif",
       paddingBottom: '4rem'
     }}>
+      {/* Navbar Style Overrides */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .navbar.scrolled {
+          background: rgba(11, 13, 25, 0.7) !important;
+          backdrop-filter: blur(16px) !important;
+          -webkit-backdrop-filter: blur(16px) !important;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+          padding: 10px 0 !important;
+          position: sticky !important;
+          top: 0 !important;
+          z-index: 1000 !important;
+        }
+
+        .nav-links a {
+          font-family: 'Outfit', sans-serif !important;
+          font-size: 0.85rem !important;
+          font-weight: 500 !important;
+          letter-spacing: 1px !important;
+          text-transform: uppercase !important;
+          color: rgba(255, 255, 255, 0.7) !important;
+          position: relative !important;
+          padding-bottom: 4px !important;
+          transition: color 0.3s ease !important;
+        }
+
+        .nav-links a::after {
+          content: '' !important;
+          position: absolute !important;
+          bottom: 0 !important;
+          left: 0 !important;
+          width: 0 !important;
+          height: 2px !important;
+          background: #8b1e1e !important;
+          transition: width 0.3s ease !important;
+        }
+
+        .nav-links a:hover {
+          color: #ffffff !important;
+        }
+
+        .nav-links a:hover::after {
+          width: 100% !important;
+        .nav-links a.active {
+          color: #ffffff !important;
+        }
+      `}} />
+
       {/* Decorative Orbs */}
       <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(139, 30, 30, 0.12)', filter: 'blur(120px)', borderRadius: '50%', top: '5%', left: '5%', pointerEvents: 'none' }}></div>
       <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(26, 32, 58, 0.3)', filter: 'blur(130px)', borderRadius: '50%', bottom: '10%', right: '5%', pointerEvents: 'none' }}></div>
 
-      {/* Header Bar */}
-      <header style={{
-        background: 'rgba(255, 255, 255, 0.02)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-        padding: '1.25rem 2rem',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            background: 'rgba(139, 30, 30, 0.1)',
-            border: '1px solid rgba(139, 30, 30, 0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <img src="/assets/logo.png" alt="Logo" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
-          </div>
-          <div>
-            <h1 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.25rem', fontWeight: '800', margin: 0, letterSpacing: '0.5px' }}>
-              CS<span style={{ color: '#a72828' }}>MUN</span> Academy
-            </h1>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '1px' }}>Notes & Study Guide Portal</span>
-          </div>
+      {/* ===== NAVBAR ===== */}
+      <nav className="navbar scrolled" id="navbar">
+        <div className="container-wide">
+          <a href="/index.html" className="nav-brand">
+            <div className="nav-logo-wrapper">
+              <img src="/assets/logo.png" alt="CSMUN Logo" className="nav-logo" />
+            </div>
+            <span className="nav-brand-text">CS<span>MUN</span></span>
+          </a>
+          <ul className="nav-links" id="navLinks">
+            <li><a href="/app">Dashboard</a></li>
+            <li><a href="/index.html#committees">Committees</a></li>
+            <li><a href="/resources.html">Resources</a></li>
+            <li><a href="/app/notes" className="active">Notes</a></li>
+            <li id="auth-nav-item">
+              {currentUser ? (
+                <a href="/app/profile" className="nav-profile-link" style={{ textDecoration: 'none' }}>
+                  <div className="nav-profile">
+                    <img 
+                      src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
+                      alt="Profile" 
+                      className="nav-avatar" 
+                    />
+                    <span className="nav-user-name">
+                      {(() => {
+                        const finalName = userData?.name || userData?.certificateName || currentUser.displayName || 'Account';
+                        const firstName = finalName.split(' ')[0];
+                        const gradeStr = userData?.grade ? ` (Gr. ${userData.grade})` : (userData?.role === 'mentor' ? ' (Mentor)' : '');
+                        return firstName + gradeStr;
+                      })()}
+                    </span>
+                  </div>
+                </a>
+              ) : (
+                <a href="/app" className="btn btn-primary nav-cta" id="registerBtn">Register Now</a>
+              )}
+            </li>
+          </ul>
         </div>
-
-        <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button
-            onClick={() => {
-              if (currentUser) {
-                navigate('/app');
-              } else {
-                window.location.href = '/index.html';
-              }
-            }}
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '30px',
-              color: '#ffffff',
-              padding: '0.6rem 1.25rem',
-              fontWeight: '700',
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            }}
-          >
-            <ArrowLeftIcon size={14} color="#ffffff" /> {currentUser ? 'Go to Dashboard' : 'Back to Home'}
-          </button>
-        </div>
-      </header>
+      </nav>
 
       {/* Main Container */}
       <main style={{ maxWidth: '1200px', margin: '2.5rem auto', padding: '0 1.5rem', position: 'relative', zIndex: 2 }}>

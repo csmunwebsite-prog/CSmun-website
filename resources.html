@@ -4,276 +4,880 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resources — CSMUN 2026</title>
+  <title>Resources Portal — CSMUN 2026</title>
   <meta name="description" content="Access all essential documents, study guides, and rules of procedure for CSMUN 2026." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700;800&display=swap"
     rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="index.css" />
   <style>
-    /* Specific styles for Resources Page */
-    .resources-hero {
-      padding: var(--space-5xl) 0 var(--space-3xl);
-      background: radial-gradient(circle at top right, rgba(139, 30, 30, 0.1), transparent 40%);
-      text-align: center;
-    }
-
-    .search-section {
-      max-width: 600px;
-      margin: 0 auto var(--space-4xl);
-      padding: 0 var(--space-md);
-    }
-
-    .search-bar {
-      width: 100%;
-      padding: 16px 24px;
-      padding-left: 50px;
-      border-radius: var(--radius-full);
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      color: var(--white);
+    /* Specific styles for Resources Portal matching Notes.jsx */
+    body {
+      background-color: #0b0d19;
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
       font-family: var(--ff-body);
-      font-size: 1rem;
-      transition: all var(--duration-normal) var(--ease-out);
     }
 
-    .search-bar:focus {
-      outline: none;
-      border-color: var(--red-500);
-      background: var(--white-10);
-      box-shadow: 0 0 20px rgba(139, 30, 30, 0.2);
+    .resources-wrapper {
+      position: relative;
+      min-height: 100vh;
+      z-index: 1;
     }
 
-    .category-filters {
-      display: flex;
-      justify-content: center;
-      gap: var(--space-md);
-      margin-bottom: var(--space-4xl);
-      flex-wrap: wrap;
+    .glow-orb-1 {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(139, 30, 30, 0.12);
+      filter: blur(120px);
+      border-radius: 50%;
+      top: 5%;
+      left: 5%;
+      pointer-events: none;
+      z-index: -1;
     }
 
-    .filter-btn {
-      padding: 8px 20px;
-      border-radius: var(--radius-full);
-      background: var(--white-05);
-      border: 1px solid var(--white-10);
-      color: var(--white-70);
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--duration-fast) var(--ease-out);
+    .glow-orb-2 {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: rgba(26, 32, 58, 0.35);
+      filter: blur(130px);
+      border-radius: 50%;
+      bottom: 10%;
+      right: 5%;
+      pointer-events: none;
+      z-index: -1;
     }
 
-    .filter-btn.active,
-    .filter-btn:hover {
-      background: var(--red-500);
-      color: var(--white);
-      border-color: var(--red-500);
+    /* Navbar overrides for clean look */
+    .navbar.scrolled {
+      background: rgba(11, 13, 25, 0.7) !important;
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .resource-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: var(--space-xl);
-      margin-bottom: var(--space-5xl);
+    .resources-container {
+      max-width: 1200px;
+      margin: 8.5rem auto 5rem;
+      padding: 0 1.5rem;
+      position: relative;
     }
 
-    .resource-card {
-      padding: var(--space-xl);
-      transition: transform var(--duration-normal) var(--ease-out);
+    /* Start State: Topics View */
+    .portal-header {
+      text-align: center;
+      margin-bottom: 4rem;
     }
 
-    .resource-card:hover {
-      transform: translateY(-5px);
+    .portal-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.5px;
     }
 
-    .resource-type {
-      font-family: var(--ff-accent);
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--red-400);
-      margin-bottom: var(--space-sm);
-    }
-
-    .resource-title {
-      font-family: var(--ff-heading);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: var(--space-md);
-    }
-
-    .resource-desc {
-      font-size: 0.9rem;
-      color: var(--white-50);
-      margin-bottom: var(--space-xl);
+    .portal-header p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
       line-height: 1.6;
     }
 
-    .resource-actions {
-      display: flex;
-      gap: var(--space-md);
+    /* Custom Search Bar */
+    .search-wrapper {
+      max-width: 600px;
+      margin: 0 auto 2rem;
+      position: relative;
     }
 
-    .btn-small {
-      padding: 8px 16px;
+    .search-icon-svg {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1.1rem 1.5rem 1.1rem 3.25rem;
+      border-radius: 30px;
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      border-color: rgba(167, 40, 40, 0.6);
+      background: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 25px rgba(167, 40, 40, 0.18);
+    }
+
+    /* Filter Categories */
+    .filter-tags {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tag-btn {
+      padding: 8px 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #cbd5e1;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .tag-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .tag-btn.active {
+      background: linear-gradient(90deg, #8b1e1e 0%, #a72828 100%);
+      color: #ffffff;
+      border-color: transparent;
+      box-shadow: 0 4px 15px rgba(139, 30, 30, 0.25);
+    }
+
+    /* Cards Grid */
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 850px;
+      margin: 1.5rem auto 0 auto;
+    }
+
+    .document-card {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 1.5rem 2rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .document-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(139, 30, 30, 0.45);
+      background: rgba(255, 255, 255, 0.04);
+      box-shadow: 0 6px 22px rgba(139, 30, 30, 0.14);
+    }
+
+    .card-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .num-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(139, 30, 30, 0.15);
+      border: 1.5px solid #a72828;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px rgba(139, 30, 30, 0.2);
+    }
+
+    .icon-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #a72828;
+      background: rgba(255, 255, 255, 0.02);
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .meta-content {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .meta-content h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 0.25rem 0;
+      line-height: 1.3;
+    }
+
+    .meta-content p {
+      font-size: 0.88rem;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-left: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .badge-tag {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 0.4rem 0.85rem;
+      border-radius: 12px;
       font-size: 0.75rem;
+      color: #cbd5e1;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .arrow-icon {
+      font-size: 1.25rem;
+      color: #a72828;
+      font-weight: bold;
+      transition: transform 0.2s ease;
+    }
+
+    .document-card:hover .arrow-icon {
+      transform: translateX(4px);
+    }
+
+    /* Immersive Document Viewer Focus State */
+    .viewer-section {
+      display: none;
+      animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .viewer-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      color: #ffffff;
+      padding: 0.6rem 1.25rem;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(-4px);
+    }
+
+    .viewer-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .viewer-info-panel {
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .viewer-info-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .viewer-info-header .icon-box {
+      font-size: 2.2rem;
+      padding: 15px;
+      border-radius: 18px;
+      margin-bottom: 1rem;
+      background: rgba(139, 30, 30, 0.1);
+      border: 1px solid rgba(139, 30, 30, 0.3);
+      color: #a72828;
+    }
+
+    .viewer-info-header h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem 0;
+      line-height: 1.3;
+    }
+
+    .viewer-info-header span {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .doc-description {
+      color: #cbd5e1;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      margin: 0 0 1.5rem;
+    }
+
+    .doc-meta-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-bottom: 2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .doc-meta-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+    }
+
+    .doc-meta-label {
+      color: #94a3b8;
+    }
+
+    .doc-meta-value {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .drive-cta {
+      width: 100%;
+      background: linear-gradient(90deg, #8b1e1e 0%, #a72828 100%);
+      border: none;
+      border-radius: 30px;
+      color: #ffffff;
+      padding: 0.85rem 1.5rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(139, 30, 30, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+    }
+
+    .drive-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 30, 30, 0.35);
+    }
+
+    /* Embedded Iframe Container */
+    .iframe-panel {
+      background: rgba(255, 255, 255, 0.01);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      position: relative;
+    }
+
+    .iframe-loader {
+      position: absolute;
+      inset: 0;
+      background: #0b0d19;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 24px;
+      transition: opacity 0.3s ease;
+    }
+
+    .loader-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-top-color: #a72828;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .iframe-container {
+      width: 100%;
+      height: 650px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.4);
+      position: relative;
+    }
+
+    .iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .viewer-layout {
+        grid-template-columns: 1fr;
+      }
+      .viewer-info-panel {
+        order: 2;
+      }
+      .iframe-panel {
+        order: 1;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar scrolled" id="navbar">
-    <div class="container-wide">
-      <a href="index.html" class="nav-brand">
-        <div class="nav-logo-wrapper">
-          <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
-        </div>
-        <span class="nav-brand-text">CS<span>MUN</span></span>
-      </a>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="index.html#about">About</a></li>
-        <li><a href="index.html#committees">Committees</a></li>
-        <li><a href="#" class="active">Resources</a></li>
-        <li><a href="/app/notes">Notes</a></li>
-        <li id="auth-nav-item">
-          <a href="/app" class="btn btn-primary nav-cta" id="registerBtn">Register Now</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <div class="resources-wrapper">
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
 
-  <!-- ===== HERO ===== -->
-  <header class="resources-hero">
-    <div class="container">
-      <div class="section-label reveal">Resource Portal</div>
-      <h1 class="section-title reveal">Essential <span class="accent-text">Documents</span></h1>
-      <p class="section-subtitle reveal" style="margin: 0 auto var(--space-2xl);">
-        Everything you need to prepare for academic excellence at CSMUN 2026.
-      </p>
-
-      <div class="search-section reveal">
-        <input type="text" class="search-bar" placeholder="Search for guides, matrixes, or rules..." id="resourceSearch" />
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar scrolled" id="navbar">
+      <div class="container-wide">
+        <a href="index.html" class="nav-brand">
+          <div class="nav-logo-wrapper">
+            <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+          </div>
+          <span class="nav-brand-text">CS<span>MUN</span></span>
+        </a>
+        <ul class="nav-links" id="navLinks">
+          <li><a href="/app">Dashboard</a></li>
+          <li><a href="index.html#committees">Committees</a></li>
+          <li><a href="#" class="active">Resources</a></li>
+          <li><a href="/app/notes">Notes</a></li>
+          <li id="auth-nav-item">
+            <a href="/app" class="btn btn-primary nav-cta" id="registerBtn">Register Now</a>
+          </li>
+        </ul>
       </div>
+    </nav>
 
-      <div class="category-filters reveal">
-        <button class="filter-btn active" data-filter="all">All Resources</button>
-        <button class="filter-btn" data-filter="guide">Study Guides</button>
-        <button class="filter-btn" data-filter="procedure">Procedure</button>
-        <button class="filter-btn" data-filter="matrix">Matrices</button>
-        <button class="filter-btn" data-filter="guideline">Guidelines</button>
-      </div>
-    </div>
-  </header>
+    <!-- ===== MAIN PORTAL CONTAINER ===== -->
+    <main class="resources-container">
 
-  <!-- ===== CONTENT ===== -->
-  <section class="resources-content">
-    <div class="container">
-      <div class="resource-grid" id="resourceGrid">
-        <!-- Resource Card 1 -->
-        <div class="resource-card glass reveal" data-category="procedure">
-          <div class="resource-type">Procedure</div>
-          <h3 class="resource-title">Rules of Procedure (RoP)</h3>
-          <p class="resource-desc">The official guide to the parliamentary procedures practiced at CSMUN 2026.</p>
-          <div class="resource-actions">
-            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
-            <a href="#" class="btn btn-outline btn-small">View Online</a>
+      <!-- ===== START STATE: GALLERY GRID ===== -->
+      <div id="gallerySection" class="gallery-section">
+        <div class="portal-header">
+          <div class="section-label" style="display: inline-block;">Library Portal</div>
+          <h2>Academic & <span class="accent-text">Resource Library</span></h2>
+          <p>
+            Select a document from our curated delegate resources below to review and read it embedded directly inside your browser.
+          </p>
+
+          <!-- Search Bar -->
+          <div class="search-wrapper">
+            <span class="search-icon-svg">
+              <i data-lucide="search" style="width: 18px; height: 18px; color: #94a3b8;"></i>
+            </span>
+            <input
+              type="text"
+              id="librarySearch"
+              class="search-input"
+              placeholder="Search guides, position papers, checklists..." />
+          </div>
+
+          <!-- Tags Filters -->
+          <div class="filter-tags">
+            <button class="tag-btn active" data-filter="all">All Documents</button>
+            <button class="tag-btn" data-filter="guide">Guides</button>
+            <button class="tag-btn" data-filter="format">Formats</button>
+            <button class="tag-btn" data-filter="checklist">Checklists</button>
           </div>
         </div>
 
-        <!-- Resource Card 2 -->
-        <div class="resource-card glass reveal" data-category="guide">
-          <div class="resource-type">Study Guide</div>
-          <h3 class="resource-title">UNGA Study Guide</h3>
-          <p class="resource-desc">Background research and agenda details for the General Assembly committee.</p>
-          <div class="resource-actions">
-            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
+        <!-- Document Cards List -->
+        <div class="document-list" id="documentList">
+          <!-- Item 1 -->
+          <div class="document-card" data-index="0" data-category="guide">
+            <div class="card-left">
+              <div class="num-badge">1</div>
+              <div class="icon-box"><i data-lucide="book-open" style="width: 20px; height: 20px;"></i></div>
+              <div class="meta-content">
+                <h3>The Basic Aspects of MUN</h3>
+                <p>A thoroughly structured primary manual describing core MUN principles, debate flows and committee proceedings.</p>
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="badge-tag">Guide</span>
+              <span class="arrow-icon">➔</span>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="document-card" data-index="1" data-category="format">
+            <div class="card-left">
+              <div class="num-badge">2</div>
+              <div class="icon-box"><i data-lucide="file-text" style="width: 20px; height: 20px;"></i></div>
+              <div class="meta-content">
+                <h3>Standard Position Paper Format</h3>
+                <p>The required formatting, heading layout, and font guidelines for writing a CSMUN position paper.</p>
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="badge-tag">Format</span>
+              <span class="arrow-icon">➔</span>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="document-card" data-index="2" data-category="guide">
+            <div class="card-left">
+              <div class="num-badge">3</div>
+              <div class="icon-box"><i data-lucide="archive" style="width: 20px; height: 20px;"></i></div>
+              <div class="meta-content">
+                <h3>Sample Research Binder</h3>
+                <p>A mock research binder showing how delegates are expected to compile country research, topic research and solutions.</p>
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="badge-tag">Sample</span>
+              <span class="arrow-icon">➔</span>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="document-card" data-index="3" data-category="format">
+            <div class="card-left">
+              <div class="num-badge">4</div>
+              <div class="icon-box"><i data-lucide="landmark" style="width: 20px; height: 20px;"></i></div>
+              <div class="meta-content">
+                <h3>Sample Draft Resolution</h3>
+                <p>A fully formatted reference draft resolution outlining exact formatting, placement of operative clauses, preambulatory clauses and sponsors.</p>
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="badge-tag">Format</span>
+              <span class="arrow-icon">➔</span>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="document-card" data-index="4" data-category="checklist">
+            <div class="card-left">
+              <div class="num-badge">5</div>
+              <div class="icon-box"><i data-lucide="check-square" style="width: 20px; height: 20px;"></i></div>
+              <div class="meta-content">
+                <h3>Draft Resolution Checklist</h3>
+                <p>Use this final quality parameter to inspect your draft resolution’s details and formatting prior to the conference.</p>
+              </div>
+            </div>
+            <div class="card-right">
+              <span class="badge-tag">Checklist</span>
+              <span class="arrow-icon">➔</span>
+            </div>
           </div>
         </div>
 
-        <!-- Resource Card 3 -->
-        <div class="resource-card glass reveal" data-category="guideline">
-          <div class="resource-type">Guideline</div>
-          <h3 class="resource-title">Position Paper Guidelines</h3>
-          <p class="resource-desc">Instructions on how to draft and submit your position papers for evaluating awards.</p>
-          <div class="resource-actions">
-            <a href="#" class="btn btn-primary btn-small">Download PDF</a>
-          </div>
+        <!-- No Results state -->
+        <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; max-width: 600px; margin: 3rem auto 0;">
+          <i data-lucide="search" style="width: 48px; height: 48px; color: rgba(255,255,255,0.15); margin-bottom: 1rem;"></i>
+          <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">No matching documents found</h3>
+          <p style="color: #94a3b8; font-size: 0.95rem;">Try refining your query or searching for 'checklist', 'resolution', or 'binder'.</p>
         </div>
-
-        <!-- Resource Card 4 -->
-        <div class="resource-card glass reveal" data-category="matrix">
-          <div class="resource-type">Matrix</div>
-          <h3 class="resource-title">Delegate Country Matrix</h3>
-          <p class="resource-desc">Full list of allocated countries across all six committees.</p>
-          <div class="resource-actions">
-            <a href="#" class="btn btn-primary btn-small">View Matrix</a>
-          </div>
-        </div>
-
-        <!-- More cards can be added here -->
       </div>
-    </div>
-  </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-bottom">
-        <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
-        <div class="footer-socials">
-          <a href="#" class="footer-social-link">📸</a>
-          <a href="#" class="footer-social-link">🐦</a>
-          <a href="#" class="footer-social-link">💼</a>
-          <a href="#" class="footer-social-link">✉️</a>
+      <!-- ===== FOCUS STATE: DOCUMENT VIEWAL INTERFACE ===== -->
+      <div id="viewerSection" class="viewer-section">
+        
+        <div class="viewer-controls">
+          <button class="back-btn" id="backToGalleryBtn">
+            <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> Back to Library
+          </button>
+        </div>
+
+        <div class="viewer-layout">
+          <!-- Information details column -->
+          <div class="viewer-info-panel">
+            <div class="viewer-info-header">
+              <div class="icon-box" id="viewerIcon">
+                <i data-lucide="file-text"></i>
+              </div>
+              <h3 id="viewerTitle">Document Title</h3>
+              <span id="viewerCategory">Category</span>
+            </div>
+            
+            <p class="doc-description" id="viewerDesc">Document description goes here...</p>
+
+            <!-- Meta info removed as requested -->
+
+            <a href="#" target="_blank" class="drive-cta" id="viewerDriveLink">
+              <i data-lucide="external-link" style="width: 16px; height: 16px;"></i> Open in Drive
+            </a>
+          </div>
+
+          <!-- Document Embedded View column -->
+          <div class="iframe-panel">
+            <div class="iframe-loader" id="iframeLoader">
+              <div class="loader-spinner"></div>
+              <p style="color: #94a3b8; font-size: 0.9rem;">Connecting to Google Drive...</p>
+            </div>
+            <div class="iframe-container">
+              <iframe id="docViewerIframe" src="" allow="autoplay"></iframe>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-bottom">
+          <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
+          <div class="footer-socials">
+            <a href="https://www.instagram.com/csmunerode?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="footer-social-link"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+            <a href="#" class="footer-social-link"><i data-lucide="twitter" style="width: 20px; height: 20px;"></i></a>
+            <a href="#" class="footer-social-link"><i data-lucide="linkedin" style="width: 20px; height: 20px;"></i></a>
+            <a href="mailto:csmun@csacademy.in" class="footer-social-link"><i data-lucide="mail" style="width: 20px; height: 20px;"></i></a>
+          </div>
         </div>
       </div>
-    </div>
-  </footer>
+    </footer>
 
-  <script src="main.js"></script>
+  </div>
+
+  <script type="module" src="main.js"></script>
   <script>
-    // Search and Filter Logic
-    const searchBar = document.getElementById('resourceSearch');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const cards = document.querySelectorAll('.resource-card');
+    // ── Document DB ──
+    const documentVault = [
+      {
+        title: "The Basic Aspects of MUN",
+        desc: "A thoroughly structured primary manual describing core MUN principles, debate flows and committee proceedings.",
+        category: "guide",
+        tag: "Guide",
+        icon: "book-open",
+        author: "Viswajeeth G K",
+        format: "Google Doc",
+        driveId: "1mh0PbZhEeKENvku4TWBy5qvQhDavKpmi"
+      },
+      {
+        title: "Standard Position Paper Format",
+        desc: "The required formatting, heading layout, and font guidelines for writing a CSMUN position paper.",
+        category: "format",
+        tag: "Format",
+        icon: "file-text",
+        author: "CSMUN Academics",
+        format: "Google Doc",
+        driveId: "1-Fa7WZoQUPSe1BJdMA-MlSF6oVbxCsLo"
+      },
+      {
+        title: "Sample Research Binder",
+        desc: "A mock research binder showing how delegates are expected to compile country research, topic research and solutions.",
+        category: "guide",
+        tag: "Sample",
+        icon: "archive",
+        author: "CSMUN Academics",
+        format: "Google Doc",
+        driveId: "1Rk0svBAyHui6L22kojt2YiUStL1sBbgR"
+      },
+      {
+        title: "Sample Draft Resolution",
+        desc: "A fully formatted reference draft resolution outlining exact formatting, placement of operative clauses, preambulatory clauses and sponsors.",
+        category: "format",
+        tag: "Format",
+        icon: "landmark",
+        author: "CSMUN Academics",
+        format: "Google Doc",
+        driveId: "1fbN26f_FxVSOHBGHFrB3iQqfVe91xiKT"
+      },
+      {
+        title: "Draft Resolution Checklist",
+        desc: "Use this final quality parameter to inspect your draft resolution’s details and formatting prior to the conference.",
+        category: "checklist",
+        tag: "Checklist",
+        icon: "check-square",
+        author: "CSMUN Academics",
+        format: "Google Doc",
+        driveId: "1XxX_bzjBxxnKxYTvWrZ4b0wf2jGI0fnn"
+      }
+    ];
 
-    function filterResources() {
-      const searchTerm = searchBar.value.toLowerCase();
-      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+    // DOM Elements
+    const searchBar = document.getElementById('librarySearch');
+    const filterBtns = document.querySelectorAll('.tag-btn');
+    const cards = document.querySelectorAll('.document-card');
+    const gallerySection = document.getElementById('gallerySection');
+    const viewerSection = document.getElementById('viewerSection');
+    const noResults = document.getElementById('noResults');
+
+    const backToGalleryBtn = document.getElementById('backToGalleryBtn');
+    const docViewerIframe = document.getElementById('docViewerIframe');
+    const iframeLoader = document.getElementById('iframeLoader');
+
+    // Detail Fields
+    const viewerTitle = document.getElementById('viewerTitle');
+    const viewerCategory = document.getElementById('viewerCategory');
+    const viewerDesc = document.getElementById('viewerDesc');
+    const viewerDriveLink = document.getElementById('viewerDriveLink');
+    const viewerIcon = document.getElementById('viewerIcon');
+
+    // ── Search and Filter Grid Logic ──
+    function filterLibrary() {
+      const query = searchBar.value.toLowerCase();
+      const activeFilter = document.querySelector('.tag-btn.active').dataset.filter;
+      let visibleCount = 0;
 
       cards.forEach(card => {
-        const title = card.querySelector('.resource-title').textContent.toLowerCase();
-        const category = card.dataset.category;
-        const matchesSearch = title.includes(searchTerm);
-        const matchesFilter = activeFilter === 'all' || category === activeFilter;
+        const idx = card.dataset.index;
+        const doc = documentVault[idx];
+        const matchesQuery = doc.title.toLowerCase().includes(query) || doc.desc.toLowerCase().includes(query);
+        const matchesFilter = activeFilter === 'all' || doc.category === activeFilter;
 
-        if (matchesSearch && matchesFilter) {
-          card.style.display = 'block';
+        if (matchesQuery && matchesFilter) {
+          card.style.display = 'flex';
+          visibleCount++;
         } else {
           card.style.display = 'none';
         }
       });
+
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
 
-    searchBar.addEventListener('input', filterResources);
+    searchBar.addEventListener('input', filterLibrary);
 
     filterBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        filterResources();
+        filterLibrary();
       });
+    });
+
+    // ── Transition to Focused Document Viewer ──
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        const index = parseInt(card.dataset.index);
+        const doc = documentVault[index];
+
+        // 1. Populate details panel
+        viewerTitle.textContent = doc.title;
+        viewerCategory.textContent = doc.tag;
+        viewerDesc.textContent = doc.desc;
+        
+        // Google Drive links
+        viewerDriveLink.href = `https://drive.google.com/file/d/${doc.driveId}/view?usp=drive_link`;
+        
+        // Update Icon dynamically
+        viewerIcon.innerHTML = `<i data-lucide="${doc.icon}" style="width: 32px; height: 32px;"></i>`;
+        
+        // Render Lucide icon
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+
+        // 2. Load Google Drive Preview Iframe
+        iframeLoader.style.opacity = '1';
+        iframeLoader.style.pointerEvents = 'all';
+        
+        // Google Drive preview url format
+        docViewerIframe.src = `https://drive.google.com/file/d/${doc.driveId}/preview`;
+        
+        // Hide loader when iframe finishes loading
+        docViewerIframe.onload = () => {
+          iframeLoader.style.opacity = '0';
+          iframeLoader.style.pointerEvents = 'none';
+        };
+
+        // 3. Slide view
+        gallerySection.style.display = 'none';
+        viewerSection.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    // ── Go Back to Gallery ──
+    backToGalleryBtn.addEventListener('click', () => {
+      docViewerIframe.src = ""; // Unload iframe
+      viewerSection.style.display = 'none';
+      gallerySection.style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>

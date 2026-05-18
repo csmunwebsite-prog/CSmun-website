@@ -32,7 +32,7 @@
         <span class="nav-brand-text">CS<span>MUN</span></span>
       </a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="#about">About</a></li>
+        <li><a href="/app">Dashboard</a></li>
         <li><a href="#committees">Committees</a></li>
         <li><a href="resources.html">Resources</a></li>
         <li><a href="/app/notes">Notes</a></li>
@@ -50,88 +50,34 @@
   </nav>
 
   <!-- ===== HERO ===== -->
-  <section class="hero" id="hero">
+  <section class="hero premium-hero" id="hero">
     <div class="hero-bg">
       <img src="assets/hero.png" alt="United Nations Assembly Hall" />
     </div>
-    <div class="hero-overlay"></div>
+    <div class="hero-overlay premium-overlay"></div>
 
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge glass-light">
-          <span class="dot"></span>
-          Registration Open
-        </div>
-
-        <h1 class="hero-title">
-          <span class="line">Shaping the</span>
-          <span class="line"><span class="accent-text">Future</span> of</span>
-          <span class="line">Diplomacy</span>
-        </h1>
-
-        <p class="hero-description">
-          CSMUN 2026 brings together the brightest young minds to debate, negotiate, and resolve the most pressing
-          global challenges of our time.
-        </p>
-
-        <div class="hero-actions">
-          <a href="/app" class="btn btn-primary" id="heroRegisterBtn">Register as Delegate</a>
-          <a href="#committees" class="btn btn-outline" id="heroExploreBtn">Explore Committees</a>
-        </div>
-
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hero-stat-number" id="statDelegates">300+</div>
-            <div class="hero-stat-label">Delegates</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-number">6</div>
-            <div class="hero-stat-label">Committees</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hero-stat-number">3</div>
-            <div class="hero-stat-label">Days</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="hero-card glass">
-          <div class="hero-card-label">📅 Save the Date</div>
-          <div class="hero-card-date">August 15 – 17, 2026</div>
-          <div class="hero-card-venue">
-            📍 &nbsp;CS Academy, Main Auditorium
-          </div>
-          <div class="hero-card-divider"></div>
-          <div class="hero-card-committees">
-            <div class="committee-tag">
-              <span class="tag-icon silver">🌐</span>
-              UNGA – Disarmament & Security
-            </div>
-            <div class="committee-tag">
-              <span class="tag-icon red">⚖️</span>
-              UNHRC – Digital Privacy
-            </div>
-            <div class="committee-tag">
-              <span class="tag-icon green">🌍</span>
-              UNEP – Climate Adaptation
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="premium-hero-content">
+      <h1 class="premium-hero-title">
+        CSMUN <span class="accent-text">VI</span>
+      </h1>
+    </div>
+      
+    <div class="scroll-indicator">
+      <span class="scroll-text">Scroll to explore</span>
+      <div class="scroll-line"></div>
     </div>
   </section>
 
   <!-- ===== ABOUT ===== -->
   <section class="about" id="about">
     <div class="container">
-      <div class="about-image-wrapper reveal">
+      <div class="about-image-wrapper reveal reveal-left">
         <img src="assets/hero.png" alt="CSMUN Conference" />
         <div class="about-image-overlay"></div>
         <div class="about-image-badge glass-light">Est. 2019</div>
       </div>
 
-      <div class="about-text reveal">
+      <div class="about-text reveal reveal-right">
         <div class="section-label">About CSMUN</div>
         <h2 class="section-title">Where Young Leaders <span class="accent-text">Find Their Voice</span></h2>
         <p class="section-subtitle">
@@ -142,28 +88,28 @@
 
         <div class="about-features">
           <div class="about-feature">
-            <div class="about-feature-icon">🎤</div>
+            <div class="about-feature-icon"><i data-lucide="mic"></i></div>
             <div class="about-feature-text">
               <h4>Expert Chairs</h4>
               <p>Experienced MUN veterans guide every session</p>
             </div>
           </div>
           <div class="about-feature">
-            <div class="about-feature-icon">🏆</div>
+            <div class="about-feature-icon"><i data-lucide="trophy"></i></div>
             <div class="about-feature-text">
               <h4>Awards & Recognition</h4>
               <p>Best Delegate, Outstanding Delegate, and more</p>
             </div>
           </div>
           <div class="about-feature">
-            <div class="about-feature-icon">🤝</div>
+            <div class="about-feature-icon"><i data-lucide="handshake"></i></div>
             <div class="about-feature-text">
               <h4>Networking</h4>
               <p>Connect with delegates from across the region</p>
             </div>
           </div>
           <div class="about-feature">
-            <div class="about-feature-icon">📚</div>
+            <div class="about-feature-icon"><i data-lucide="book-open"></i></div>
             <div class="about-feature-text">
               <h4>Study Guides</h4>
               <p>Comprehensive background guides for prep</p>
@@ -181,7 +127,7 @@
     <div class="glow-orb navy" style="width: 350px; height: 350px; bottom: -80px; right: -80px;"></div>
 
     <div class="container">
-      <div class="committees-header reveal">
+      <div class="committees-header reveal reveal-up">
         <div class="section-label">Our Committees</div>
         <h2 class="section-title">Debate. Negotiate. <span class="accent-text">Resolve.</span></h2>
         <p class="section-subtitle">Choose from our carefully curated committees, each tackling some of the world's most
@@ -190,8 +136,8 @@
 
       <div class="committees-grid">
         <!-- Committee 1 -->
-        <div class="committee-card glass reveal" id="committee-unga">
-          <div class="committee-icon icon-silver">🌐</div>
+        <div class="committee-card glass reveal reveal-left" id="committee-unga">
+          <div class="committee-icon icon-silver"><i data-lucide="globe"></i></div>
           <h3>UNGA</h3>
           <div class="committee-full-name">United Nations General Assembly</div>
           <p>The chief deliberative, policymaking, and representative organ of the United Nations, addressing the most
@@ -203,8 +149,8 @@
         </div>
 
         <!-- Committee 2 -->
-        <div class="committee-card glass reveal" id="committee-unhrc">
-          <div class="committee-icon icon-red">⚖️</div>
+        <div class="committee-card glass reveal reveal-zoom" id="committee-unhrc">
+          <div class="committee-icon icon-red"><i data-lucide="scale"></i></div>
           <h3>UNHRC</h3>
           <div class="committee-full-name">United Nations Human Rights Council</div>
           <p>Responsible for strengthening the promotion and protection of human rights around the globe and addressing
@@ -216,8 +162,8 @@
         </div>
 
         <!-- Committee 3 -->
-        <div class="committee-card glass reveal" id="committee-unep">
-          <div class="committee-icon icon-green">🌍</div>
+        <div class="committee-card glass reveal reveal-right" id="committee-unep">
+          <div class="committee-icon icon-green"><i data-lucide="earth"></i></div>
           <h3>UNEP</h3>
           <div class="committee-full-name">United Nations Environment Programme</div>
           <p>The leading global environmental authority that sets the environmental agenda and promotes sustainable
@@ -229,8 +175,8 @@
         </div>
 
         <!-- Committee 4 -->
-        <div class="committee-card glass reveal" id="committee-unsc">
-          <div class="committee-icon icon-silver">🛡️</div>
+        <div class="committee-card glass reveal reveal-left" id="committee-unsc">
+          <div class="committee-icon icon-silver"><i data-lucide="shield"></i></div>
           <h3>UNSC</h3>
           <div class="committee-full-name">United Nations Security Council</div>
           <p>The most powerful body of the UN, primarily responsible for the maintenance of international peace and
@@ -242,8 +188,8 @@
         </div>
 
         <!-- Committee 5 -->
-        <div class="committee-card glass reveal" id="committee-ecosoc">
-          <div class="committee-icon icon-red">📊</div>
+        <div class="committee-card glass reveal reveal-zoom" id="committee-ecosoc">
+          <div class="committee-icon icon-red"><i data-lucide="bar-chart-2"></i></div>
           <h3>ECOSOC</h3>
           <div class="committee-full-name">Economic and Social Council</div>
           <p>Coordinates the economic and social work of the UN, promoting international economic cooperation and
@@ -255,8 +201,8 @@
         </div>
 
         <!-- Committee 6 -->
-        <div class="committee-card glass reveal" id="committee-ip">
-          <div class="committee-icon icon-green">🇮🇳</div>
+        <div class="committee-card glass reveal reveal-right" id="committee-ip">
+          <div class="committee-icon icon-green"><i data-lucide="landmark"></i></div>
           <h3>IP</h3>
           <div class="committee-full-name">Indian Parliament — Lok Sabha</div>
           <p>A dynamic simulation of India's lower house, debating critical national policies with the intensity of real
@@ -273,26 +219,26 @@
   <!-- ===== TIMELINE / SCHEDULE ===== -->
   <section class="timeline-section" id="schedule">
     <div class="container">
-      <div class="timeline-header reveal">
+      <div class="timeline-header reveal reveal-up">
         <div class="section-label">Conference Schedule</div>
-        <h2 class="section-title">Three Days of <span class="accent-text">Intense Diplomacy</span></h2>
+        <h2 class="section-title">Two Days of <span class="accent-text">Intense Diplomacy</span></h2>
         <p class="section-subtitle">From opening ceremonies to the final gavel, every moment is crafted to challenge and
           inspire.</p>
       </div>
 
       <div class="timeline">
-        <div class="timeline-item reveal">
-          <div class="timeline-marker">🎪</div>
+        <div class="timeline-item reveal reveal-left">
+          <div class="timeline-marker"><i data-lucide="flag" style="width: 16px; height: 16px;"></i></div>
           <div class="timeline-content glass-light">
             <div class="timeline-time">Day 1 — August 15</div>
             <h3>Opening Ceremony & Committee Session I</h3>
-            <p>Keynote address, delegate orientation, and the first round of committee sessions. Set the tone for three
+             <p>Keynote address, delegate orientation, and the first round of committee sessions. Set the tone for two
               transformative days.</p>
           </div>
         </div>
 
-        <div class="timeline-item reveal">
-          <div class="timeline-marker">🔥</div>
+        <div class="timeline-item reveal reveal-right">
+          <div class="timeline-marker"><i data-lucide="flame" style="width: 16px; height: 16px;"></i></div>
           <div class="timeline-content glass-light">
             <div class="timeline-time">Day 2 — August 16</div>
             <h3>Committee Sessions II & III</h3>
@@ -301,8 +247,8 @@
           </div>
         </div>
 
-        <div class="timeline-item reveal">
-          <div class="timeline-marker">🏆</div>
+        <div class="timeline-item reveal reveal-left">
+          <div class="timeline-marker"><i data-lucide="trophy" style="width: 16px; height: 16px;"></i></div>
           <div class="timeline-content glass-light">
             <div class="timeline-time">Day 3 — August 17</div>
             <h3>Final Session & Closing Ceremony</h3>
@@ -317,7 +263,7 @@
   <!-- ===== SECRETARY GENERAL LETTER ===== -->
   <section class="letter-section" id="letter">
     <div class="container">
-      <div class="letter-container glass reveal">
+      <div class="letter-container glass reveal reveal-zoom">
         <div class="letter-quote">"</div>
         <p class="letter-text">
           Dear Future Delegates,<br /><br />
@@ -343,16 +289,16 @@
   <!-- ===== REGISTER CTA ===== -->
   <section class="register-cta" id="register">
     <div class="container">
-      <div class="register-cta-box glass reveal">
+      <div class="register-cta-box glass reveal reveal-up">
         <div class="section-label">Registration Open</div>
         <h2>Ready to Make <span class="accent-text">History?</span></h2>
         <p>Secure your seat at the most anticipated MUN conference of 2026. Limited delegate spots available — register
           today.</p>
         <a href="/app" class="btn btn-primary" id="registerBtn">Register Now →</a>
         <div class="register-cta-info">
-          <span>📅 August 15 – 17, 2026</span>
-          <span>📍 CS Academy, Main Auditorium</span>
-          <span>🎟️ Limited Seats</span>
+          <span><i data-lucide="calendar" style="width: 16px; height: 16px; display: inline; vertical-align: middle;"></i> August 15 – 17, 2026</span>
+          <span><i data-lucide="map-pin" style="width: 16px; height: 16px; display: inline; vertical-align: middle;"></i> CS Academy, Main Auditorium</span>
+          <span><i data-lucide="ticket" style="width: 16px; height: 16px; display: inline; vertical-align: middle;"></i> Limited Seats</span>
         </div>
       </div>
     </div>
@@ -378,7 +324,7 @@
         <div class="footer-links">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="#about">About</a></li>
+             <li><a href="/app">Dashboard</a></li>
             <li><a href="#committees">Committees</a></li>
             <li><a href="#schedule">Schedule</a></li>
             <li><a href="/app">Register</a></li>
@@ -398,9 +344,9 @@
         <div class="footer-links">
           <h4>Contact</h4>
           <ul>
+             <li><a href="mailto:csmun@csacademy.in">csmun@csacademy.in</a></li>
+            <li><a href="#">CS Academy, Erode</a></li>
             <li><a href="mailto:csmun@csacademy.in">csmun@csacademy.in</a></li>
-            <li><a href="#">CS Academy, Chennai</a></li>
-            <li><a href="#">+91 98765 43210</a></li>
           </ul>
         </div>
       </div>
@@ -408,16 +354,19 @@
       <div class="footer-bottom">
         <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
         <div class="footer-socials">
-          <a href="#" class="footer-social-link" aria-label="Instagram" id="socialInstagram">📸</a>
-          <a href="#" class="footer-social-link" aria-label="Twitter" id="socialTwitter">🐦</a>
-          <a href="#" class="footer-social-link" aria-label="LinkedIn" id="socialLinkedin">💼</a>
-          <a href="#" class="footer-social-link" aria-label="Email" id="socialEmail">✉️</a>
+          <a href="https://www.instagram.com/csmunerode?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" class="footer-social-link" aria-label="Instagram" id="socialInstagram"><i data-lucide="instagram" style="width: 20px; height: 20px;"></i></a>
+          <a href="#" class="footer-social-link" aria-label="Twitter" id="socialTwitter"><i data-lucide="twitter" style="width: 20px; height: 20px;"></i></a>
+          <a href="#" class="footer-social-link" aria-label="LinkedIn" id="socialLinkedin"><i data-lucide="linkedin" style="width: 20px; height: 20px;"></i></a>
+          <a href="#" class="footer-social-link" aria-label="Email" id="socialEmail"><i data-lucide="mail" style="width: 20px; height: 20px;"></i></a>
         </div>
       </div>
     </div>
   </footer>
 
   <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.4/ScrollTrigger.min.js"></script>
   <script type="module" src="main.js"></script>
 </body>
 
