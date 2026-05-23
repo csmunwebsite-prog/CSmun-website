@@ -115,160 +115,97 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── IMMERSIVE CINEMATIC SCROLLYTELLING (GSAP) ──
-    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        gsap.registerPlugin(ScrollTrigger);
+    // ── IMMERSIVE CINEMATIC SCROLLYTELLING (Intersection Observer + Fallback) ──
+    document.body.style.overflowX = "hidden";
 
-        // Clean up old CSS reveal classes
-        const revealElements = document.querySelectorAll('.reveal');
-        revealElements.forEach(el => {
-            el.style.transition = 'none';
-            el.style.opacity = '1';
-            el.style.transform = 'none';
-            el.classList.remove('reveal', 'reveal-up', 'reveal-down', 'reveal-left', 'reveal-right', 'reveal-zoom');
+    // Staggered reveal system
+    const observerOptions = {
+        root: null,
+        rootMargin: "0px 0px -80px 0px", // Trigger when elements are 80px inside viewport
+        threshold: 0.05
+    };
+
+    const entriesBySection = new Map();
+    let staggerTimeout = null;
+
+    const observer = new IntersectionObserver((entries, observerInstance) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                // Group by parent section or layout grid to stagger reveals
+                const section = el.closest('.committees-grid') || 
+                                el.closest('.about-features') || 
+                                el.closest('.timeline') || 
+                                el.closest('section') || 
+                                el.parentElement;
+                
+                if (!entriesBySection.has(section)) {
+                    entriesBySection.set(section, []);
+                }
+                entriesBySection.get(section).push(el);
+                observerInstance.unobserve(el);
+            }
         });
 
-        // Ensure sections fill screen for pinning
-        document.body.style.overflowX = "hidden";
+        // Process groups with stagger delays
+        if (entriesBySection.size > 0) {
+            if (staggerTimeout) clearTimeout(staggerTimeout);
+            staggerTimeout = setTimeout(() => {
+                entriesBySection.forEach((elements) => {
+                    // Sort elements based on their vertical/horizontal position on page
+                    elements.sort((a, b) => {
+                        const rectA = a.getBoundingClientRect();
+                        const rectB = b.getBoundingClientRect();
+                        return (rectA.top - rectB.top) || (rectA.left - rectB.left);
+                    });
 
-        // 1. HERO SCENE: Pin and scrub zoom out
-        const heroSection = document.querySelector('.premium-hero');
-        if (heroSection) {
-            const heroContent = document.querySelector('.premium-hero-content');
-            const heroBgImg = document.querySelector('.hero-bg img');
-
-            const heroTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: heroSection,
-                    start: "top 0",
-                    end: "+=150%", // Good distance for a smooth fade
-                    pin: true,
-                    scrub: 1.5, // Smooth scrubbing
-                    anticipatePin: 1
-                }
-            });
-
-            // Keep text completely visible at start, but fade out quickly on scroll
-            heroTl.to(heroContent, {
-                scale: 1.1,
-                opacity: 0,
-                filter: "blur(8px)",
-                duration: 0.8
-            }, 0) // Reacts immediately on scroll
-            .to(heroBgImg, {
-                scale: 1.2,
-                opacity: 0.3,
-                duration: 1.3
-            }, 0);
+                    // Apply stagger delay transition and add active
+                    elements.forEach((el, index) => {
+                        const baseDelay = parseFloat(window.getComputedStyle(el).transitionDelay) || 0;
+                        const staggerDelay = index * 0.12; // 120ms stagger
+                        el.style.transitionDelay = `${baseDelay + staggerDelay}s`;
+                        
+                        // Force layout reflow and set active
+                        requestAnimationFrame(() => {
+                            el.classList.add('active');
+                        });
+                    });
+                });
+                entriesBySection.clear();
+            }, 20); // small batching timeout
         }
+    }, observerOptions);
 
-        // 2. ABOUT SCENE: Pinned lateral reveal
-        const aboutSection = document.querySelector('.about');
-        if (aboutSection) {
-            const aboutImg = aboutSection.querySelector('.about-image-wrapper');
-            const aboutText = aboutSection.querySelector('.about-text');
+    // Start observing all reveal elements
+    const revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach(el => observer.observe(el));
 
-            const aboutTl = gsap.timeline({
-                scrollTrigger: {
-                    trigger: aboutSection,
-                    start: "center center",
-                    end: "+=150%",
-                    pin: true,
-                    scrub: 1.5
+    // ── HERO SCENE PARALLAX & FADE ──
+    const heroSection = document.querySelector('.premium-hero');
+    if (heroSection) {
+        const heroContent = document.querySelector('.premium-hero-content');
+        const heroBgImg = document.querySelector('.hero-bg img');
+
+        const handleHeroScroll = () => {
+            const scrollTop = window.scrollY;
+            const heroHeight = heroSection.offsetHeight;
+            if (scrollTop <= heroHeight) {
+                const progress = scrollTop / heroHeight;
+                
+                // Apply smooth transforms & filters
+                if (heroContent) {
+                    heroContent.style.opacity = Math.max(0, 1 - progress * 1.5).toString();
+                    heroContent.style.transform = `scale(${1 + progress * 0.06}) translateY(${progress * 50}px)`;
+                    heroContent.style.filter = `blur(${progress * 8}px)`;
                 }
-            });
-
-            // Start state
-            gsap.set(aboutImg, { x: "-20vw", opacity: 0, rotationY: -10 });
-            gsap.set(aboutText, { x: "20vw", opacity: 0 });
-
-            // Animate in and stay
-            aboutTl.to(aboutImg, { x: 0, opacity: 1, rotationY: 0, duration: 1, ease: "power2.out" }, 0)
-                   .to(aboutText, { x: 0, opacity: 1, duration: 1, ease: "power2.out" }, 0.2);
-        }
-
-        // 3. COMMITTEES SCENE: Natural smooth scroll entry (Unpinned to avoid cutting off grid)
-        const committeesSection = document.querySelector('.committees');
-        if (committeesSection) {
-            const headerText = committeesSection.querySelectorAll('.committees-header > *');
-            const cards = committeesSection.querySelectorAll('.committee-card');
-
-            // Hide initially
-            gsap.set(headerText, { y: 30, opacity: 0 });
-            gsap.set(cards, { y: 60, opacity: 0, scale: 0.9 });
-
-            // Play smoothly when scrolled into view (no scrub, prevents skipping)
-            ScrollTrigger.create({
-                trigger: committeesSection,
-                start: "top 75%",
-                onEnter: () => {
-                    gsap.to(headerText, { y: 0, opacity: 1, stagger: 0.15, duration: 1, ease: "power3.out" });
-                    gsap.to(cards, { y: 0, opacity: 1, scale: 1, stagger: 0.1, duration: 1.2, ease: "power3.out", delay: 0.3 });
+                if (heroBgImg) {
+                    heroBgImg.style.opacity = (0.2 + (1 - progress) * 0.8).toString();
+                    heroBgImg.style.transform = `scale(${1.05 + progress * 0.08}) translateY(${progress * 30}px)`;
                 }
-            });
-        }
-
-        // 4. TIMELINE SCENE: Flowing cinematic entry (Unpinned to fit all items)
-        const timelineSection = document.querySelector('.timeline-section');
-        if (timelineSection) {
-            const timelineHeader = timelineSection.querySelectorAll('.timeline-header > *');
-            const timelineItems = document.querySelectorAll('.timeline-item');
-            
-            gsap.set(timelineHeader, { y: 30, opacity: 0 });
-            gsap.set(timelineItems, { opacity: 0, x: (i) => i % 2 === 0 ? -50 : 50 });
-
-            ScrollTrigger.create({
-                trigger: timelineSection,
-                start: "top 75%",
-                onEnter: () => {
-                    gsap.to(timelineHeader, { y: 0, opacity: 1, stagger: 0.15, duration: 1, ease: "power3.out" });
-                    gsap.to(timelineItems, { x: 0, opacity: 1, stagger: 0.3, duration: 1.2, ease: "power3.out", delay: 0.4 });
-                }
-            });
-        }
-
-        // 5. SG LETTER: Smooth parallax float (Unpinned)
-        const letterSection = document.querySelector('.letter-section');
-        if (letterSection) {
-            const letterContainer = letterSection.querySelector('.letter-container');
-            
-            gsap.set(letterContainer, { scale: 0.9, opacity: 0, y: 80 });
-
-            gsap.to(letterContainer, {
-                scale: 1,
-                opacity: 1,
-                y: 0,
-                duration: 1.5,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: letterSection,
-                    start: "top 80%",
-                    end: "center center",
-                    scrub: 1.5 // Scrub gives it a nice parallax feel without pinning
-                }
-            });
-        }
-        
-        // 6. REGISTER CTA: Reveal
-        const ctaSection = document.querySelector('.register-cta');
-        if (ctaSection) {
-            const ctaBox = ctaSection.querySelector('.register-cta-box');
-            
-            gsap.set(ctaBox, { scale: 0.9, opacity: 0, y: 50 });
-            
-            gsap.to(ctaBox, {
-                scale: 1,
-                opacity: 1,
-                y: 0,
-                duration: 1.2,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: ctaSection,
-                    start: "top 85%",
-                    toggleActions: "play none none none"
-                }
-            });
-        }
+            }
+        };
+        window.addEventListener('scroll', handleHeroScroll, { passive: true });
+        handleHeroScroll(); // Run once on load
     }
 
     // ── Smooth scroll for anchor links ──
@@ -285,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── Committee cards hover tilt effect (GSAP Powered for high-end smoothness) ──
+    // ── Committee cards hover tilt effect (GSAP Powered with Native Fallback) ──
     const cards = document.querySelectorAll('.committee-card');
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
@@ -294,29 +231,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = e.clientY - rect.top;
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
-            const rotateX = (y - centerY) / 15;
-            const rotateY = (centerX - x) / 15;
+            const rotateX = ((y - centerY) / centerY) * 12; // Max 12 deg tilt
+            const rotateY = ((centerX - x) / centerX) * 12;
 
-            gsap.to(card, {
-                transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`,
-                duration: 0.3,
-                ease: "power2.out",
-                overwrite: "auto"
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.to(card, {
+                    transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`,
+                    duration: 0.3,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            } else {
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+                card.style.transition = 'transform 0.15s ease-out';
+            }
         });
 
         card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-                transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`,
-                duration: 0.5,
-                ease: "power2.out",
-                overwrite: "auto"
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.to(card, {
+                    transform: `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`,
+                    duration: 0.5,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            } else {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)`;
+                card.style.transition = 'transform 0.4s ease-out';
+            }
         });
     });
 
     // ── Countdown timer (optional, shows days until event) ──
-    const eventDate = new Date('2026-08-15T09:00:00+05:30');
+    const eventDate = new Date('2026-09-12T09:00:00+05:30');
     function updateCountdown() {
         const now = new Date();
         const diff = eventDate - now;
