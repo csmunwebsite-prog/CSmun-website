@@ -36,7 +36,6 @@
         <li><a href="#committees">Committees</a></li>
         <li><a href="resources.html">Resources</a></li>
         <li><a href="/app/notes">Notes</a></li>
-        <li><a href="#letter">SG Message</a></li>
         <li id="auth-nav-item">
           <a href="/app" class="btn btn-primary nav-cta" id="navRegisterBtn">Register Now</a>
         </li>
@@ -102,10 +101,10 @@
             </div>
           </div>
           <div class="about-feature">
-            <div class="about-feature-icon"><i data-lucide="handshake"></i></div>
+            <div class="about-feature-icon"><i data-lucide="users"></i></div>
             <div class="about-feature-text">
-              <h4>Networking</h4>
-              <p>Connect with delegates from across the region</p>
+              <h4>Delegate Mentorship</h4>
+              <p>Trained mentors for proper delegate training</p>
             </div>
           </div>
           <div class="about-feature">
@@ -135,84 +134,184 @@
       </div>
 
       <div class="committees-grid">
-        <!-- Committee 1 -->
-        <div class="committee-card glass reveal reveal-left" id="committee-unga">
-          <div class="committee-icon icon-silver"><i data-lucide="globe"></i></div>
-          <h3>UNGA</h3>
-          <div class="committee-full-name">United Nations General Assembly</div>
-          <p>The chief deliberative, policymaking, and representative organ of the United Nations, addressing the most
-            pressing global issues.</p>
-          <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"Addressing the Proliferation of Autonomous Weapons Systems"</div>
-          </div>
-        </div>
-
-        <!-- Committee 2 -->
-        <div class="committee-card glass reveal reveal-zoom" id="committee-unhrc">
-          <div class="committee-icon icon-red"><i data-lucide="scale"></i></div>
-          <h3>UNHRC</h3>
-          <div class="committee-full-name">United Nations Human Rights Council</div>
-          <p>Responsible for strengthening the promotion and protection of human rights around the globe and addressing
-            situations of violations.</p>
-          <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"Safeguarding Digital Privacy in the Age of Mass Surveillance"</div>
-          </div>
-        </div>
-
-        <!-- Committee 3 -->
-        <div class="committee-card glass reveal reveal-right" id="committee-unep">
+        <!-- Committee 1: UNEP -->
+        <div class="committee-card glass reveal reveal-left" id="committee-unep">
           <div class="committee-icon icon-green"><i data-lucide="earth"></i></div>
           <h3>UNEP</h3>
           <div class="committee-full-name">United Nations Environment Programme</div>
-          <p>The leading global environmental authority that sets the environmental agenda and promotes sustainable
-            development.</p>
+          <p><strong>Grade 7</strong></p>
           <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"Financing Climate Adaptation in Developing Nations"</div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Addressing Environmental Degradation Caused by Excessive Consumption and Improper Waste Disposal</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Analyzing the Impact of Industrial Expansion on Ecological Stability</div>
+            </div>
           </div>
         </div>
 
-        <!-- Committee 4 -->
-        <div class="committee-card glass reveal reveal-left" id="committee-unsc">
+        <!-- Committee 2: DISEC -->
+        <div class="committee-card glass reveal reveal-zoom" id="committee-disec">
+          <div class="committee-icon icon-red"><i data-lucide="swords"></i></div>
+          <h3>DISEC</h3>
+          <div class="committee-full-name">Disarmament and International Security Committee</div>
+          <p><strong>Grade 7</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Addressing the Threats Posed by Autonomous Weapons, Artificial Intelligence, and Cyber Warfare to Global Security</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Addressing the Weaponisation of Space and Global Security</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 3: HRC -->
+        <div class="committee-card glass reveal reveal-right" id="committee-hrc">
+          <div class="committee-icon icon-silver"><i data-lucide="scale"></i></div>
+          <h3>HRC</h3>
+          <div class="committee-full-name">United Nations Human Rights Council</div>
+          <p><strong>Grades 7 and 8</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Addressing the Human Rights and Humanitarian Impact of Nuclear Testing and Radiation Exposure</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Safeguarding Mental Health and Human Rights in an Era of Digital Volatility</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 4: SOCHUM I -->
+        <div class="committee-card glass reveal reveal-left" id="committee-sochum-i">
+          <div class="committee-icon icon-silver"><i data-lucide="users"></i></div>
+          <h3>SOCHUM I</h3>
+          <div class="committee-full-name">Social, Humanitarian & Cultural Committee I</div>
+          <p><strong>Grade 8</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Strengthening Rehabilitation and Reintegration Programs for Survivors of Human Trafficking</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Addressing Labour Rights and Refugee Integration Challenges in Migrant Labour and Global Resettlement Systems</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 5: SOCHUM II -->
+        <div class="committee-card glass reveal reveal-zoom" id="committee-sochum-ii">
+          <div class="committee-icon icon-silver"><i data-lucide="users"></i></div>
+          <h3>SOCHUM II</h3>
+          <div class="committee-full-name">Social, Humanitarian & Cultural Committee II</div>
+          <p><strong>Grade 8</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Combating the Exploitation of Youth Through Online Radicalization</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Combating the Social Exploitation and Forced Displacement of Civilians in Regions of Conflict</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 6: UNEA I -->
+        <div class="committee-card glass reveal reveal-right" id="committee-unea-i">
+          <div class="committee-icon icon-green"><i data-lucide="leaf"></i></div>
+          <h3>UNEA I</h3>
+          <div class="committee-full-name">United Nations Environment Assembly I</div>
+          <p><strong>Grade 9</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Strengthening International Cooperation for Affordable and Sustainable Clean Energy Access</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Examining the Ecological Risks of Deep-Sea Mining for Resources Essential to Renewable Energy Production</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 7: UNEA II -->
+        <div class="committee-card glass reveal reveal-left" id="committee-unea-ii">
+          <div class="committee-icon icon-green"><i data-lucide="leaf"></i></div>
+          <h3>UNEA II</h3>
+          <div class="committee-full-name">United Nations Environment Assembly II</div>
+          <p><strong>Grade 9</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Evaluating Sustainable Pathways for Critical Mineral Extraction Amid the Global Green Energy Transition</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Managing the Lifecycle and Toxic Waste Volatility of Decommissioned Clean Energy Technologies</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 8: WTO I -->
+        <div class="committee-card glass reveal reveal-zoom" id="committee-wto-i">
+          <div class="committee-icon icon-silver"><i data-lucide="briefcase"></i></div>
+          <h3>WTO I</h3>
+          <div class="committee-full-name">World Trade Organization I</div>
+          <p><strong>Grades 11 and 12</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Addressing the Compatibility of Carbon Border Adjustment Mechanisms with WTO Non-Discrimination Rules</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Discussing the Monopoly of Major Powers in Global Semiconductor and Technology Trade</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 9: WTO II -->
+        <div class="committee-card glass reveal reveal-right" id="committee-wto-ii">
+          <div class="committee-icon icon-silver"><i data-lucide="briefcase"></i></div>
+          <h3>WTO II</h3>
+          <div class="committee-full-name">World Trade Organization II</div>
+          <p><strong>Grades 11 and 12</strong></p>
+          <div class="committee-agenda">
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Deliberating the Future of Digital Trade Governance in AI Economies and WTO E-Commerce Frameworks</div>
+            </div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 2</div>
+              <div class="committee-agenda-text">Ensuring Equitable Access to Global Markets Amid Geopolitical Disruptions to Trade Routes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Committee 10: SC -->
+        <div class="committee-card glass reveal reveal-left" id="committee-sc">
           <div class="committee-icon icon-silver"><i data-lucide="shield"></i></div>
-          <h3>UNSC</h3>
+          <h3>SC</h3>
           <div class="committee-full-name">United Nations Security Council</div>
-          <p>The most powerful body of the UN, primarily responsible for the maintenance of international peace and
-            security.</p>
           <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"De-escalation of Geopolitical Tensions in the Indo-Pacific"</div>
-          </div>
-        </div>
-
-        <!-- Committee 5 -->
-        <div class="committee-card glass reveal reveal-zoom" id="committee-ecosoc">
-          <div class="committee-icon icon-red"><i data-lucide="bar-chart-2"></i></div>
-          <h3>ECOSOC</h3>
-          <div class="committee-full-name">Economic and Social Council</div>
-          <p>Coordinates the economic and social work of the UN, promoting international economic cooperation and
-            development.</p>
-          <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"Bridging the Global Digital Divide for Equitable Development"</div>
-          </div>
-        </div>
-
-        <!-- Committee 6 -->
-        <div class="committee-card glass reveal reveal-right" id="committee-ip">
-          <div class="committee-icon icon-green"><i data-lucide="landmark"></i></div>
-          <h3>IP</h3>
-          <div class="committee-full-name">Indian Parliament — Lok Sabha</div>
-          <p>A dynamic simulation of India's lower house, debating critical national policies with the intensity of real
-            parliamentary sessions.</p>
-          <div class="committee-agenda">
-            <div class="committee-agenda-label">Agenda</div>
-            <div class="committee-agenda-text">"Reforming India's Education System for the 21st Century"</div>
+            <div class="topic-item">
+              <div class="committee-agenda-label">Topic 1</div>
+              <div class="committee-agenda-text">Managing Cross-border Supply Chains and Provincial Industrial Policy Under U.S. Trade Tensions</div>
+            </div>
           </div>
         </div>
       </div>
+
+
+
     </div>
   </section>
 
@@ -244,32 +343,6 @@
             <h3>Final Sessions & Closing Ceremony</h3>
             <p>Deep-dive into agendas, draft resolutions go to vote. Award ceremony celebrates the best delegates,
               diplomats, and rising stars of CSMUN 2026.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== SECRETARY GENERAL LETTER ===== -->
-  <section class="letter-section" id="letter">
-    <div class="container">
-      <div class="letter-container glass reveal reveal-zoom">
-        <div class="letter-quote">"</div>
-        <p class="letter-text">
-          Dear Future Delegates,<br /><br />
-          In a world grappling with unprecedented challenges — from geopolitical unrest to climate crises — the need for
-          informed, empathetic, and courageous leaders has never been greater. CSMUN 2026 is not just a simulation; it
-          is a crucible where your ideas will be tested, your convictions challenged, and your voice
-          amplified.<br /><br />
-          Whether you are a seasoned MUNner or stepping into committee for the first time, I promise you an experience
-          that will push your boundaries and expand your horizons. Together, let us shape a future worthy of the world
-          we wish to inherit.
-        </p>
-        <div class="letter-author">
-          <div class="letter-avatar">SG</div>
-          <div class="letter-author-info">
-            <h4>The Secretary General</h4>
-            <p>CSMUN 2026</p>
           </div>
         </div>
       </div>

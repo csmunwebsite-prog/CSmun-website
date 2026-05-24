@@ -11,6 +11,10 @@
     --red-500: #8b1e1e;
     --red-600: #6a1616;
     --red-300: #c24646;
+
+    --gold-400: #c9a84c;
+    --gold-500: #b8932d;
+    --blue-500: #2563eb;
     
     --silver-300: #e2e8f0;
     --silver-400: #cbd5e1;
@@ -493,7 +497,7 @@ ul {
 
 /* ===== ABOUT SECTION ===== */
 .about {
-    padding: var(--space-5xl) 0;
+    padding: var(--space-5xl) 0 var(--space-2xl) 0;
     position: relative;
 }
 
@@ -583,7 +587,7 @@ ul {
 
 /* ===== COMMITTEES SECTION ===== */
 .committees {
-    padding: var(--space-5xl) 0;
+    padding: var(--space-2xl) 0 var(--space-2xl) 0;
     position: relative;
 }
 
@@ -632,6 +636,18 @@ ul {
 .committee-card:hover::before {
     opacity: 1;
 }
+
+#committee-sc {
+    grid-column: span 3;
+    text-align: center;
+}
+
+#committee-sc .committee-icon {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 
 .committee-icon {
     width: 56px;
@@ -703,9 +719,15 @@ ul {
     font-style: italic;
 }
 
+.topic-item:not(:last-child) {
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 /* ===== TIMELINE SECTION ===== */
 .timeline-section {
-    padding: var(--space-5xl) 0;
+    padding: var(--space-2xl) 0 var(--space-2xl) 0;
     position: relative;
 }
 
@@ -795,81 +817,9 @@ ul {
     line-height: 1.6;
 }
 
-/* ===== LETTER SECTION ===== */
-.letter-section {
-    padding: var(--space-5xl) 0;
-}
-
-.letter-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: var(--space-3xl);
-    border-radius: var(--radius-xl);
-    position: relative;
-}
-
-.letter-container::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: var(--radius-xl);
-    background: linear-gradient(135deg, var(--red-500), transparent, var(--red-500));
-    z-index: -1;
-    opacity: 0.15;
-}
-
-.letter-quote {
-    font-size: 4rem;
-    color: var(--red-500);
-    opacity: 0.3;
-    font-family: Georgia, serif;
-    line-height: 0;
-    margin-bottom: var(--space-xl);
-}
-
-.letter-text {
-    font-size: 1.05rem;
-    color: var(--white-70);
-    line-height: 1.9;
-    margin-bottom: var(--space-xl);
-}
-
-.letter-author {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    padding-top: var(--space-xl);
-    border-top: 1px solid var(--white-10);
-}
-
-.letter-avatar {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--red-500), var(--navy-500));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--ff-heading);
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--white);
-}
-
-.letter-author-info h4 {
-    font-family: var(--ff-heading);
-    font-size: 1.1rem;
-    color: var(--white);
-}
-
-.letter-author-info p {
-    font-size: 0.85rem;
-    color: var(--red-400);
-}
-
 /* ===== REGISTER CTA SECTION ===== */
 .register-cta {
-    padding: var(--space-5xl) 0;
+    padding: var(--space-2xl) 0 var(--space-5xl) 0;
     text-align: center;
     position: relative;
 }
@@ -1075,39 +1025,89 @@ ul {
 
 .reveal {
     opacity: 0;
-    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform, opacity;
 }
 
 /* Directional Fly-Ins */
 .reveal-up {
-    transform: translateY(80px);
+    transform: translateY(100px);
 }
 
 .reveal-down {
-    transform: translateY(-80px);
+    transform: translateY(-100px);
 }
 
 .reveal-left {
-    transform: translateX(-100px);
+    transform: translateX(-120px);
 }
 
 .reveal-right {
-    transform: translateX(100px);
+    transform: translateX(120px);
 }
 
 .reveal-zoom {
-    transform: scale(0.92) translateY(40px);
+    transform: scale(0.85) translateY(60px);
 }
 
 /* Fallback default if no direction specified */
 .reveal:not(.reveal-up):not(.reveal-down):not(.reveal-left):not(.reveal-right):not(.reveal-zoom) {
-    transform: translateY(60px);
+    transform: translateY(80px);
 }
 
 .reveal.active {
     opacity: 1;
     transform: translate(0, 0) scale(1) !important;
+}
+
+/* Stagger children inside grids when parent becomes visible */
+.committees-grid .committee-card,
+.about-features .about-feature,
+.timeline .timeline-item {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.committees-grid .committee-card.stagger-visible,
+.about-features .about-feature.stagger-visible,
+.timeline .timeline-item.stagger-visible,
+.register-cta-info span.stagger-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Section labels animate in */
+.section-label {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+}
+
+.reveal.active .section-label,
+.section-label.stagger-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Section titles animate in slightly after labels */
+.reveal.active .section-title {
+    animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+
+.reveal.active .section-subtitle {
+    animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ===== DECORATIVE ELEMENTS ===== */
@@ -1164,6 +1164,18 @@ ul {
     .committees-grid {
         grid-template-columns: 1fr 1fr;
     }
+
+    #committee-sc {
+        grid-column: span 1;
+        text-align: left;
+    }
+
+    #committee-sc .committee-icon {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+
 
     .footer-top {
         grid-template-columns: 1fr 1fr;
@@ -1228,9 +1240,6 @@ ul {
         text-align: center;
     }
 
-    .letter-container {
-        padding: var(--space-xl);
-    }
 }
 
 /* ===== SMOOTH SCROLLBAR ===== */

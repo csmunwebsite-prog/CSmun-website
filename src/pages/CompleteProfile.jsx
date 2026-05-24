@@ -307,16 +307,16 @@ export default function CompleteProfile() {
               required
             >
               <option value="">Select Committee</option>
-              <option value="Committee 1">Committee 1</option>
-              <option value="Committee 2">Committee 2</option>
-              <option value="Committee 3">Committee 3</option>
-              <option value="Committee 4">Committee 4</option>
-              <option value="Committee 5">Committee 5</option>
-              <option value="Committee 6">Committee 6</option>
-              <option value="Committee 7">Committee 7</option>
-              <option value="Committee 8">Committee 8</option>
-              <option value="Committee 9">Committee 9</option>
-              <option value="Committee 10">Committee 10</option>
+              <option value="UNEP">UNEP (United Nations Environment Programme)</option>
+              <option value="DISEC">DISEC (Disarmament and International Security Committee)</option>
+              <option value="HRC">HRC (United Nations Human Rights Council)</option>
+              <option value="SOCHUM I">SOCHUM I (Social, Humanitarian & Cultural Committee I)</option>
+              <option value="SOCHUM II">SOCHUM II (Social, Humanitarian & Cultural Committee II)</option>
+              <option value="UNEA I">UNEA I (United Nations Environment Assembly I)</option>
+              <option value="UNEA II">UNEA II (United Nations Environment Assembly II)</option>
+              <option value="WTO I">WTO I (World Trade Organization I)</option>
+              <option value="WTO II">WTO II (World Trade Organization II)</option>
+              <option value="SC">SC (United Nations Security Council)</option>
             </select>
           </div>
 

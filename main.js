@@ -115,72 +115,99 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ── IMMERSIVE CINEMATIC SCROLLYTELLING (Intersection Observer + Fallback) ──
+    // ── IMMERSIVE CINEMATIC SCROLLYTELLING ──
     document.body.style.overflowX = "hidden";
 
-    // Staggered reveal system
-    const observerOptions = {
-        root: null,
-        rootMargin: "0px 0px -80px 0px", // Trigger when elements are 80px inside viewport
-        threshold: 0.05
-    };
-
-    const entriesBySection = new Map();
-    let staggerTimeout = null;
-
-    const observer = new IntersectionObserver((entries, observerInstance) => {
+    // ── 1. Main Reveal Observer (for .reveal elements) ──
+    const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const el = entry.target;
-                // Group by parent section or layout grid to stagger reveals
-                const section = el.closest('.committees-grid') || 
-                                el.closest('.about-features') || 
-                                el.closest('.timeline') || 
-                                el.closest('section') || 
-                                el.parentElement;
-                
-                if (!entriesBySection.has(section)) {
-                    entriesBySection.set(section, []);
-                }
-                entriesBySection.get(section).push(el);
-                observerInstance.unobserve(el);
+                entry.target.classList.add('active');
+                revealObserver.unobserve(entry.target);
             }
         });
+    }, {
+        root: null,
+        rootMargin: "0px 0px -60px 0px",
+        threshold: 0.1
+    });
 
-        // Process groups with stagger delays
-        if (entriesBySection.size > 0) {
-            if (staggerTimeout) clearTimeout(staggerTimeout);
-            staggerTimeout = setTimeout(() => {
-                entriesBySection.forEach((elements) => {
-                    // Sort elements based on their vertical/horizontal position on page
-                    elements.sort((a, b) => {
-                        const rectA = a.getBoundingClientRect();
-                        const rectB = b.getBoundingClientRect();
-                        return (rectA.top - rectB.top) || (rectA.left - rectB.left);
-                    });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-                    // Apply stagger delay transition and add active
-                    elements.forEach((el, index) => {
-                        const baseDelay = parseFloat(window.getComputedStyle(el).transitionDelay) || 0;
-                        const staggerDelay = index * 0.12; // 120ms stagger
-                        el.style.transitionDelay = `${baseDelay + staggerDelay}s`;
-                        
-                        // Force layout reflow and set active
-                        requestAnimationFrame(() => {
-                            el.classList.add('active');
-                        });
-                    });
+    // ── 2. Staggered child reveal for grids, features, and timeline ──
+    const staggerContainers = [
+        { selector: '.committees-grid', children: '.committee-card' },
+        { selector: '.about-features', children: '.about-feature' },
+        { selector: '.timeline', children: '.timeline-item' },
+        { selector: '.register-cta-info', children: 'span' },
+    ];
+
+    const staggerObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const container = entry.target;
+                const childSelector = container.getAttribute('data-stagger-child');
+                const children = container.querySelectorAll(childSelector);
+
+                children.forEach((child, index) => {
+                    setTimeout(() => {
+                        child.classList.add('stagger-visible');
+                    }, index * 150); // 150ms stagger between each child
                 });
-                entriesBySection.clear();
-            }, 20); // small batching timeout
+
+                staggerObserver.unobserve(container);
+            }
+        });
+    }, {
+        root: null,
+        rootMargin: "0px 0px -40px 0px",
+        threshold: 0.15
+    });
+
+    staggerContainers.forEach(({ selector, children }) => {
+        const container = document.querySelector(selector);
+        if (container) {
+            container.setAttribute('data-stagger-child', children);
+            staggerObserver.observe(container);
         }
-    }, observerOptions);
+    });
 
-    // Start observing all reveal elements
-    const revealElements = document.querySelectorAll('.reveal');
-    revealElements.forEach(el => observer.observe(el));
+    // ── 3. GSAP ScrollTrigger Parallax (if GSAP available) ──
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
 
-    // ── HERO SCENE PARALLAX & FADE ──
+        // Parallax glow orbs
+        document.querySelectorAll('.glow-orb').forEach(orb => {
+            gsap.to(orb, {
+                y: () => Math.random() * 150 - 75,
+                scrollTrigger: {
+                    trigger: orb.closest('section'),
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: 1.5,
+                }
+            });
+        });
+
+        // Subtle section background parallax
+        document.querySelectorAll('.committees, .timeline-section, .register-cta').forEach(section => {
+            const bg = section.querySelector('::before') || section;
+            gsap.fromTo(section, {
+                backgroundPositionY: '0%'
+            }, {
+                backgroundPositionY: '30%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+    }
+
+    // ── 4. HERO SCENE PARALLAX & FADE ──
     const heroSection = document.querySelector('.premium-hero');
     if (heroSection) {
         const heroContent = document.querySelector('.premium-hero-content');
@@ -192,7 +219,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (scrollTop <= heroHeight) {
                 const progress = scrollTop / heroHeight;
                 
-                // Apply smooth transforms & filters
                 if (heroContent) {
                     heroContent.style.opacity = Math.max(0, 1 - progress * 1.5).toString();
                     heroContent.style.transform = `scale(${1 + progress * 0.06}) translateY(${progress * 50}px)`;
@@ -205,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
         window.addEventListener('scroll', handleHeroScroll, { passive: true });
-        handleHeroScroll(); // Run once on load
+        handleHeroScroll();
     }
 
     // ── Smooth scroll for anchor links ──
