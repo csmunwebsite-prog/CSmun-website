@@ -1210,7 +1210,7 @@ export default function DelegateDashboard() {
               <UploadIcon style={{ width: '18px', height: '18px', color: '#8b1e1e' }} /> Document Submissions
             </h3>
             <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              Submit position papers or draft resolutions to receive scoring.
+              Submit draft resolutions, research binders, or opening speeches to receive scoring.
             </p>
             
             <form onSubmit={handleSubmitDocument} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -1295,7 +1295,7 @@ export default function DelegateDashboard() {
                   if (linkUrl && linkUrl.trim()) e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                Submit Paper
+                Submit Document
               </button>
               
               {uploadMessage && (

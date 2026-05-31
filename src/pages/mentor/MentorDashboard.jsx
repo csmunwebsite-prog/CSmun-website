@@ -843,7 +843,7 @@ export default function MentorDashboard() {
                   <UploadIcon style={{ color: '#8b1e1e' }} /> Submissions & Evaluation
                 </h3>
                 <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-                  Grade and score papers submitted by your tracked delegates. Enter 1-10 to save.
+                  Grade and score documents submitted by your tracked delegates. Enter 1-10 to save.
                 </p>
               </div>
 
