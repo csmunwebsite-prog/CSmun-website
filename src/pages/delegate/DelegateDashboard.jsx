@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
 import { doc, getDoc, setDoc, updateDoc, arrayUnion, collection, addDoc, serverTimestamp, query, where, onSnapshot } from 'firebase/firestore';
+import { TRAINING_VIDEOS, VIDEO_CHECKPOINTS } from '../../constants/videos';
 
 const HomeIcon = ({ style }) => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
@@ -131,98 +132,7 @@ const SuccessIcon = ({ style }) => (
   </svg>
 );
 
-const TRAINING_VIDEOS = [
-  { id: 'v1', title: 'Opening Speech Guide', url: 'https://www.youtube.com/embed/F7CRCt0Td7A', youtubeId: 'F7CRCt0Td7A', deadline: 'May 20, 2026' },
-  { id: 'v2', title: 'Resolution Debate Procedure', url: 'https://www.youtube.com/embed/RpSqJTaiBJI', youtubeId: 'RpSqJTaiBJI', deadline: 'May 24, 2026' },
-  { id: 'v3', title: 'How to Write a Position Paper', url: 'https://www.youtube.com/embed/rP1hD1vN5bY', youtubeId: 'rP1hD1vN5bY', deadline: 'May 28, 2026' }
-];
-
-const VIDEO_CHECKPOINTS = {
-  v1: [
-    {
-      id: 'v1_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "In an MUN opening speech, what should your hook or opening sentence ideally do?",
-      options: [
-        "Grab the committee's attention with a statistic, quote, or strong statement",
-        "Read the entire country profile document",
-        "Make a personal joke about another delegate",
-        "Say 'Hello everyone, I don't know what to say'"
-      ],
-      correct: "Grab the committee's attention with a statistic, quote, or strong statement"
-    },
-    {
-      id: 'v1_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "How long is a standard MUN opening speech typically limited to?",
-      options: [
-        "60 to 90 seconds",
-        "10 to 15 minutes",
-        "5 seconds",
-        "Unlimited time"
-      ],
-      correct: "60 to 90 seconds"
-    }
-  ],
-  v2: [
-    {
-      id: 'v2_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "What is a 'Sponsor' of a draft resolution?",
-      options: [
-        "A country that actively wrote and supports the resolution",
-        "A country that is paying money for the room",
-        "A delegate who is absent",
-        "The chair of the committee"
-      ],
-      correct: "A country that actively wrote and supports the resolution"
-    },
-    {
-      id: 'v2_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "What does a 'Motion to introduce a draft resolution' require to pass?",
-      options: [
-        "Approval by the Chair and a simple majority of the committee",
-        "Unanimous agreement of all nations",
-        "Payment of fee",
-        "No votes at all"
-      ],
-      correct: "Approval by the Chair and a simple majority of the committee"
-    }
-  ],
-  v3: [
-    {
-      id: 'v3_q1',
-      timestamp: 110,
-      timestampLabel: '1:50',
-      question: "Which section is crucial to include in the opening of a Position Paper?",
-      options: [
-        "A background analysis of the topic from your country's viewpoint",
-        "Your favorite food list",
-        "A critique of other delegates' outfits",
-        "A greeting to your friends"
-      ],
-      correct: "A background analysis of the topic from your country's viewpoint"
-    },
-    {
-      id: 'v3_q2',
-      timestamp: 170,
-      timestampLabel: '2:50',
-      question: "What should the final section of a Position Paper propose?",
-      options: [
-        "Specific, actionable solutions and draft policy recommendations",
-        "A complaint about the session length",
-        "No solutions at all",
-        "A request to change committees"
-      ],
-      correct: "Specific, actionable solutions and draft policy recommendations"
-    }
-  ]
-};
+// TRAINING_VIDEOS and VIDEO_CHECKPOINTS are now imported from '../../constants/videos'
 
 export default function DelegateDashboard() {
   const { currentUser, userData, logout } = useAuth();
@@ -629,7 +539,8 @@ export default function DelegateDashboard() {
     }
   };
 
-  const progressPercentage = Math.round((completedVideos.length / TRAINING_VIDEOS.length) * 100);
+  const activeVideosCount = TRAINING_VIDEOS.filter(v => !v.isPlaceholder).length;
+  const progressPercentage = activeVideosCount > 0 ? Math.round((completedVideos.length / activeVideosCount) * 100) : 0;
 
   return (
     <div className="portal-wrapper" style={{ 
@@ -1012,7 +923,17 @@ export default function DelegateDashboard() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
               {TRAINING_VIDEOS.map((video, idx) => {
-                const isUnlocked = idx === 0 || completedVideos.includes(TRAINING_VIDEOS[idx - 1].id);
+                const isUnlocked = (() => {
+                  if (idx === 0) return true;
+                  // Look back for the previous non-placeholder video
+                  for (let i = idx - 1; i >= 0; i--) {
+                    if (!TRAINING_VIDEOS[i].isPlaceholder) {
+                      return completedVideos.includes(TRAINING_VIDEOS[i].id);
+                    }
+                  }
+                  return true;
+                })();
+                
                 return (
                   <div key={video.id} style={{ 
                     background: '#f8fafc', 
@@ -1023,77 +944,103 @@ export default function DelegateDashboard() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1.25rem',
-                    cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                    cursor: video.isPlaceholder ? 'default' : (isUnlocked ? 'pointer' : 'not-allowed'),
                     opacity: isUnlocked ? 1 : 0.55,
                     filter: isUnlocked ? 'none' : 'grayscale(70%)',
                     pointerEvents: isUnlocked ? 'auto' : 'none'
                   }}
                   onClick={() => {
-                    if (isUnlocked) setActiveVideo(video);
+                    if (isUnlocked && !video.isPlaceholder) setActiveVideo(video);
                   }}
                   onMouseEnter={(e) => {
-                    if (isUnlocked) {
+                    if (isUnlocked && !video.isPlaceholder) {
                       e.currentTarget.style.borderColor = 'rgba(139, 30, 30, 0.3)';
                       e.currentTarget.style.transform = 'translateY(-2px)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (isUnlocked) {
+                    if (isUnlocked && !video.isPlaceholder) {
                       e.currentTarget.style.borderColor = '#e2e8f0';
                       e.currentTarget.style.transform = 'translateY(0)';
                     }
                   }}
                   >
-                    {/* Premium YouTube Video Thumbnail */}
-                    <div style={{
-                      width: '100px',
-                      height: '65px',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      position: 'relative',
-                      flexShrink: 0,
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
-                    }}>
-                      <img 
-                        src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`} 
-                        alt={video.title} 
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover'
-                        }}
-                      />
+                    {/* Premium Video Thumbnail */}
+                    {video.isPlaceholder ? (
                       <div style={{
-                        position: 'absolute',
-                        top: 0, left: 0, right: 0, bottom: 0,
-                        background: 'rgba(0,0,0,0.2)',
+                        width: '100px',
+                        height: '65px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        flexShrink: 0,
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                        background: '#e2e8f0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
                       }}>
+                        <span style={{ fontSize: '1.5rem' }}>📄</span>
+                      </div>
+                    ) : (
+                      <div style={{
+                        width: '100px',
+                        height: '65px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        flexShrink: 0,
+                        boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                      }}>
+                        <img 
+                          src={`https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`} 
+                          alt={video.title} 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover'
+                          }}
+                        />
                         <div style={{
-                          width: '28px',
-                          height: '28px',
-                          borderRadius: '50%',
-                          background: '#8b1e1e',
-                          color: '#ffffff',
+                          position: 'absolute',
+                          top: 0, left: 0, right: 0, bottom: 0,
+                          background: 'rgba(0,0,0,0.2)',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.75rem',
-                          boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
-                          border: '2px solid #ffffff'
+                          justifyContent: 'center'
                         }}>
-                          {isUnlocked ? '▶' : '🔒'}
+                          <div style={{
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: '#8b1e1e',
+                            color: '#ffffff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '0.75rem',
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.3)',
+                            border: '2px solid #ffffff'
+                          }}>
+                            {isUnlocked ? '▶' : '🔒'}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Middle: Video info */}
                     <div style={{ flex: 1 }}>
                       <h4 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#0a2342', margin: '0 0 0.25rem 0' }}>{video.title}</h4>
                       <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>
-                        2 Checkpoints (1:50 & 2:50)
+                        {video.isPlaceholder ? (
+                          "Video & Quiz coming soon"
+                        ) : (
+                          (() => {
+                            const checkpoints = VIDEO_CHECKPOINTS[video.id] || [];
+                            if (checkpoints.length === 0) return "No checkpoints";
+                            return `${checkpoints.length} Checkpoint${checkpoints.length === 1 ? '' : 's'} (at ${checkpoints.map(cp => cp.timestampLabel).join(' & ')})`;
+                          })()
+                        )}
                       </span>
                       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
                        {!isUnlocked ? (
@@ -1157,6 +1104,21 @@ export default function DelegateDashboard() {
                              Reset
                            </button>
                          </>
+                       ) : video.isPlaceholder ? (
+                         <span style={{ 
+                           background: '#fef3c7', 
+                           color: '#d97706', 
+                           fontSize: '0.75rem', 
+                           fontWeight: '700', 
+                           padding: '4px 10px', 
+                           borderRadius: '20px',
+                           display: 'inline-flex',
+                           alignItems: 'center',
+                           gap: '0.25rem',
+                           border: '1px solid #fde68a'
+                         }}>
+                           ⏳ Coming Soon
+                         </span>
                        ) : (
                          <span style={{ 
                            background: 'rgba(139, 30, 30, 0.08)', 
@@ -1180,16 +1142,16 @@ export default function DelegateDashboard() {
                       <span style={{ 
                         fontSize: '0.75rem', 
                         fontWeight: '800', 
-                        color: '#ef4444', 
-                        background: 'rgba(239, 68, 68, 0.06)', 
+                        color: video.isPlaceholder ? '#d97706' : '#ef4444', 
+                        background: video.isPlaceholder ? 'rgba(217, 119, 6, 0.06)' : 'rgba(239, 68, 68, 0.06)', 
                         padding: '6px 12px', 
                         borderRadius: '20px',
-                        border: '1px solid rgba(239, 68, 68, 0.12)',
+                        border: video.isPlaceholder ? '1px solid rgba(217, 119, 6, 0.12)' : '1px solid rgba(239, 68, 68, 0.12)',
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.35rem'
                       }}>
-                        <CalendarIcon /> Deadline: {video.deadline}
+                        <CalendarIcon /> {video.isPlaceholder ? 'Available:' : 'Deadline:'} {video.deadline}
                       </span>
                     </div>
                   </div>

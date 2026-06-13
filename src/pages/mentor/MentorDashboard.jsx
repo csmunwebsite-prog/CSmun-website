@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { db } from '../../firebase';
 import { collection, query, where, getDocs, updateDoc, doc, addDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
+import { TRAINING_VIDEOS } from '../../constants/videos';
+
+const activeVideosCount = TRAINING_VIDEOS.filter(v => !v.isPlaceholder).length;
 
 const HomeIcon = ({ style }) => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle', ...style }}>
@@ -795,11 +798,11 @@ export default function MentorDashboard() {
                               borderRadius: '20px',
                               fontSize: '0.75rem',
                               fontWeight: '800',
-                              background: del.completedVideosCount === 3 ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9',
-                              color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#64748b',
-                              border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`
+                              background: del.completedVideosCount === activeVideosCount ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9',
+                              color: del.completedVideosCount === activeVideosCount ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#64748b',
+                              border: `1px solid ${del.completedVideosCount === activeVideosCount ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`
                             }}>
-                              <VideoIcon /> {del.completedVideosCount || 0} / 3
+                              <VideoIcon /> {del.completedVideosCount || 0} / {activeVideosCount}
                             </span>
                           </td>
                           <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -1061,17 +1064,17 @@ export default function MentorDashboard() {
                       <span style={{ color: '#64748b', fontSize: '0.8rem', display: 'block' }}>{del.email}</span>
                       <span style={{ 
                         fontSize: '0.75rem', 
-                        color: del.completedVideosCount === 3 ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#475569', 
+                        color: del.completedVideosCount === activeVideosCount ? '#065f46' : del.completedVideosCount > 0 ? '#1e40af' : '#475569', 
                         fontWeight: '800', 
-                        background: del.completedVideosCount === 3 ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9', 
+                        background: del.completedVideosCount === activeVideosCount ? '#d1fae5' : del.completedVideosCount > 0 ? '#eff6ff' : '#f1f5f9', 
                         padding: '4px 10px', 
                         borderRadius: '12px', 
-                        border: `1px solid ${del.completedVideosCount === 3 ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
+                        border: `1px solid ${del.completedVideosCount === activeVideosCount ? '#a7f3d0' : del.completedVideosCount > 0 ? '#bfdbfe' : '#e2e8f0'}`,
                         display: 'inline-flex',
                         alignItems: 'center',
                         gap: '0.25rem' 
                       }}>
-                        <VideoIcon /> {del.completedVideosCount || 0}/3 Done
+                        <VideoIcon /> {del.completedVideosCount || 0}/{activeVideosCount} Done
                       </span>
                     </div>
                     <button 
