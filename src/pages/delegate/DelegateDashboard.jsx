@@ -154,6 +154,7 @@ export default function DelegateDashboard() {
 
   // Checkpoints timeline states
   const [answeredCheckpoints, setAnsweredCheckpoints] = useState([]);
+  const [wrongCheckpoints, setWrongCheckpoints] = useState([]);
   const [activeCheckpoint, setActiveCheckpoint] = useState(null);
   const [ytPlayer, setYtPlayer] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -196,8 +197,9 @@ export default function DelegateDashboard() {
         if (docSnap.exists()) {
           setCompletedVideos(docSnap.data().completedVideos || []);
           setAnsweredCheckpoints(docSnap.data().answeredCheckpoints || []);
+          setWrongCheckpoints(docSnap.data().wrongCheckpoints || []);
         } else {
-          await setDoc(docRef, { completedVideos: [], answeredCheckpoints: [] });
+          await setDoc(docRef, { completedVideos: [], answeredCheckpoints: [], wrongCheckpoints: [] });
         }
       }
     };
@@ -301,7 +303,25 @@ export default function DelegateDashboard() {
           },
           onStateChange: (event) => {
             if (event.data === 1) {
-              setIsPlaying(true);
+              const checkpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
+              const curr = playerInstance.getCurrentTime ? playerInstance.getCurrentTime() : 0;
+              const pendingCP = checkpoints.find(cp => 
+                curr >= cp.timestamp && 
+                !answeredCheckpointsRef.current.includes(cp.id)
+              );
+              if (pendingCP || activeCheckpointRef.current) {
+                playerInstance.pauseVideo();
+                setIsPlaying(false);
+                if (pendingCP && !activeCheckpointRef.current) {
+                  setActiveCheckpoint(pendingCP);
+                  setSelectedQuizOption('');
+                  setQuizError('');
+                  setQuizSuccess(false);
+                  setIsSidebarOpen(true);
+                }
+              } else {
+                setIsPlaying(true);
+              }
             } else {
               setIsPlaying(false);
             }
@@ -362,7 +382,15 @@ export default function DelegateDashboard() {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!(document.fullscreenElement || document.webkitFullscreenElement));
+      const currentlyFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      setIsFullscreen(currentlyFS);
+      if (currentlyFS) {
+        if (!activeCheckpointRef.current) {
+          setIsSidebarOpen(false);
+        }
+      } else {
+        setIsSidebarOpen(true);
+      }
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
@@ -430,14 +458,17 @@ export default function DelegateDashboard() {
     try {
       const updatedCompleted = completedVideos.filter(id => id !== videoId);
       const updatedAnswered = answeredCheckpoints.filter(id => !id.startsWith(videoId));
+      const updatedWrong = wrongCheckpoints.filter(id => !id.startsWith(videoId));
       
       setCompletedVideos(updatedCompleted);
       setAnsweredCheckpoints(updatedAnswered);
+      setWrongCheckpoints(updatedWrong);
 
       const docRef = doc(db, 'delegateProgress', currentUser.uid);
       await setDoc(docRef, {
         completedVideos: updatedCompleted,
-        answeredCheckpoints: updatedAnswered
+        answeredCheckpoints: updatedAnswered,
+        wrongCheckpoints: updatedWrong
       }, { merge: true });
       
       if (activeVideo && activeVideo.id === videoId) {
@@ -458,14 +489,53 @@ export default function DelegateDashboard() {
   };
 
   const toggleModalFullscreen = () => {
-    setIsFullScreenViewer(!isFullScreenViewer);
+    const nextVal = !isFullScreenViewer;
+    setIsFullScreenViewer(nextVal);
+    if (nextVal) {
+      if (!activeCheckpoint) {
+        setIsSidebarOpen(false);
+      }
+    } else {
+      setIsSidebarOpen(true);
+    }
+  };
+
+  const getFirstUnansweredCheckpoint = () => {
+    if (!activeVideo) return null;
+    const checkpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
+    return checkpoints.find(cp => !answeredCheckpoints.includes(cp.id));
+  };
+
+  const handleSeek = (targetTime) => {
+    if (!ytPlayer) return;
+    const unanswered = getFirstUnansweredCheckpoint();
+    if (unanswered && targetTime > unanswered.timestamp) {
+      ytPlayer.seekTo(unanswered.timestamp);
+      return;
+    }
+    ytPlayer.seekTo(targetTime);
+  };
+
+  const handlePlayPause = () => {
+    if (!ytPlayer) return;
+    if (isPlaying) {
+      ytPlayer.pauseVideo();
+    } else {
+      if (activeCheckpoint) {
+        setQuizError('Please answer the checkpoint question to continue!');
+        return;
+      }
+      ytPlayer.playVideo();
+    }
   };
 
   const handleCheckpointSubmit = async (e) => {
     e.preventDefault();
     if (!activeVideo || !activeCheckpoint) return;
     
-    if (selectedQuizOption === activeCheckpoint.correct) {
+    const isCorrect = selectedQuizOption === activeCheckpoint.correct;
+    
+    if (isCorrect) {
       setQuizError('');
       setQuizSuccess(true);
       
@@ -490,13 +560,70 @@ export default function DelegateDashboard() {
         setSelectedQuizOption('');
         setActiveCheckpoint(null);
         
+        if (isFullScreenViewer || isFullscreen) {
+          setIsSidebarOpen(false);
+        }
+        
         if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
           ytPlayer.playVideo();
         }
       }, 1500);
     } else {
+      // Mark as wrong answer in database (add to both answered and wrong)
+      const newAnswered = [...answeredCheckpoints, activeCheckpoint.id];
+      setAnsweredCheckpoints(newAnswered);
+      const newWrong = [...wrongCheckpoints, activeCheckpoint.id];
+      setWrongCheckpoints(newWrong);
+      
+      const docRef = doc(db, 'delegateProgress', currentUser.uid);
+      await updateDoc(docRef, {
+        answeredCheckpoints: arrayUnion(activeCheckpoint.id),
+        wrongCheckpoints: arrayUnion(activeCheckpoint.id)
+      });
+
+      // Notify the mentor
+      try {
+        await addDoc(collection(db, 'notifications'), {
+          delegateId: currentUser.uid,
+          delegateName: userData?.name || currentUser?.displayName || 'Delegate',
+          committee: userData?.committee || '',
+          videoTitle: activeVideo.title,
+          question: activeCheckpoint.question,
+          selectedOption: selectedQuizOption,
+          correctOption: activeCheckpoint.correct,
+          type: 'wrong_answer',
+          createdAt: serverTimestamp(),
+          read: false
+        });
+      } catch (err) {
+        console.error("Error creating notification for mentor:", err);
+      }
+
+      // Check if all checkpoints for this video are completed
+      const allVideoCheckpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
+      const hasUnfinished = allVideoCheckpoints.some(cp => !newAnswered.includes(cp.id));
+      
+      if (!hasUnfinished) {
+        await markCompleted(activeVideo.id);
+      }
+
+      // Show that they were wrong for 2.5 seconds
       setQuizSuccess(false);
-      setQuizError('Incorrect answer. Please review the video and try again!');
+      setQuizError('❌ Incorrect answer! Moving to the next section...');
+
+      setTimeout(() => {
+        setQuizError('');
+        setSelectedQuizOption('');
+        setActiveCheckpoint(null);
+        
+        if (isFullScreenViewer || isFullscreen) {
+          setIsSidebarOpen(false);
+        }
+        
+        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
+          ytPlayer.playVideo();
+        }
+      }, 2500);
     }
   };
 
@@ -822,18 +949,40 @@ export default function DelegateDashboard() {
           </div>
 
           {/* Committee Card (Top Right) */}
-          <div style={{ 
-            flex: '2 1 600px',
-            background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
-            borderRadius: '24px',
-            padding: '2rem 2.5rem',
-            boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: '1.5rem'
-          }}>
+          <div 
+            onClick={() => {
+              if (userData?.committee) {
+                navigate('/app/committee');
+              }
+            }}
+            style={{ 
+              flex: '2 1 600px',
+              background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
+              borderRadius: '24px',
+              padding: '2rem 2.5rem',
+              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '1.5rem',
+              cursor: userData?.committee ? 'pointer' : 'default',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+              border: '1px solid rgba(10, 35, 66, 0.03)'
+            }}
+            onMouseEnter={(e) => {
+              if (userData?.committee) {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 12px 30px rgba(59, 130, 246, 0.12)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (userData?.committee) {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.05)';
+              }
+            }}
+          >
               <div>
                 <span style={{ 
                   background: '#ffffff', 
@@ -855,9 +1004,17 @@ export default function DelegateDashboard() {
                   fontSize: '1.6rem', 
                   color: '#0a2342', 
                   margin: '0 0 0.5rem 0',
-                  fontWeight: '800'
+                  fontWeight: '800',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
                 }}>
                   {userData?.committee || 'No Committee Assigned'}
+                  {userData?.committee && (
+                    <span style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: '700', marginLeft: '0.5rem' }}>
+                      (View Page →)
+                    </span>
+                  )}
                 </h3>
                 <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0, maxWidth: '480px', lineHeight: '1.5' }}>
                   {mentorName ? (
@@ -1283,117 +1440,140 @@ export default function DelegateDashboard() {
           </div>
 
       {/* Premium Video Viewer Overlay / Modal */}
-      {activeVideo && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, width: '100vw', height: '100vh',
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(10px)',
-          zIndex: 999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: isFullScreenViewer ? '0' : '2rem',
-          transition: 'all 0.3s ease'
-        }}>
-          <div
-            ref={modalContainerRef}
-            style={{
-              background: '#ffffff',
-              border: isFullScreenViewer ? 'none' : '1px solid #cbd5e1',
-              borderRadius: isFullScreenViewer ? '0' : '24px',
-              padding: isFullScreenViewer ? '3.5rem 2rem 2rem 2rem' : isFullscreen ? '2rem' : '2rem',
-              maxWidth: isFullScreenViewer ? '100vw' : '1240px',
-              width: isFullscreen ? '100vw' : '100%',
-              height: isFullScreenViewer ? '100vh' : isFullscreen ? '100vh' : 'auto',
-              maxHeight: isFullScreenViewer ? '100vh' : isFullscreen ? '100vh' : '90vh',
-              overflowY: 'auto',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              position: 'relative',
-              display: 'flex',
-              gap: isSidebarOpen ? '2rem' : '0',
-              flexWrap: 'nowrap',
-              alignContent: 'start',
-              alignItems: 'stretch',
-              transition: 'all 0.3s ease'
-            }}>
-            {/* Toggle Full Screen / Theater Mode Button */}
-            <button 
-              onClick={toggleModalFullscreen}
+      {activeVideo && (() => {
+        const isFullScreenActive = isFullScreenViewer || isFullscreen;
+        return (
+          <div style={{
+            position: 'fixed',
+            top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(10px)',
+            zIndex: 999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: isFullScreenActive ? '0' : '2rem',
+            transition: 'all 0.3s ease'
+          }}>
+            <div
+              ref={modalContainerRef}
               style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '3.5rem',
-                background: 'transparent',
-                border: 'none',
-                color: '#64748b',
-                fontSize: '0.9rem',
-                cursor: 'pointer',
-                transition: 'color 0.2s ease',
+                background: isFullScreenActive ? '#000000' : '#ffffff',
+                border: isFullScreenActive ? 'none' : '1px solid #cbd5e1',
+                borderRadius: isFullScreenActive ? '0' : '24px',
+                padding: isFullScreenActive ? '0' : '2rem',
+                maxWidth: isFullScreenActive ? '100vw' : '1240px',
+                width: isFullScreenActive ? '100vw' : '100%',
+                height: isFullScreenActive ? '100vh' : 'auto',
+                maxHeight: isFullScreenActive ? '100vh' : '90vh',
+                overflow: 'hidden',
+                boxShadow: isFullScreenActive ? 'none' : '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                position: 'relative',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem',
-                fontWeight: '700',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#8b1e1e'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
-            >
-              {isFullScreenViewer ? <><ExitFullscreenIcon style={{ marginRight: '0.25rem' }} /> Exit Fullscreen</> : <><FullscreenIcon style={{ marginRight: '0.25rem' }} /> Fullscreen</>}
-            </button>
+                gap: isSidebarOpen && !isFullScreenActive ? '2rem' : '0',
+                flexWrap: 'nowrap',
+                alignContent: 'start',
+                alignItems: 'stretch',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}>
 
-            {/* Close Button */}
-            <button 
-              onClick={() => {
-                setActiveVideo(null);
-                setSelectedQuizOption('');
-                setQuizError('');
-                setQuizSuccess(false);
-                setIsFullScreenViewer(false);
-              }}
-              style={{
-                position: 'absolute',
-                top: '1.25rem',
-                right: '1.25rem',
-                background: 'transparent',
-                border: 'none',
-                color: '#64748b',
-                fontSize: '1.75rem',
-                cursor: 'pointer',
-                transition: 'color 0.2s ease',
-                lineHeight: '1'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#64748b'}
-            >
-              ×
-            </button>
+              {/* Close Button */}
+              <button 
+                onClick={() => {
+                  setActiveVideo(null);
+                  setSelectedQuizOption('');
+                  setQuizError('');
+                  setQuizSuccess(false);
+                  setIsFullScreenViewer(false);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '1.5rem',
+                  right: isFullScreenActive ? '2.5rem' : '1.75rem',
+                  background: isFullScreenActive ? 'rgba(15, 23, 42, 0.6)' : 'rgba(241, 245, 249, 0.8)',
+                  backdropFilter: 'blur(4px)',
+                  border: isFullScreenActive ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #cbd5e1',
+                  borderRadius: '50%',
+                  width: '36px',
+                  height: '36px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: isFullScreenActive ? '#ffffff' : '#64748b',
+                  fontSize: '1.4rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  lineHeight: '1',
+                  zIndex: 101,
+                  opacity: isFullScreenActive && isPlaying && !isMouseActive ? 0 : 1,
+                  pointerEvents: isFullScreenActive && isPlaying && !isMouseActive ? 'none' : 'auto',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.background = isFullScreenActive ? 'rgba(239, 68, 68, 0.2)' : '#fee2e2';
+                  e.currentTarget.style.borderColor = isFullScreenActive ? '#ef4444' : '#fca5a5';
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = isFullScreenActive ? '#ffffff' : '#64748b';
+                  e.currentTarget.style.background = isFullScreenActive ? 'rgba(15, 23, 42, 0.6)' : 'rgba(241, 245, 249, 0.8)';
+                  e.currentTarget.style.borderColor = isFullScreenActive ? 'rgba(255, 255, 255, 0.2)' : '#cbd5e1';
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                ×
+              </button>
 
-            {/* Left: Cinematic Video Player Column */}
-            <div style={{ 
-              flex: isSidebarOpen ? '1 1 70%' : '1 1 100%', 
-              width: isSidebarOpen ? '70%' : '100%',
-              display: 'flex', 
-              flexDirection: 'column', 
-              gap: '1rem',
-              minWidth: 0,
-              transition: 'all 0.3s ease'
-            }}>
-              <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.6rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <PlayIcon style={{ width: '22px', height: '22px', color: '#8b1e1e' }} /> {activeVideo.title}
-              </h3>
+              {/* Left: Cinematic Video Player Column */}
+              <div style={{ 
+                flex: isSidebarOpen ? '1 1 70%' : '1 1 100%', 
+                width: isSidebarOpen ? '70%' : '100%',
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: isFullScreenActive ? '0' : '1rem',
+                minWidth: 0,
+                transition: 'all 0.3s ease',
+                height: isFullScreenActive ? '100%' : 'auto'
+              }}>
+                {!isFullScreenActive ? (
+                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.6rem', color: '#0a2342', fontWeight: '800', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <PlayIcon style={{ width: '22px', height: '22px', color: '#8b1e1e' }} /> {activeVideo.title}
+                  </h3>
+                ) : (
+                  <h3 style={{
+                    position: 'absolute',
+                    top: '1.5rem',
+                    left: '2rem',
+                    zIndex: 100,
+                    fontFamily: "'Outfit', sans-serif",
+                    fontSize: '1.5rem',
+                    color: '#ffffff',
+                    fontWeight: '800',
+                    margin: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    textShadow: '0 2px 8px rgba(0,0,0,0.8)',
+                    pointerEvents: 'none',
+                    opacity: isMouseActive || !isPlaying ? 1 : 0,
+                    transition: 'opacity 0.4s ease'
+                  }}>
+                    <PlayIcon style={{ width: '20px', height: '20px', color: '#ff4a4a' }} /> {activeVideo.title}
+                  </h3>
+                )}
               
               <div 
                 style={{ 
                   position: 'relative',
                   width: '100%',
-                  paddingBottom: '56.25%',
-                  height: 0,
+                  height: isFullScreenActive ? '100%' : 0,
+                  paddingBottom: isFullScreenActive ? '0' : '56.25%',
                   overflow: 'hidden',
-                  borderRadius: '16px',
+                  borderRadius: isFullScreenActive ? '0' : '16px',
                   background: '#000000',
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)'
+                  boxShadow: isFullScreenActive ? 'none' : '0 10px 25px rgba(0,0,0,0.15)',
+                  flex: isFullScreenActive ? 1 : 'none'
                 }}
               >
                 <div id="csmun-yt-player" style={{
@@ -1426,13 +1606,7 @@ export default function DelegateDashboard() {
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (ytPlayer) {
-                        if (isPlaying) {
-                          ytPlayer.pauseVideo();
-                        } else {
-                          ytPlayer.playVideo();
-                        }
-                      }
+                      handlePlayPause();
                     }}
                     style={{
                       background: 'transparent',
@@ -1578,9 +1752,7 @@ export default function DelegateDashboard() {
                       const rect = e.currentTarget.getBoundingClientRect();
                       const clickX = e.clientX - rect.left;
                       const newTime = (clickX / rect.width) * duration;
-                      if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
-                        ytPlayer.seekTo(newTime);
-                      }
+                      handleSeek(newTime);
                     }}
                     >
                       {/* Background Line */}
@@ -1631,6 +1803,9 @@ export default function DelegateDashboard() {
                       {(VIDEO_CHECKPOINTS[activeVideo.id] || []).map((cp, idx) => {
                         const pct = (cp.timestamp / (duration || 237)) * 100;
                         const isCompleted = answeredCheckpoints.includes(cp.id);
+                        const isWrong = wrongCheckpoints.includes(cp.id);
+                        const markerColor = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#94a3b8');
+                        
                         return (
                           <div 
                             key={cp.id}
@@ -1647,14 +1822,12 @@ export default function DelegateDashboard() {
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
-                                ytPlayer.seekTo(cp.timestamp - 2);
-                              }
+                              handleSeek(cp.timestamp - 2);
                             }}
                             title={`Checkpoint ${idx + 1} (${cp.timestampLabel})`}
                           >
                             {/* Water drop shape */}
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill={isCompleted ? '#22c55e' : '#ff4a4a'} style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill={markerColor} style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }}>
                               <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
                             </svg>
                           </div>
@@ -1832,16 +2005,19 @@ export default function DelegateDashboard() {
               opacity: isSidebarOpen ? 1 : 0,
               visibility: isSidebarOpen ? 'visible' : 'hidden',
               overflow: 'hidden',
-              background: '#f8fafc', 
-              border: isSidebarOpen ? '1px solid #cbd5e1' : 'none', 
-              borderRadius: '20px', 
-              padding: isSidebarOpen ? '1.75rem' : '0',
+              background: isFullScreenActive ? '#ffffff' : '#f8fafc', 
+              border: isSidebarOpen ? (isFullScreenActive ? 'none' : '1px solid #cbd5e1') : 'none', 
+              borderLeft: isSidebarOpen && isFullScreenActive ? '1px solid #e2e8f0' : 'none',
+              borderRadius: isFullScreenActive ? '0' : '20px', 
+              padding: isSidebarOpen ? (isFullScreenActive ? '2.5rem' : '1.75rem') : '0',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               boxSizing: 'border-box',
-              transition: 'all 0.3s ease',
-              minWidth: isSidebarOpen ? '300px' : '0'
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+              minWidth: isSidebarOpen ? (isFullScreenActive ? '380px' : '300px') : '0',
+              height: isFullScreenActive ? '100%' : 'auto',
+              zIndex: 10
             }}>
               {activeCheckpoint ? (
                 <>
@@ -1995,40 +2171,48 @@ export default function DelegateDashboard() {
 
                       {/* Checkpoint Status Indicator Checklist */}
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'center', width: '100%' }}>
-                        <div style={{ 
-                          background: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '#dcfce7' : '#fee2e2',
-                          color: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '#16a34a' : '#8b1e1e',
-                          padding: '0.65rem 1rem',
-                          borderRadius: '12px',
-                          fontSize: '0.8rem',
-                          fontWeight: '700',
-                          border: answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '1px solid #16a34a' : '1px solid #8b1e1e',
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-                        }}>
-                          <span>Checkpoint 1 (1:50)</span>
-                          <span>{answeredCheckpoints.includes(`${activeVideo.id}_q1`) ? '✓ Complete' : '⏳ Pending'}</span>
-                        </div>
-                        <div style={{ 
-                          background: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '#dcfce7' : '#fee2e2',
-                          color: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '#16a34a' : '#8b1e1e',
-                          padding: '0.65rem 1rem',
-                          borderRadius: '12px',
-                          fontSize: '0.8rem',
-                          fontWeight: '700',
-                          border: answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '1px solid #16a34a' : '1px solid #8b1e1e',
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-                        }}>
-                          <span>Checkpoint 2 (2:50)</span>
-                          <span>{answeredCheckpoints.includes(`${activeVideo.id}_q2`) ? '✓ Complete' : '⏳ Pending'}</span>
-                        </div>
+                        {(VIDEO_CHECKPOINTS[activeVideo.id] || []).map((cp, idx) => {
+                          const isAns = answeredCheckpoints.includes(cp.id);
+                          const isWr = wrongCheckpoints.includes(cp.id);
+                          
+                          let bg = '#f1f5f9';
+                          let fg = '#64748b';
+                          let borderStyle = '1px solid #cbd5e1';
+                          let label = '⏳ Pending';
+                          
+                          if (isWr) {
+                            bg = '#fee2e2';
+                            fg = '#ef4444';
+                            borderStyle = '1px solid #fca5a5';
+                            label = '✗ Wrong';
+                          } else if (isAns) {
+                            bg = '#dcfce7';
+                            fg = '#16a34a';
+                            borderStyle = '1px solid #86efac';
+                            label = '✓ Correct';
+                          }
+                          
+                          return (
+                            <div key={cp.id} style={{ 
+                              background: bg,
+                              color: fg,
+                              padding: '0.65rem 1rem',
+                              borderRadius: '12px',
+                              fontSize: '0.8rem',
+                              fontWeight: '700',
+                              border: borderStyle,
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                              boxSizing: 'border-box'
+                            }}>
+                              <span>Checkpoint {idx + 1} ({cp.timestampLabel})</span>
+                              <span>{label}</span>
+                            </div>
+                          );
+                        })}
                       </div>
                     </>
                   )}
@@ -2038,7 +2222,8 @@ export default function DelegateDashboard() {
 
           </div>
         </div>
-      )}
+        );
+      })()}
 
     </div>
   );

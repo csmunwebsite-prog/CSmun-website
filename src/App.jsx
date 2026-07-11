@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import CompleteProfile from './pages/CompleteProfile';
 import Profile from './pages/Profile';
 import DelegateDashboard from './pages/delegate/DelegateDashboard';
+import CommitteePage from './pages/delegate/CommitteePage';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import Notes from './pages/Notes';
 import './App.css';
@@ -86,6 +87,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRoles={['delegate']}>
             <DelegateDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/app/committee"
+        element={
+          <ProtectedRoute allowedRoles={['delegate']}>
+            <CommitteePage />
           </ProtectedRoute>
         }
       />

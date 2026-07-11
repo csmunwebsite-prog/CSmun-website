@@ -131,6 +131,16 @@ export default function MentorDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [error, setError] = useState('');
   const [newMeeting, setNewMeeting] = useState({ title: '', date: '', time: '', link: '' });
+  const [notifications, setNotifications] = useState([]);
+
+  const dismissNotification = async (notificationId) => {
+    try {
+      await deleteDoc(doc(db, 'notifications', notificationId));
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    } catch (err) {
+      console.error("Error deleting notification:", err);
+    }
+  };
 
   const fetchData = async () => {
     if (!currentUser || !userData?.committee) return;
@@ -141,8 +151,10 @@ export default function MentorDashboard() {
       // Fetch all delegate progress records
       const progressSnapshot = await getDocs(collection(db, 'delegateProgress'));
       const progressMap = {};
+      const wrongCountMap = {};
       progressSnapshot.forEach(doc => {
         progressMap[doc.id] = doc.data().completedVideos || [];
+        wrongCountMap[doc.id] = (doc.data().wrongCheckpoints || []).length;
       });
 
       // Fetch delegates in the same committee
@@ -155,8 +167,25 @@ export default function MentorDashboard() {
       const committeeDels = delSnapshot.docs.map(doc => ({ 
         id: doc.id, 
         ...doc.data(),
-        completedVideosCount: (progressMap[doc.id] || []).length
+        completedVideosCount: (progressMap[doc.id] || []).length,
+        wrongCheckpointsCount: wrongCountMap[doc.id] || 0
       }));
+
+      // Fetch incorrect answer notifications
+      const notificationsSnapshot = await getDocs(query(
+        collection(db, 'notifications'),
+        where('committee', '==', userData.committee)
+      ));
+      const notifsList = notificationsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      notifsList.sort((a, b) => {
+        const timeA = a.createdAt?.seconds || 0;
+        const timeB = b.createdAt?.seconds || 0;
+        return timeB - timeA;
+      });
+      setNotifications(notifsList);
 
       // Separate into tracked by current mentor vs available (no mentorId)
       const tracked = committeeDels.filter(del => del.mentorId === currentUser.uid);
@@ -707,6 +736,83 @@ export default function MentorDashboard() {
 
         </div>
 
+        {/* Notifications Section */}
+        {notifications.length > 0 && (
+          <div style={{ 
+            background: '#ffffff', 
+            border: '1px solid #cbd5e1',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)',
+            marginTop: '2rem'
+          }}>
+            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#8b1e1e', fontWeight: '800', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0 }}>
+              ⚠️ Incorrect Answer Alerts
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '0.5rem', lineHeight: '1.5' }}>
+              The following delegates submitted incorrect answers for video checkpoints. Reach out to guide them.
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+              {notifications.map((notif) => (
+                <div key={notif.id} style={{ 
+                  background: '#fff5f5', 
+                  border: '1px solid #feb2b2', 
+                  borderRadius: '16px',
+                  padding: '1.25rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '1rem'
+                }}>
+                  <div>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '800', color: '#e53e3e', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      {notif.videoTitle || 'Training Video'} Checkpoint Alert
+                    </span>
+                    <h4 style={{ fontSize: '0.95rem', fontWeight: '700', color: '#0a2342', margin: '0.25rem 0' }}>
+                      {notif.delegateName} answered incorrectly
+                    </h4>
+                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#4a5568' }}>
+                      <strong>Question:</strong> {notif.question}
+                    </p>
+                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', color: '#718096' }}>
+                      <strong>Selected Answer:</strong> <span style={{ color: '#e53e3e', fontWeight: '600' }}>{notif.selectedOption}</span> | 
+                      <strong> Correct Answer:</strong> <span style={{ color: '#38a169', fontWeight: '600' }}>{notif.correctOption}</span>
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => dismissNotification(notif.id)}
+                    style={{ 
+                      padding: '0.4rem 0.85rem', 
+                      borderRadius: '20px', 
+                      background: '#ffffff',
+                      border: '1.5px solid #feb2b2',
+                      color: '#e53e3e',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      transition: 'all 0.2s ease',
+                      flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#e53e3e';
+                      e.currentTarget.style.color = '#ffffff';
+                      e.currentTarget.style.borderColor = '#e53e3e';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#ffffff';
+                      e.currentTarget.style.color = '#e53e3e';
+                      e.currentTarget.style.borderColor = '#feb2b2';
+                    }}
+                  >
+                    Clear Alert
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Bottom Row: Tracked Delegates Table Card (Full Width) */}
         <div style={{ marginTop: '2rem' }}>
           <div style={{ 
@@ -804,6 +910,25 @@ export default function MentorDashboard() {
                             }}>
                               <VideoIcon /> {del.completedVideosCount || 0} / {activeVideosCount}
                             </span>
+                            {del.wrongCheckpointsCount > 0 && (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.2rem',
+                                padding: '0.25rem 0.65rem',
+                                borderRadius: '20px',
+                                fontSize: '0.75rem',
+                                fontWeight: '800',
+                                background: '#fee2e2',
+                                color: '#ef4444',
+                                border: '1px solid #fca5a5',
+                                marginLeft: '0.5rem'
+                              }}
+                              title={`${del.wrongCheckpointsCount} checkpoint question(s) answered incorrectly`}
+                              >
+                                ⚠️ {del.wrongCheckpointsCount} Wrong
+                              </span>
+                            )}
                           </td>
                           <td style={{ padding: '0.85rem 0.75rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
                             <button 
