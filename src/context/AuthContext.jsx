@@ -242,9 +242,9 @@ export function AuthProvider({ children }) {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#0a0c16', color: 'white', flexDirection: 'column', gap: '1rem' }}>
-        <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid rgba(255,255,255,0.1)', borderTop: '4px solid #8b1e1e', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-        <p>Loading CSMUN Portal...</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'linear-gradient(135deg, #f8f9fa 0%, #eceef4 50%, #f8f9fa 100%)', color: '#1a1d2b', flexDirection: 'column', gap: '1rem', fontFamily: "'Inter', sans-serif" }}>
+        <div className="spinner" style={{ width: '40px', height: '40px', border: '4px solid rgba(26, 29, 43, 0.08)', borderTop: '4px solid #8b1e1e', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+        <p style={{ fontSize: '0.95rem', fontWeight: '500', color: '#5c6278', margin: 0 }}>Loading CSMUN Portal...</p>
         <style>{`
           @keyframes spin {
             0% { transform: rotate(0deg); }

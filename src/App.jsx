@@ -9,6 +9,7 @@ import DelegateDashboard from './pages/delegate/DelegateDashboard';
 import CommitteePage from './pages/delegate/CommitteePage';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import Notes from './pages/Notes';
+import Footer from './components/Footer';
 import './App.css';
 
 class ErrorBoundary extends Component {
@@ -117,7 +118,12 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <ErrorBoundary>
-          <AppRoutes />
+          <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1 }}>
+              <AppRoutes />
+            </div>
+            <Footer />
+          </div>
         </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>

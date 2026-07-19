@@ -45,23 +45,22 @@ export default function Login() {
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center', 
-      background: 'linear-gradient(135deg, #0a0c16 0%, #12172a 50%, #0a0c16 100%)',
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #eceef4 50%, #f8f9fa 100%)',
       fontFamily: "'Inter', sans-serif",
       position: 'relative',
       overflow: 'hidden',
       padding: '2rem 1.5rem'
     }}>
       {/* Decorative Blur Spheres */}
-      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(139, 30, 30, 0.15)', filter: 'blur(100px)', borderRadius: '50%', top: '15%', left: '10%', pointerEvents: 'none' }}></div>
-      <div style={{ position: 'absolute', width: '350px', height: '350px', background: 'rgba(26, 32, 58, 0.35)', filter: 'blur(120px)', borderRadius: '50%', bottom: '15%', right: '10%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(139, 30, 30, 0.06)', filter: 'blur(100px)', borderRadius: '50%', top: '15%', left: '10%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '350px', height: '350px', background: 'rgba(37, 45, 80, 0.06)', filter: 'blur(120px)', borderRadius: '50%', bottom: '15%', right: '10%', pointerEvents: 'none' }}></div>
 
       <div className="auth-card" style={{ 
         padding: '3rem 2.5rem', 
-        background: 'rgba(255, 255, 255, 0.03)', 
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: '#ffffff', 
+        border: '1px solid rgba(0, 0, 0, 0.08)',
         borderRadius: '24px', 
-        boxShadow: '0 16px 48px rgba(0,0,0,0.4)', 
+        boxShadow: '0 16px 48px rgba(26,29,43,0.08)', 
         maxWidth: '440px', 
         width: '100%',
         position: 'relative',
@@ -70,25 +69,25 @@ export default function Login() {
         <h2 style={{ 
           textAlign: 'center', 
           marginBottom: '1rem',
-          color: '#ffffff',
+          color: '#1a1d2b',
           fontFamily: "'Outfit', sans-serif",
           fontWeight: '800',
           fontSize: '2rem',
-          background: 'linear-gradient(90deg, #ffffff 0%, #cbd5e1 50%, #a72828 100%)',
+          background: 'linear-gradient(90deg, #1a1d2b 0%, #3a3f52 50%, #8b1e1e 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
           Login to CSMUN
         </h2>
-        <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.9rem', marginBottom: '2rem' }}>
+        <p style={{ textAlign: 'center', color: '#5c6278', fontSize: '0.9rem', marginBottom: '2rem' }}>
           Welcome back! Please select your portal role and sign in.
         </p>
         
         {error && (
           <div className="alert alert-danger" style={{ 
             color: '#ef4444', 
-            backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-            border: '1px solid rgba(239, 68, 68, 0.2)', 
+            backgroundColor: 'rgba(239, 68, 68, 0.05)', 
+            border: '1px solid rgba(239, 68, 68, 0.15)', 
             padding: '0.85rem', 
             borderRadius: '8px', 
             marginBottom: '1.5rem', 
@@ -101,17 +100,17 @@ export default function Login() {
         )}
         
         <div className="form-group" style={{ marginBottom: '2.5rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'center' }}>
+          <label style={{ display: 'block', marginBottom: '0.75rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem', textAlign: 'center' }}>
             Select Your Portal Role:
           </label>
           
           {/* Custom Capsule Toggle Tabs */}
           <div style={{ 
             display: 'flex', 
-            background: 'rgba(0, 0, 0, 0.3)', 
+            background: 'rgba(0, 0, 0, 0.04)', 
             padding: '4px', 
             borderRadius: '30px', 
-            border: '1px solid rgba(255, 255, 255, 0.08)' 
+            border: '1px solid rgba(0, 0, 0, 0.05)' 
           }}>
             <button
               onClick={() => setRole('delegate')}
@@ -121,7 +120,7 @@ export default function Login() {
                 border: 'none',
                 borderRadius: '26px',
                 background: role === 'delegate' ? 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)' : 'transparent',
-                color: role === 'delegate' ? '#ffffff' : '#94a3b8',
+                color: role === 'delegate' ? '#ffffff' : '#5c6278',
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
@@ -140,7 +139,7 @@ export default function Login() {
                 border: 'none',
                 borderRadius: '26px',
                 background: role === 'mentor' ? 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)' : 'transparent',
-                color: role === 'mentor' ? '#ffffff' : '#94a3b8',
+                color: role === 'mentor' ? '#ffffff' : '#5c6278',
                 fontWeight: '700',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
@@ -161,7 +160,7 @@ export default function Login() {
           flexDirection: 'column',
           gap: '0.6rem'
         }}>
-          <label style={{ display: 'block', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
+          <label style={{ display: 'block', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
             🔑 {role === 'mentor' ? 'Mentor Access Code' : 'Delegate Access Code'}:
           </label>
           <input 
@@ -173,9 +172,9 @@ export default function Login() {
               width: '100%', 
               padding: '0.85rem 1.2rem', 
               borderRadius: '30px', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              background: 'rgba(0, 0, 0, 0.4)', 
-              color: '#ffffff',
+              border: '1px solid rgba(0,0,0,0.1)', 
+              background: 'rgba(0, 0, 0, 0.02)', 
+              color: '#1a1d2b',
               fontSize: '0.95rem',
               outline: 'none',
               textAlign: 'center',
@@ -184,10 +183,10 @@ export default function Login() {
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
-              e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.2)';
+              e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.12)';
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+              e.target.style.borderColor = 'rgba(0,0,0,0.1)';
               e.target.style.boxShadow = 'none';
             }}
           />
@@ -199,10 +198,10 @@ export default function Login() {
           style={{ 
             width: '100%', 
             padding: '1rem', 
-            border: '1px solid rgba(255, 255, 255, 0.15)', 
+            border: '1px solid rgba(0, 0, 0, 0.12)', 
             borderRadius: '30px', 
-            background: 'rgba(255, 255, 255, 0.05)', 
-            color: '#ffffff',
+            background: 'rgba(0, 0, 0, 0.02)', 
+            color: '#1a1d2b',
             fontWeight: '700',
             cursor: loading ? 'not-allowed' : 'pointer', 
             display: 'flex', 
@@ -211,19 +210,19 @@ export default function Login() {
             gap: '0.75rem',
             fontSize: '0.95rem',
             transition: 'all 0.3s ease',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+            boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
           }}
           onMouseEnter={(e) => {
             if (!loading) {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.2)';
+              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.05)';
               e.currentTarget.style.transform = 'translateY(-2px)';
             }
           }}
           onMouseLeave={(e) => {
             if (!loading) {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.12)';
+              e.currentTarget.style.background = 'rgba(0, 0, 0, 0.02)';
               e.currentTarget.style.transform = 'translateY(0)';
             }
           }}

@@ -90,23 +90,22 @@ export default function CompleteProfile() {
       display: 'flex', 
       alignItems: 'center', 
       justifyContent: 'center', 
-      background: 'linear-gradient(135deg, #0a0c16 0%, #12172a 50%, #0a0c16 100%)', 
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #eceef4 50%, #f8f9fa 100%)', 
       padding: '2rem 1.5rem',
       fontFamily: "'Inter', sans-serif",
       position: 'relative',
       overflow: 'hidden'
     }}>
       {/* Decorative Blur Spheres */}
-      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(139, 30, 30, 0.15)', filter: 'blur(100px)', borderRadius: '50%', top: '15%', left: '10%', pointerEvents: 'none' }}></div>
-      <div style={{ position: 'absolute', width: '350px', height: '350px', background: 'rgba(26, 32, 58, 0.35)', filter: 'blur(120px)', borderRadius: '50%', bottom: '15%', right: '10%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(139, 30, 30, 0.06)', filter: 'blur(100px)', borderRadius: '50%', top: '15%', left: '10%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '350px', height: '350px', background: 'rgba(37, 45, 80, 0.06)', filter: 'blur(120px)', borderRadius: '50%', bottom: '15%', right: '10%', pointerEvents: 'none' }}></div>
 
       <div className="auth-card" style={{ 
         padding: '3rem 2.5rem', 
-        background: 'rgba(255, 255, 255, 0.03)', 
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        background: '#ffffff', 
+        border: '1px solid rgba(0, 0, 0, 0.08)',
         borderRadius: '24px', 
-        boxShadow: '0 16px 48px rgba(0,0,0,0.4)', 
+        boxShadow: '0 16px 48px rgba(26,29,43,0.08)', 
         maxWidth: '460px', 
         width: '100%',
         position: 'relative',
@@ -115,25 +114,25 @@ export default function CompleteProfile() {
         <h2 style={{ 
           textAlign: 'center', 
           marginBottom: '1rem', 
-          color: '#ffffff',
+          color: '#1a1d2b',
           fontFamily: "'Outfit', sans-serif",
           fontWeight: '800',
           fontSize: '2rem',
-          background: 'linear-gradient(90deg, #ffffff 0%, #cbd5e1 50%, #a72828 100%)',
+          background: 'linear-gradient(90deg, #1a1d2b 0%, #3a3f52 50%, #8b1e1e 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
           Complete Your Profile
         </h2>
-        <p style={{ textAlign: 'center', color: '#94a3b8', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.6' }}>
+        <p style={{ textAlign: 'center', color: '#5c6278', marginBottom: '2rem', fontSize: '0.95rem', lineHeight: '1.6' }}>
           Please provide these details for your conference registration and certificate.
         </p>
         
         {error && (
           <div style={{ 
             color: '#ef4444', 
-            backgroundColor: 'rgba(239, 68, 68, 0.1)', 
-            border: '1px solid rgba(239, 68, 68, 0.2)', 
+            backgroundColor: 'rgba(239, 68, 68, 0.05)', 
+            border: '1px solid rgba(239, 68, 68, 0.15)', 
             padding: '0.85rem', 
             borderRadius: '8px', 
             marginBottom: '1.5rem', 
@@ -147,7 +146,7 @@ export default function CompleteProfile() {
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>Full Name (for Certificate):</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>Full Name (for Certificate):</label>
             <input 
               type="text" 
               value={certificateName} 
@@ -157,15 +156,15 @@ export default function CompleteProfile() {
                 width: '100%', 
                 padding: '0.85rem', 
                 borderRadius: '8px', 
-                border: '1px solid rgba(255,255,255,0.1)', 
-                background: 'rgba(0, 0, 0, 0.4)', 
-                color: '#ffffff',
+                border: '1px solid rgba(0,0,0,0.12)', 
+                background: 'rgba(0, 0, 0, 0.02)', 
+                color: '#1a1d2b',
                 fontSize: '0.95rem',
                 outline: 'none',
                 transition: 'border-color 0.2s ease'
               }}
               onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
               required
             />
           </div>
@@ -173,7 +172,7 @@ export default function CompleteProfile() {
           {userRole === 'delegate' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>Grade (Academic Year 2026-2027):</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>Grade (Academic Year 2026-2027):</label>
                 <select 
                   value={grade} 
                   onChange={(e) => setGrade(e.target.value)}
@@ -181,17 +180,17 @@ export default function CompleteProfile() {
                     width: '100%', 
                     padding: '0.85rem', 
                     borderRadius: '8px', 
-                    border: '1px solid rgba(255,255,255,0.1)', 
-                    background: 'rgba(0, 0, 0, 0.4)', 
-                    color: '#ffffff',
+                    border: '1px solid rgba(0,0,0,0.12)', 
+                    background: 'rgba(0, 0, 0, 0.02)', 
+                    color: '#1a1d2b',
                     fontSize: '0.95rem',
                     outline: 'none',
                     cursor: 'pointer',
-                    colorScheme: 'dark',
+                    colorScheme: 'light',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
                   required
                 >
                   <option value="">Select Grade</option>
@@ -206,7 +205,7 @@ export default function CompleteProfile() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>Section:</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>Section:</label>
                 <input 
                   type="text" 
                   value={section} 
@@ -217,21 +216,21 @@ export default function CompleteProfile() {
                     width: '100%', 
                     padding: '0.85rem', 
                     borderRadius: '8px', 
-                    border: '1px solid rgba(255,255,255,0.1)', 
-                    background: 'rgba(0, 0, 0, 0.4)', 
-                    color: '#ffffff',
+                    border: '1px solid rgba(0,0,0,0.12)', 
+                    background: 'rgba(0, 0, 0, 0.02)', 
+                    color: '#1a1d2b',
                     fontSize: '0.95rem',
                     outline: 'none',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
                   required
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>Stream:</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>Stream:</label>
                 <select 
                   value={stream} 
                   onChange={(e) => setStream(e.target.value)}
@@ -239,17 +238,17 @@ export default function CompleteProfile() {
                     width: '100%', 
                     padding: '0.85rem', 
                     borderRadius: '8px', 
-                    border: '1px solid rgba(255,255,255,0.1)', 
-                    background: 'rgba(0, 0, 0, 0.4)', 
-                    color: '#ffffff',
+                    border: '1px solid rgba(0,0,0,0.12)', 
+                    background: 'rgba(0, 0, 0, 0.02)', 
+                    color: '#1a1d2b',
                     fontSize: '0.95rem',
                     outline: 'none',
                     cursor: 'pointer',
-                    colorScheme: 'dark',
+                    colorScheme: 'light',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
                   required
                 >
                   <option value="">Select Stream</option>
@@ -259,7 +258,7 @@ export default function CompleteProfile() {
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>Contact Number:</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>Contact Number:</label>
                 <input 
                   type="tel" 
                   value={contactNo} 
@@ -269,15 +268,15 @@ export default function CompleteProfile() {
                     width: '100%', 
                     padding: '0.85rem', 
                     borderRadius: '8px', 
-                    border: '1px solid rgba(255,255,255,0.1)', 
-                    background: 'rgba(0, 0, 0, 0.4)', 
-                    color: '#ffffff',
+                    border: '1px solid rgba(0,0,0,0.12)', 
+                    background: 'rgba(0, 0, 0, 0.02)', 
+                    color: '#1a1d2b',
                     fontSize: '0.95rem',
                     outline: 'none',
                     transition: 'border-color 0.2s ease'
                   }}
                   onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
                   required
                 />
               </div>
@@ -285,7 +284,7 @@ export default function CompleteProfile() {
           )}
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#cbd5e1', fontSize: '0.9rem' }}>CSMUN Committee Assignment:</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem' }}>CSMUN Committee Assignment:</label>
             <select 
               value={committee} 
               onChange={(e) => setCommittee(e.target.value)}
@@ -293,17 +292,17 @@ export default function CompleteProfile() {
                 width: '100%', 
                 padding: '0.85rem', 
                 borderRadius: '8px', 
-                border: '1px solid rgba(255,255,255,0.1)', 
-                background: 'rgba(0, 0, 0, 0.4)', 
-                color: '#ffffff',
+                border: '1px solid rgba(0,0,0,0.12)', 
+                background: 'rgba(0, 0, 0, 0.02)', 
+                color: '#1a1d2b',
                 fontSize: '0.95rem',
                 outline: 'none',
                 cursor: 'pointer',
-                colorScheme: 'dark',
+                colorScheme: 'light',
                 transition: 'border-color 0.2s ease'
               }}
               onFocus={(e) => e.target.style.borderColor = 'rgba(139, 30, 30, 0.5)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(0,0,0,0.12)'}
               required
             >
               <option value="">Select Committee</option>

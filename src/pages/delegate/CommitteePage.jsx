@@ -292,8 +292,8 @@ export default function CommitteePage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0a0c16 0%, #12172a 50%, #0a0c16 100%)',
-      color: '#ffffff',
+      background: 'linear-gradient(135deg, #f8f9fa 0%, #eceef4 50%, #f8f9fa 100%)',
+      color: '#1a1d2b',
       fontFamily: "'Inter', sans-serif",
       padding: '2rem 1.5rem',
       boxSizing: 'border-box',
@@ -301,8 +301,8 @@ export default function CommitteePage() {
       overflowX: 'hidden'
     }}>
       {/* Decorative Spheres */}
-      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(197, 160, 89, 0.05)', filter: 'blur(120px)', borderRadius: '50%', top: '10%', left: '5%', pointerEvents: 'none' }}></div>
-      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(59, 130, 246, 0.05)', filter: 'blur(140px)', borderRadius: '50%', bottom: '15%', right: '5%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '300px', height: '300px', background: 'rgba(197, 160, 89, 0.04)', filter: 'blur(120px)', borderRadius: '50%', top: '10%', left: '5%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(59, 130, 246, 0.04)', filter: 'blur(140px)', borderRadius: '50%', bottom: '15%', right: '5%', pointerEvents: 'none' }}></div>
 
       <div style={{ maxWidth: '1100px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         
@@ -314,25 +314,25 @@ export default function CommitteePage() {
               display: 'flex',
               alignItems: 'center',
               gap: '0.5rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
+              background: 'rgba(26, 29, 43, 0.02)',
+              border: '1px solid rgba(0, 0, 0, 0.12)',
               borderRadius: '30px',
               padding: '0.6rem 1.2rem',
-              color: '#ffffff',
+              color: '#1a1d2b',
               cursor: 'pointer',
               fontWeight: '700',
               fontSize: '0.85rem',
               transition: 'all 0.2s ease',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+              boxShadow: '0 2px 8px rgba(26,29,43,0.03)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+              e.currentTarget.style.background = 'rgba(26, 29, 43, 0.06)';
+              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.2)';
               e.currentTarget.style.transform = 'translateX(-2px)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+              e.currentTarget.style.background = 'rgba(26, 29, 43, 0.02)';
+              e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.12)';
               e.currentTarget.style.transform = 'none';
             }}
           >
@@ -346,7 +346,7 @@ export default function CommitteePage() {
             color: '#c5a059',
             textTransform: 'uppercase',
             letterSpacing: '1.5px',
-            background: 'rgba(197, 160, 89, 0.1)',
+            background: 'rgba(197, 160, 89, 0.08)',
             padding: '6px 16px',
             borderRadius: '20px'
           }}>
@@ -356,21 +356,20 @@ export default function CommitteePage() {
 
         {/* Committee Title Section */}
         <div style={{
-          background: 'linear-gradient(135deg, rgba(26, 32, 58, 0.6) 0%, rgba(10, 15, 30, 0.8) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          background: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           borderRadius: '24px',
           padding: '2.5rem',
           marginBottom: '2.5rem',
           textAlign: 'center',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.2)'
+          boxShadow: '0 8px 32px rgba(26, 29, 43, 0.05)'
         }}>
           <h1 style={{
             fontFamily: "'Outfit', sans-serif",
             fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
             fontWeight: '900',
             margin: '0 0 1rem 0',
-            background: 'linear-gradient(90deg, #ffffff 0%, #cbd5e1 50%, #c5a059 100%)',
+            background: 'linear-gradient(90deg, #1a1d2b 0%, #3a3f52 50%, #c5a059 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>
@@ -379,8 +378,8 @@ export default function CommitteePage() {
           {info.grade && (
             <div style={{
               display: 'inline-block',
-              background: 'rgba(197, 160, 89, 0.12)',
-              border: '1px solid rgba(197, 160, 89, 0.2)',
+              background: 'rgba(197, 160, 89, 0.08)',
+              border: '1px solid rgba(197, 160, 89, 0.15)',
               borderRadius: '20px',
               padding: '4px 16px',
               fontSize: '0.8rem',
@@ -395,12 +394,12 @@ export default function CommitteePage() {
             {info.topics.map((topic, i) => (
               <p key={i} style={{
                 fontSize: '1rem',
-                color: '#94a3b8',
+                color: '#5c6278',
                 margin: '0.5rem 0',
                 lineHeight: '1.6',
                 fontWeight: '500'
               }}>
-                <strong style={{ color: '#ffffff' }}>Topic {info.topics.length > 1 ? i + 1 : ''}:</strong> {topic}
+                <strong style={{ color: '#1a1d2b' }}>Topic {info.topics.length > 1 ? i + 1 : ''}:</strong> {topic}
               </p>
             ))}
           </div>
@@ -412,7 +411,7 @@ export default function CommitteePage() {
           fontSize: '1.6rem',
           fontWeight: '800',
           marginBottom: '1.5rem',
-          color: '#ffffff',
+          color: '#1a1d2b',
           display: 'flex',
           alignItems: 'center',
           gap: '0.65rem'
@@ -430,26 +429,25 @@ export default function CommitteePage() {
             <div
               key={index}
               style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                border: '1px solid rgba(255, 255, 255, 0.06)',
+                background: '#ffffff',
+                border: '1px solid rgba(0, 0, 0, 0.08)',
                 borderRadius: '24px',
                 padding: '2rem',
                 display: 'flex',
                 gap: '1.5rem',
                 alignItems: 'flex-start',
-                backdropFilter: 'blur(16px)',
                 transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                boxShadow: '0 4px 24px rgba(26,29,43,0.05)'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-6px)';
-                e.currentTarget.style.borderColor = 'rgba(197, 160, 89, 0.3)';
-                e.currentTarget.style.boxShadow = '0 15px 40px rgba(197, 160, 89, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(197, 160, 89, 0.45)';
+                e.currentTarget.style.boxShadow = '0 12px 40px rgba(197, 160, 89, 0.12)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'none';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.06)';
-                e.currentTarget.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
+                e.currentTarget.style.boxShadow = '0 4px 24px rgba(26,29,43,0.05)';
               }}
             >
               {/* Chair Avatar */}
@@ -460,7 +458,7 @@ export default function CommitteePage() {
                   bottom: '-5px',
                   right: '-5px',
                   background: chair.role === 'Head Chair' ? '#c5a059' : chair.role === 'Deputy Chair' ? '#3b82f6' : '#8b5cf6',
-                  color: '#0a0c16',
+                  color: '#ffffff',
                   fontSize: '0.55rem',
                   fontWeight: '800',
                   padding: '2px 6px',
@@ -478,7 +476,7 @@ export default function CommitteePage() {
                   fontFamily: "'Outfit', sans-serif",
                   fontSize: '1.2rem',
                   fontWeight: '800',
-                  color: '#ffffff',
+                  color: '#1a1d2b',
                   margin: 0
                 }}>
                   {chair.name}
@@ -486,7 +484,7 @@ export default function CommitteePage() {
                 <span style={{
                   fontSize: '0.7rem',
                   fontWeight: '700',
-                  color: chair.role === 'Head Chair' ? '#c5a059' : chair.role === 'Deputy Chair' ? '#60a5fa' : '#a78bfa',
+                  color: chair.role === 'Head Chair' ? '#c5a059' : chair.role === 'Deputy Chair' ? '#3b82f6' : '#8b5cf6',
                   textTransform: 'uppercase',
                   letterSpacing: '1px'
                 }}>
@@ -495,15 +493,15 @@ export default function CommitteePage() {
                 
                 {/* Note Bubble */}
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  background: 'rgba(26, 29, 43, 0.02)',
+                  border: '1px solid rgba(0, 0, 0, 0.05)',
                   borderRadius: '12px',
                   padding: '1rem',
                   marginTop: '0.5rem',
                   position: 'relative'
                 }}>
                   <p style={{
-                    color: '#cbd5e1',
+                    color: '#5c6278',
                     fontSize: '0.85rem',
                     lineHeight: '1.5',
                     margin: 0,
@@ -523,7 +521,7 @@ export default function CommitteePage() {
           fontSize: '1.6rem',
           fontWeight: '800',
           marginBottom: '1.5rem',
-          color: '#ffffff',
+          color: '#1a1d2b',
           display: 'flex',
           alignItems: 'center',
           gap: '0.65rem'
@@ -532,12 +530,11 @@ export default function CommitteePage() {
         </h2>
 
         <div style={{
-          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.3) 0%, rgba(15, 23, 42, 0.5) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.06)',
+          background: '#ffffff',
+          border: '1px solid rgba(0, 0, 0, 0.08)',
           borderRadius: '24px',
           padding: '2.5rem',
-          backdropFilter: 'blur(20px)',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+          boxShadow: '0 8px 32px rgba(26, 29, 43, 0.05)',
           display: 'flex',
           flexDirection: 'column',
           gap: '2rem'
@@ -547,12 +544,12 @@ export default function CommitteePage() {
               fontFamily: "'Outfit', sans-serif",
               fontSize: '1.3rem',
               fontWeight: '800',
-              color: '#ffffff',
+              color: '#1a1d2b',
               margin: '0 0 0.5rem 0'
             }}>
               Download Background Guide (BG)
             </h3>
-            <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0, lineHeight: '1.5' }}>
+            <p style={{ color: '#5c6278', fontSize: '0.9rem', margin: 0, lineHeight: '1.5' }}>
               The background guide outlines the topic framework, historical context, bloc dynamics, and research questions. Read it carefully to draft your position paper.
             </p>
           </div>
@@ -596,7 +593,7 @@ export default function CommitteePage() {
           </div>
 
           <div style={{
-            borderTop: '1px solid rgba(255,255,255,0.06)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
             paddingTop: '1.5rem',
             display: 'flex',
             alignItems: 'center',
