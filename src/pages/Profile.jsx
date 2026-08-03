@@ -376,8 +376,7 @@ export default function Profile() {
               <option value="UNEP">UNEP (United Nations Environment Programme)</option>
               <option value="DISEC">DISEC (Disarmament and International Security Committee)</option>
               <option value="HRC">HRC (United Nations Human Rights Council)</option>
-              <option value="SOCHUM I">SOCHUM I (Social, Humanitarian & Cultural Committee I)</option>
-              <option value="SOCHUM II">SOCHUM II (Social, Humanitarian & Cultural Committee II)</option>
+              <option value="SOCHUM">SOCHUM (Social, Humanitarian & Cultural Committee)</option>
               <option value="UNEA I">UNEA I (United Nations Environment Assembly I)</option>
               <option value="UNEA II">UNEA II (United Nations Environment Assembly II)</option>
               <option value="WTO I">WTO I (World Trade Organization I)</option>

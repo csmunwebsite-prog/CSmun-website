@@ -672,161 +672,86 @@ export default function DelegateDashboard() {
   return (
     <div className="portal-wrapper" style={{ 
       minHeight: '100vh', 
-      background: '#f3f6fa', 
-      color: '#0f172a',
-      padding: '2rem 1.5rem',
-      fontFamily: "'Inter', sans-serif",
-      position: 'relative'
+      background: 'var(--bg-primary, #ffffff)', 
+      color: 'var(--text-secondary, #3a3f52)',
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      position: 'relative',
+      overflowX: 'hidden'
     }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 2 }}>
+
+      {/* Decorative Orbs */}
+      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(139, 30, 30, 0.05)', filter: 'blur(120px)', borderRadius: '50%', top: '5%', left: '5%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(37, 45, 80, 0.04)', filter: 'blur(130px)', borderRadius: '50%', bottom: '10%', right: '5%', pointerEvents: 'none' }}></div>
+
+      {/* ===== NAVBAR ===== */}
+      <nav className="navbar scrolled" id="navbar">
+        <div className="container-wide">
+          <a href="/index.html" className="nav-brand">
+            <div className="nav-logo-wrapper">
+              <img src="/assets/logo.png" alt="CSMUN Logo" className="nav-logo" />
+            </div>
+            <span className="nav-brand-text">CS<span>MUN</span></span>
+          </a>
+          <ul className="nav-links" id="navLinks">
+            <li><a href="/app" className="active">Dashboard</a></li>
+            <li><a href="/index.html#committees">Committees</a></li>
+            <li><a href="/resources.html">Resources</a></li>
+            <li><a href="/app/notes">Notes</a></li>
+            <li id="auth-nav-item">
+              {currentUser ? (
+                <a href="/app/profile" className="nav-profile-link" style={{ textDecoration: 'none' }}>
+                  <div className="nav-profile">
+                    <img 
+                      src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
+                      alt="Profile" 
+                      className="nav-avatar" 
+                    />
+                    <span className="nav-user-name">
+                      {(() => {
+                        const finalName = userData?.name || userData?.certificateName || currentUser.displayName || 'Account';
+                        const firstName = finalName.split(' ')[0];
+                        const gradeStr = userData?.grade ? ` (Gr. ${userData.grade})` : '';
+                        return firstName + gradeStr;
+                      })()}
+                    </span>
+                  </div>
+                </a>
+              ) : (
+                <a href="/app" className="btn btn-primary nav-cta" id="registerBtn">Register Now</a>
+              )}
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '7rem 1.5rem 3rem', position: 'relative', zIndex: 2 }}>
         
         {/* Navigation / Header Banner */}
-        <header style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          marginBottom: '2rem',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}>
-          <div>
-            <span style={{ 
-              fontSize: '0.8rem', 
-              fontWeight: '800', 
-              color: '#3b82f6', 
-              textTransform: 'uppercase', 
-              letterSpacing: '1.5px',
-              display: 'block',
-              marginBottom: '0.25rem'
-            }}>
-              DASHBOARD
-            </span>
-            <h1 style={{ 
-              fontSize: '2.2rem', 
-              fontWeight: '800', 
-              fontFamily: "'Outfit', sans-serif",
-              color: '#0a2342',
-              margin: 0
-            }}>
-              Welcome, {userData?.name || currentUser?.displayName || 'Delegate'}.
-            </h1>
-            <p style={{ color: '#475569', fontSize: '0.95rem', margin: '0.25rem 0 0 0', fontWeight: '500' }}>
-              You've completed <strong style={{ color: '#0a2342' }}>{progressPercentage}%</strong> of training this week. Go through your resources to keep your progress glowing.
-            </p>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-            <button 
-              onClick={() => navigate('/app/notes')}
-              style={{ 
-                padding: '0.65rem 1.5rem', 
-                borderRadius: '30px', 
-                background: 'linear-gradient(90deg, #8b1e1e 0%, #a72828 100%)',
-                border: 'none',
-                color: '#ffffff',
-                fontWeight: '700',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontSize: '0.85rem',
-                boxShadow: '0 4px 12px rgba(139, 30, 30, 0.15)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(139, 30, 30, 0.25)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(139, 30, 30, 0.15)';
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-              </svg>
-              View Academic Notes
-            </button>
-            <button 
-              onClick={() => window.location.href = '/'}
-              style={{ 
-                padding: '0.65rem 1.5rem', 
-                borderRadius: '30px', 
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                color: '#334155',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontSize: '0.85rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f1f5f9';
-                e.currentTarget.style.borderColor = '#94a3b8';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-              }}
-            >
-              <HomeIcon style={{ marginRight: '0.35rem' }} /> Home
-            </button>
-            <button 
-              onClick={() => navigate('/app/profile')}
-              style={{ 
-                padding: '0.65rem 1.5rem', 
-                borderRadius: '30px', 
-                background: '#ffffff',
-                border: '1px solid #cbd5e1',
-                color: '#334155',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontSize: '0.85rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f1f5f9';
-                e.currentTarget.style.borderColor = '#94a3b8';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = '#ffffff';
-                e.currentTarget.style.borderColor = '#cbd5e1';
-              }}
-            >
-              <SettingsIcon /> Profile
-            </button>
-            <button 
-              onClick={logout} 
-              style={{ 
-                padding: '0.65rem 1.5rem', 
-                borderRadius: '30px', 
-                background: 'transparent',
-                border: '1.5px solid rgba(139, 30, 30, 0.25)',
-                color: '#8b1e1e',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                fontSize: '0.85rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#8b1e1e';
-                e.currentTarget.style.background = 'rgba(139, 30, 30, 0.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(139, 30, 30, 0.25)';
-                e.currentTarget.style.background = 'transparent';
-              }}
-            >
-              <LogOutIcon /> Log Out
-            </button>
-          </div>
+        {/* Dashboard Header */}
+        <header style={{ marginBottom: '2.5rem' }}>
+          <div className="section-label" style={{ display: 'inline-block', marginBottom: '0.75rem' }}>Delegate Portal</div>
+          <h1 style={{ 
+            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', 
+            fontWeight: '800', 
+            fontFamily: "'Outfit', sans-serif",
+            color: 'var(--text-primary, #1a1d2b)',
+            margin: '0 0 0.5rem 0'
+          }}>
+            Welcome, <span className="accent-text">{(userData?.name || currentUser?.displayName || 'Delegate').split(' ')[0]}</span>.
+          </h1>
+          <p style={{ color: 'var(--text-muted, #5c6278)', fontSize: '1rem', margin: '0 0 1.5rem 0', maxWidth: '600px', lineHeight: '1.6' }}>
+            You've completed <strong style={{ color: 'var(--text-primary, #1a1d2b)' }}>{progressPercentage}%</strong> of training. Go through your resources to keep your progress glowing.
+          </p>
+          <a 
+            href="/app/notes"
+            className="btn btn-primary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '12px 28px', fontSize: '0.8rem' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            View Academic Notes
+          </a>
         </header>
 
         {/* TOP ROW: Profile Card & Committee Card Side-by-Side with Matching Height */}
@@ -838,35 +763,39 @@ export default function DelegateDashboard() {
           alignItems: 'stretch' // Force matching heights!
         }}>
           
-          {/* Left Column: Premium Profile Card with Sleek, Compressed Height */}
+          {/* Left Column: Premium Profile Card */}
           <div style={{ 
-            flex: '1 1 280px', // Stretchable flex width
-            background: '#f4f6fe',
-            border: '1px solid #cbd5e1',
-            borderRadius: '24px',
-            padding: '1.25rem', // Compressed padding
-            boxShadow: '0 4px 20px rgba(10, 35, 66, 0.02)',
+            flex: '1 1 280px',
+            background: 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(26, 29, 43, 0.08)',
+            borderRadius: '20px',
+            padding: '1.5rem',
+            boxShadow: '0 4px 24px rgba(26, 29, 43, 0.04)',
             display: 'flex',
-            flexDirection: 'column' // Height matches via flexbox stretch
+            flexDirection: 'column',
+            transition: 'box-shadow 0.3s ease, transform 0.3s ease'
           }}>
             <span style={{ 
-              fontSize: '0.75rem', 
+              fontSize: '0.7rem', 
               fontWeight: '700', 
-              color: '#64748b', 
+              color: 'var(--red-500, #a72828)', 
               textTransform: 'uppercase', 
-              letterSpacing: '1px', 
+              letterSpacing: '2px', 
               display: 'block', 
               textAlign: 'center', 
-              marginBottom: '0.4rem' // Reduced margin
+              marginBottom: '0.5rem',
+              fontFamily: "'Outfit', sans-serif"
             }}>
               CSMUN VI 2026 DELEGATE
             </span>
 
             <h3 style={{ 
-              fontSize: '1.5rem', // Sleeker font size
+              fontSize: '1.4rem',
               fontWeight: '800', 
-              color: '#0a2342', 
-              margin: '0 0 0.75rem 0', // Compressed margin
+              color: 'var(--text-primary, #1a1d2b)', 
+              margin: '0 0 0.75rem 0',
               fontFamily: "'Outfit', sans-serif", 
               textAlign: 'center' 
             }}>
@@ -876,50 +805,47 @@ export default function DelegateDashboard() {
             {/* Rounded Badges */}
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
               <span style={{ 
-                background: '#ffffff', 
-                border: '1px solid #cbd5e1', 
-                padding: '0.4rem 0.85rem', 
+                background: 'rgba(26, 29, 43, 0.04)', 
+                border: '1px solid rgba(26, 29, 43, 0.08)', 
+                padding: '0.35rem 0.8rem', 
                 borderRadius: '30px', 
-                fontSize: '0.8rem', 
+                fontSize: '0.78rem', 
                 fontWeight: '600', 
-                color: '#334155', 
+                color: 'var(--text-secondary, #3a3f52)', 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: '0.3rem',
-                boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                gap: '0.3rem'
               }}>
                 <GraduationCapIcon /> {userData?.grade ? `Grade ${userData.grade}` : 'N/A'}
               </span>
               {userData?.stream && (
                 <span style={{ 
-                  background: '#ffffff', 
-                  border: '1px solid #cbd5e1', 
-                  padding: '0.4rem 0.85rem', 
+                  background: 'rgba(26, 29, 43, 0.04)', 
+                  border: '1px solid rgba(26, 29, 43, 0.08)', 
+                  padding: '0.35rem 0.8rem', 
                   borderRadius: '30px', 
-                  fontSize: '0.8rem', 
+                  fontSize: '0.78rem', 
                   fontWeight: '600', 
-                  color: '#334155', 
+                  color: 'var(--text-secondary, #3a3f52)', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.3rem',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  gap: '0.3rem'
                 }}>
                   <SchoolIcon /> {userData.stream}
                 </span>
               )}
               {userData?.section && (
                 <span style={{ 
-                  background: '#ffffff', 
-                  border: '1px solid #cbd5e1', 
-                  padding: '0.4rem 0.85rem', 
+                  background: 'rgba(26, 29, 43, 0.04)', 
+                  border: '1px solid rgba(26, 29, 43, 0.08)', 
+                  padding: '0.35rem 0.8rem', 
                   borderRadius: '30px', 
-                  fontSize: '0.8rem', 
+                  fontSize: '0.78rem', 
                   fontWeight: '600', 
-                  color: '#334155', 
+                  color: 'var(--text-secondary, #3a3f52)', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  gap: '0.3rem',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  gap: '0.3rem'
                 }}>
                   <MapPinIcon /> Sec {userData.section.toUpperCase()}
                 </span>
@@ -929,12 +855,12 @@ export default function DelegateDashboard() {
             {/* Compact Stats Row - Highly professional single line to match user's screenshot height */}
             <div style={{ 
               display: 'flex', 
-              borderTop: '1px solid #cbd5e1', 
+              borderTop: '1px solid rgba(26, 29, 43, 0.08)', 
               paddingTop: '0.85rem', 
               marginTop: 'auto',
               justifyContent: 'space-between',
               fontSize: '0.75rem',
-              color: '#475569',
+              color: 'var(--text-muted, #5c6278)',
               fontWeight: '600'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -950,59 +876,45 @@ export default function DelegateDashboard() {
 
           {/* Committee Card (Top Right) */}
           <div 
-            onClick={() => {
-              if (userData?.committee) {
-                navigate('/app/committee');
-              }
-            }}
             style={{ 
               flex: '2 1 600px',
-              background: 'linear-gradient(135deg, #dbeafe 0%, #dcfce7 100%)', 
-              borderRadius: '24px',
+              background: 'rgba(255, 255, 255, 0.7)', 
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              borderRadius: '20px',
               padding: '2rem 2.5rem',
-              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.05)',
+              boxShadow: '0 4px 24px rgba(26, 29, 43, 0.04)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
               flexWrap: 'wrap',
               gap: '1.5rem',
-              cursor: userData?.committee ? 'pointer' : 'default',
-              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-              border: '1px solid rgba(10, 35, 66, 0.03)'
-            }}
-            onMouseEnter={(e) => {
-              if (userData?.committee) {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(59, 130, 246, 0.12)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (userData?.committee) {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(59, 130, 246, 0.05)';
-              }
+              cursor: 'default',
+              border: '1px solid rgba(26, 29, 43, 0.08)',
+              transition: 'box-shadow 0.3s ease, transform 0.3s ease'
             }}
           >
               <div>
                 <span style={{ 
-                  background: '#ffffff', 
-                  color: '#2563eb', 
-                  fontSize: '0.75rem', 
-                  fontWeight: '800', 
-                  padding: '4px 12px', 
+                  background: 'rgba(167, 40, 40, 0.08)', 
+                  color: 'var(--red-500, #a72828)', 
+                  fontSize: '0.7rem', 
+                  fontWeight: '700', 
+                  padding: '5px 14px', 
                   borderRadius: '20px', 
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: '0.35rem',
-                  boxShadow: '0 2px 5px rgba(0,0,0,0.02)',
-                  marginBottom: '1rem'
+                  letterSpacing: '1px',
+                  marginBottom: '1rem',
+                  fontFamily: "'Outfit', sans-serif"
                 }}>
                   <BoltIcon /> ACTIVE STATUS
                 </span>
                 <h3 style={{ 
                   fontFamily: "'Outfit', sans-serif", 
-                  fontSize: '1.6rem', 
-                  color: '#0a2342', 
+                  fontSize: '1.5rem', 
+                  color: 'var(--text-primary, #1a1d2b)', 
                   margin: '0 0 0.5rem 0',
                   fontWeight: '800',
                   display: 'flex',
@@ -1010,15 +922,10 @@ export default function DelegateDashboard() {
                   gap: '0.5rem'
                 }}>
                   {userData?.committee || 'No Committee Assigned'}
-                  {userData?.committee && (
-                    <span style={{ fontSize: '0.85rem', color: '#2563eb', fontWeight: '700', marginLeft: '0.5rem' }}>
-                      (View Page →)
-                    </span>
-                  )}
                 </h3>
-                <p style={{ color: '#475569', fontSize: '0.95rem', margin: 0, maxWidth: '480px', lineHeight: '1.5' }}>
+                <p style={{ color: 'var(--text-muted, #5c6278)', fontSize: '0.95rem', margin: 0, maxWidth: '480px', lineHeight: '1.5' }}>
                   {mentorName ? (
-                    <span>Your assigned mentor is <strong style={{ color: '#0a2342' }}>{mentorName}</strong>. Reach out for feedback and evaluations.</span>
+                    <span>Your assigned mentor is <strong style={{ color: 'var(--text-primary, #1a1d2b)' }}>{mentorName}</strong>. Reach out for feedback and evaluations.</span>
                   ) : (
                     <span>No mentor has tracked your profile yet. Once a mentor joins your committee, they can assign you under them.</span>
                   )}
@@ -1027,14 +934,48 @@ export default function DelegateDashboard() {
 
               {/* White rounded momentum capsule elements */}
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ background: '#ffffff', padding: '1rem 1.25rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>STREAM</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#0a2342', display: 'block', marginTop: '0.25rem' }}>{userData?.stream || 'N/A'}</strong>
+                <div style={{ background: 'rgba(26, 29, 43, 0.04)', border: '1px solid rgba(26, 29, 43, 0.08)', padding: '0.85rem 1.15rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted, #5c6278)', display: 'block', textTransform: 'uppercase' }}>STREAM</span>
+                  <strong style={{ fontSize: '1.05rem', color: 'var(--text-primary, #1a1d2b)', display: 'block', marginTop: '0.25rem' }}>{userData?.stream || 'N/A'}</strong>
                 </div>
-                <div style={{ background: '#ffffff', padding: '1rem 1.25rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px', boxShadow: '0 4px 10px rgba(0,0,0,0.02)' }}>
-                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: '#64748b', display: 'block', textTransform: 'uppercase' }}>SECTION</span>
-                  <strong style={{ fontSize: '1.1rem', color: '#0a2342', display: 'block', marginTop: '0.25rem' }}>{userData?.section?.toUpperCase() || 'N/A'}</strong>
+                <div style={{ background: 'rgba(26, 29, 43, 0.04)', border: '1px solid rgba(26, 29, 43, 0.08)', padding: '0.85rem 1.15rem', borderRadius: '16px', textAlign: 'center', minWidth: '90px' }}>
+                  <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted, #5c6278)', display: 'block', textTransform: 'uppercase' }}>SECTION</span>
+                  <strong style={{ fontSize: '1.05rem', color: 'var(--text-primary, #1a1d2b)', display: 'block', marginTop: '0.25rem' }}>{userData?.section?.toUpperCase() || 'N/A'}</strong>
                 </div>
+                <a 
+                  href="https://drive.google.com/drive/folders/12PtwTWDQnGnGsScFkHOaPgvrs6dtSM0z?usp=drive_link" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ 
+                    background: 'linear-gradient(135deg, var(--red-500, #8b1e1e) 0%, var(--red-400, #a72828) 100%)', 
+                    padding: '0.85rem 1.35rem', 
+                    borderRadius: '16px', 
+                    textAlign: 'center', 
+                    minWidth: '125px', 
+                    boxShadow: '0 4px 16px rgba(139, 30, 30, 0.25)',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(139, 30, 30, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(139, 30, 30, 0.25)';
+                  }}
+                >
+                  <span style={{ fontSize: '0.65rem', fontWeight: '800', color: 'rgba(255, 255, 255, 0.85)', display: 'block', textTransform: 'uppercase', letterSpacing: '1.2px', marginBottom: '0.2rem' }}>STUDY GUIDES</span>
+                  <strong style={{ fontSize: '0.88rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: '800' }}>
+                    ACCESS BG <LinkIcon style={{ color: '#ffffff', width: '12px', height: '12px' }} />
+                  </strong>
+                </a>
               </div>
           </div>
         </div>
@@ -1049,18 +990,20 @@ export default function DelegateDashboard() {
           
           {/* Training Videos (Card 2) */}
           <div style={{ 
-            background: '#ffffff', 
-            border: '1px solid #cbd5e1',
-            borderRadius: '24px',
+            background: 'rgba(255, 255, 255, 0.7)', 
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(26, 29, 43, 0.08)',
+            borderRadius: '20px',
             padding: '2rem',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.01)',
+            boxShadow: '0 4px 24px rgba(26, 29, 43, 0.04)',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: '#0a2342', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TvIcon style={{ width: '18px', height: '18px', color: '#8b1e1e' }} /> Training Videos
+            <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '1.3rem', color: 'var(--text-primary, #1a1d2b)', fontWeight: '800', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TvIcon style={{ width: '18px', height: '18px', color: 'var(--red-500, #8b1e1e)' }} /> Training Videos
             </h3>
-            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
+            <p style={{ color: 'var(--text-muted, #5c6278)', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: '1.5' }}>
               Watch essential MUN training videos to prepare for your committee.
             </p>
 
