@@ -319,8 +319,9 @@ export default function Profile() {
                   required
                 >
                   <option value="">Select Stream</option>
-                  <option value="iStream">iStream</option>
                   <option value="CBSE">CBSE</option>
+                  <option value="i-Stream">i-Stream</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 

@@ -22,7 +22,8 @@ export default function Login() {
       setError(`${role === 'mentor' ? 'Mentor' : 'Delegate'} access code is required.`);
       return;
     }
-    if (trimmedCode !== 'csmunvi2026') {
+    const expectedCode = role === 'mentor' ? 'MENTOR_CSmunvi2026' : 'DELEGATE_CSmunvi2026';
+    if (trimmedCode !== expectedCode) {
       setError(`Invalid ${role === 'mentor' ? 'Mentor' : 'Delegate'} access code. Access Denied.`);
       return;
     }

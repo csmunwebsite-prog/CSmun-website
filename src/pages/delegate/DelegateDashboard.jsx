@@ -159,6 +159,8 @@ export default function DelegateDashboard() {
   const [ytPlayer, setYtPlayer] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(237);
+  const [maxWatchedTime, setMaxWatchedTime] = useState(0);
+  const [isDraggingTimeline, setIsDraggingTimeline] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMouseActive, setIsMouseActive] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -166,8 +168,28 @@ export default function DelegateDashboard() {
   const [isMuted, setIsMuted] = useState(false);
   const [isCaptionsOn, setIsCaptionsOn] = useState(false);
   const modalContainerRef = useRef(null);
+  const timelineRef = useRef(null);
   const answeredCheckpointsRef = useRef(answeredCheckpoints);
   const activeCheckpointRef = useRef(activeCheckpoint);
+  const maxWatchedTimeRef = useRef(0);
+  const completedVideosRef = useRef(completedVideos);
+
+  useEffect(() => {
+    completedVideosRef.current = completedVideos;
+  }, [completedVideos]);
+
+  useEffect(() => {
+    maxWatchedTimeRef.current = maxWatchedTime;
+  }, [maxWatchedTime]);
+
+  useEffect(() => {
+    if (activeVideo) {
+      const isComp = completedVideos.includes(activeVideo.id);
+      const initialMax = isComp ? (duration || 999999) : 0;
+      setMaxWatchedTime(initialMax);
+      maxWatchedTimeRef.current = initialMax;
+    }
+  }, [activeVideo]);
 
   useEffect(() => {
     answeredCheckpointsRef.current = answeredCheckpoints;
@@ -279,6 +301,12 @@ export default function DelegateDashboard() {
                   
                   const dur = playerInstance.getDuration();
                   if (dur) setDuration(dur);
+
+                  const isComp = completedVideosRef.current.includes(activeVideo.id);
+                  if (!isComp && curr > maxWatchedTimeRef.current) {
+                    maxWatchedTimeRef.current = curr;
+                    setMaxWatchedTime(curr);
+                  }
 
                   // Check checkpoints using refs to avoid stale closures
                   const checkpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
@@ -477,6 +505,8 @@ export default function DelegateDashboard() {
         setQuizError('');
         setQuizSuccess(false);
         setCurrentTime(0);
+        setMaxWatchedTime(0);
+        maxWatchedTimeRef.current = 0;
         
         if (ytPlayer && typeof ytPlayer.seekTo === 'function') {
           ytPlayer.seekTo(0);
@@ -508,12 +538,65 @@ export default function DelegateDashboard() {
 
   const handleSeek = (targetTime) => {
     if (!ytPlayer) return;
+    const isComp = activeVideo ? completedVideos.includes(activeVideo.id) : false;
+    const allowedMaxTime = isComp ? (duration || 999999) : Math.max(maxWatchedTime, currentTime);
+
+    let finalTarget = targetTime;
     const unanswered = getFirstUnansweredCheckpoint();
-    if (unanswered && targetTime > unanswered.timestamp) {
-      ytPlayer.seekTo(unanswered.timestamp);
-      return;
+    if (unanswered && finalTarget > unanswered.timestamp) {
+      finalTarget = unanswered.timestamp;
     }
-    ytPlayer.seekTo(targetTime);
+    if (!isComp && finalTarget > allowedMaxTime) {
+      finalTarget = allowedMaxTime;
+    }
+
+    ytPlayer.seekTo(finalTarget);
+    setCurrentTime(finalTarget);
+  };
+
+  const updateTimelineFromEvent = (e, isFinal = false) => {
+    if (!timelineRef.current || !duration) return;
+    const rect = timelineRef.current.getBoundingClientRect();
+    const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const rawTarget = (clickX / rect.width) * duration;
+
+    const isComp = activeVideo ? completedVideos.includes(activeVideo.id) : false;
+    const allowedMaxTime = isComp ? (duration || 999999) : Math.max(maxWatchedTime, currentTime);
+    const unanswered = getFirstUnansweredCheckpoint();
+
+    let targetTime = rawTarget;
+    if (unanswered && targetTime > unanswered.timestamp) {
+      targetTime = unanswered.timestamp;
+    }
+    if (!isComp && targetTime > allowedMaxTime) {
+      targetTime = allowedMaxTime;
+    }
+
+    if (isFinal) {
+      handleSeek(targetTime);
+    } else {
+      setCurrentTime(targetTime);
+    }
+  };
+
+  const handleTimelinePointerDown = (e) => {
+    e.preventDefault();
+    setIsDraggingTimeline(true);
+    updateTimelineFromEvent(e, false);
+
+    const handlePointerMove = (moveEvent) => {
+      updateTimelineFromEvent(moveEvent, false);
+    };
+
+    const handlePointerUp = (upEvent) => {
+      setIsDraggingTimeline(false);
+      updateTimelineFromEvent(upEvent, true);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
   };
 
   const handlePlayPause = () => {
@@ -1682,30 +1765,42 @@ export default function DelegateDashboard() {
                       <span>{formatTime(duration)}</span>
                     </div>
 
-                    {/* Progress slider bar target */}
-                    <div style={{ 
-                      position: 'relative', 
-                      width: '100%', 
-                      height: '14px', 
-                      display: 'flex',
-                      alignItems: 'center',
-                      cursor: 'pointer'
-                    }}
-                    onClick={(e) => {
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const clickX = e.clientX - rect.left;
-                      const newTime = (clickX / rect.width) * duration;
-                      handleSeek(newTime);
-                    }}
+                    {/* Progress slider bar target with drag and forward restriction */}
+                    <div 
+                      ref={timelineRef}
+                      style={{ 
+                        position: 'relative', 
+                        width: '100%', 
+                        height: '14px', 
+                        display: 'flex',
+                        alignItems: 'center',
+                        cursor: 'pointer',
+                        touchAction: 'none'
+                      }}
+                      onPointerDown={handleTimelinePointerDown}
                     >
                       {/* Background Line */}
                       <div style={{
                         width: '100%',
                         height: '5px',
-                        background: 'rgba(255, 255, 255, 0.35)',
+                        background: 'rgba(255, 255, 255, 0.25)',
                         borderRadius: '3px',
-                        position: 'relative'
+                        position: 'relative',
+                        overflow: 'hidden'
                       }}>
+                        {/* Watched Max Range Indicator (subtle fill showing unlocked region) */}
+                        {activeVideo && !completedVideos.includes(activeVideo.id) && (
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            height: '100%',
+                            width: `${Math.min(100, (Math.max(maxWatchedTime, currentTime) / (duration || 1)) * 100)}%`,
+                            background: 'rgba(255, 255, 255, 0.4)',
+                            borderRadius: '3px'
+                          }} />
+                        )}
+
                         {/* Active Progress Blue Fill */}
                         <div style={{ 
                           position: 'absolute', 
@@ -1715,25 +1810,25 @@ export default function DelegateDashboard() {
                           width: `${Math.min(100, (currentTime / (duration || 1)) * 100)}%`, 
                           background: '#007aff', 
                           borderRadius: '3px',
-                          transition: 'width 0.1s linear'
-                        }} />
-
-                        {/* Blue Thumb Indicator */}
-                        <div style={{
-                          position: 'absolute',
-                          left: `${Math.min(100, (currentTime / (duration || 1)) * 100)}%`,
-                          top: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          width: '12px',
-                          height: '12px',
-                          borderRadius: '50%',
-                          background: '#007aff',
-                          border: '2px solid #ffffff',
-                          boxShadow: '0 0 5px rgba(0,0,0,0.6)',
-                          transition: 'left 0.1s linear, transform 0.1s ease',
-                          cursor: 'pointer'
+                          transition: isDraggingTimeline ? 'none' : 'width 0.1s linear'
                         }} />
                       </div>
+
+                      {/* Blue Thumb Indicator */}
+                      <div style={{
+                        position: 'absolute',
+                        left: `${Math.min(100, (currentTime / (duration || 1)) * 100)}%`,
+                        top: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: isDraggingTimeline ? '15px' : '12px',
+                        height: isDraggingTimeline ? '15px' : '12px',
+                        borderRadius: '50%',
+                        background: '#007aff',
+                        border: '2px solid #ffffff',
+                        boxShadow: '0 0 5px rgba(0,0,0,0.6)',
+                        transition: isDraggingTimeline ? 'none' : 'left 0.1s linear, transform 0.1s ease',
+                        cursor: 'grab'
+                      }} />
                     </div>
 
                     {/* Droplet Markers sitting below */}
