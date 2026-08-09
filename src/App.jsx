@@ -9,6 +9,7 @@ import DelegateDashboard from './pages/delegate/DelegateDashboard';
 
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import Notes from './pages/Notes';
+import AdminPortal from './pages/AdminPortal';
 import Footer from './components/Footer';
 import './App.css';
 
@@ -100,6 +101,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/app/adminportal" element={<AdminPortal />} />
       {/* Catch-all: redirect to /app */}
       <Route path="*" element={<Navigate to="/app" replace />} />
     </Routes>
