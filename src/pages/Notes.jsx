@@ -1192,62 +1192,18 @@ export default function Notes() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f8f9fa 0%, #eceef4 50%, #f8f9fa 100%)',
-      color: '#1a1d2b',
+      background: '#0b0f19',
+      color: '#e2e8f0',
       fontFamily: "'Inter', sans-serif"
     }}>
-      {/* Navbar Style Overrides */}
+      {/* Decorative orbs */}
       <style dangerouslySetInnerHTML={{__html: `
-        .navbar.scrolled {
-          background: rgba(255, 255, 255, 0.88) !important;
-          backdrop-filter: blur(16px) !important;
-          -webkit-backdrop-filter: blur(16px) !important;
-          border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-          padding: 10px 0 !important;
-          position: sticky !important;
-          top: 0 !important;
-          z-index: 1000 !important;
-          box-shadow: 0 1px 12px rgba(26, 29, 43, 0.06) !important;
-        }
-
-        .nav-links a {
-          font-family: 'Outfit', sans-serif !important;
-          font-size: 0.85rem !important;
-          font-weight: 500 !important;
-          letter-spacing: 1px !important;
-          text-transform: uppercase !important;
-          color: rgba(26, 29, 43, 0.7) !important;
-          position: relative !important;
-          padding-bottom: 4px !important;
-          transition: color 0.3s ease !important;
-        }
-
-        .nav-links a::after {
-          content: '' !important;
-          position: absolute !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          width: 0 !important;
-          height: 2px !important;
-          background: #8b1e1e !important;
-          transition: width 0.3s ease !important;
-        }
-
-        .nav-links a:hover {
-          color: #1a1d2b !important;
-        }
-
-        .nav-links a:hover::after {
-          width: 100% !important;
-        }
-        .nav-links a.active {
-          color: #1a1d2b !important;
-        }
+        body { background: #0b0f19; }
       `}} />
 
       {/* Decorative Orbs */}
-      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(139, 30, 30, 0.05)', filter: 'blur(120px)', borderRadius: '50%', top: '5%', left: '5%', pointerEvents: 'none' }}></div>
-      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(37, 45, 80, 0.04)', filter: 'blur(130px)', borderRadius: '50%', bottom: '10%', right: '5%', pointerEvents: 'none' }}></div>
+      <div style={{ position: 'absolute', width: '450px', height: '450px', background: 'rgba(139, 30, 30, 0.12)', filter: 'blur(120px)', borderRadius: '50%', top: '5%', left: '5%', pointerEvents: 'none', zIndex: 0 }}></div>
+      <div style={{ position: 'absolute', width: '400px', height: '400px', background: 'rgba(37, 45, 80, 0.15)', filter: 'blur(130px)', borderRadius: '50%', bottom: '10%', right: '5%', pointerEvents: 'none', zIndex: 0 }}></div>
 
       {/* ===== NAVBAR ===== */}
       <nav className="navbar scrolled" id="navbar">
@@ -1274,17 +1230,17 @@ export default function Notes() {
           /* START STATE: LIST OF TOPICS */
           <div>
             <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-              <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.8rem', fontWeight: '800', marginBottom: '0.75rem', color: '#1a1d2b' }}>
-                Academic Notes & <span style={{ color: '#a72828' }}>Training Guides</span>
+              <h2 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2.8rem', fontWeight: '800', marginBottom: '0.75rem', color: '#f8fafc' }}>
+                Academic Notes & <span style={{ color: '#ef4444' }}>Training Guides</span>
               </h2>
-              <p style={{ color: '#5c6278', fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto 2.5rem auto', lineHeight: '1.6' }}>
+              <p style={{ color: '#94a3b8', fontSize: '1.1rem', maxWidth: '650px', margin: '0 auto 2.5rem auto', lineHeight: '1.6' }}>
                 Select an academic topic below to open its dedicated notes in full screen distraction-free reading mode.
               </p>
 
               {/* Search Box */}
               <div style={{ maxWidth: '600px', margin: '0 auto', position: 'relative' }}>
                 <span style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.6 }}>
-                  <SearchIcon size={18} color="#5c6278" />
+                  <SearchIcon size={18} color="#94a3b8" />
                 </span>
                 <input 
                   type="text"
@@ -1295,21 +1251,21 @@ export default function Notes() {
                     width: '100%',
                     padding: '1.1rem 1.5rem 1.1rem 3.25rem',
                     borderRadius: '30px',
-                    border: '1.5px solid rgba(0, 0, 0, 0.12)',
-                    background: 'rgba(0, 0, 0, 0.02)',
-                    color: '#1a1d2b',
+                    border: '1.5px solid rgba(255, 255, 255, 0.08)',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    color: '#f8fafc',
                     fontSize: '1rem',
                     outline: 'none',
                     transition: 'all 0.3s ease'
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
-                    e.target.style.background = '#ffffff';
-                    e.target.style.boxShadow = '0 0 25px rgba(167, 40, 40, 0.12)';
+                    e.target.style.borderColor = 'rgba(239, 68, 68, 0.45)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.06)';
+                    e.target.style.boxShadow = '0 0 25px rgba(139, 30, 30, 0.2)';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'rgba(0, 0, 0, 0.12)';
-                    e.target.style.background = 'rgba(0, 0, 0, 0.02)';
+                    e.target.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.target.style.background = 'rgba(255, 255, 255, 0.03)';
                     e.target.style.boxShadow = 'none';
                   }}
                 />
@@ -1318,17 +1274,19 @@ export default function Notes() {
 
             {filteredTopics.length === 0 ? (
               <div style={{
-                background: '#ffffff',
-                border: '1px solid rgba(0, 0, 0, 0.08)',
+                background: 'rgba(255, 255, 255, 0.03)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
                 padding: '4rem 2rem',
                 borderRadius: '24px',
                 textAlign: 'center',
-                color: '#5c6278'
+                color: '#94a3b8'
               }}>
-                <span style={{ display: 'block', marginBottom: '1rem', opacity: 0.2 }}>
-                  <SearchIcon size={56} color="rgba(0,0,0,0.15)" />
+                <span style={{ display: 'block', marginBottom: '1rem', opacity: 0.3 }}>
+                  <SearchIcon size={56} color="#94a3b8" />
                 </span>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#1a1d2b', marginBottom: '0.5rem' }}>No matching topics found</h3>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#f8fafc', marginBottom: '0.5rem' }}>No matching topics found</h3>
                 <p style={{ fontSize: '0.95rem' }}>Try looking up alternative terms like "Research", "Roll Call", "UN", or "Point".</p>
               </div>
             ) : (
@@ -1341,14 +1299,15 @@ export default function Notes() {
               }}>
                 {filteredTopics.map((topic) => (
                   <div
-                    key={topic.index}
                     onClick={() => {
                       setSelectedTopicIndex(topic.index);
-                      setSearchQuery(''); // Reset search to display all sections of that topic
+                      setSearchQuery('');
                     }}
                     style={{
-                      background: '#ffffff',
-                      border: '1px solid rgba(0, 0, 0, 0.08)',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
                       borderRadius: '20px',
                       padding: '1.5rem 2rem',
                       cursor: 'pointer',
@@ -1358,17 +1317,19 @@ export default function Notes() {
                       justifyContent: 'space-between',
                       position: 'relative',
                       overflow: 'hidden',
-                      boxShadow: '0 4px 24px rgba(26,29,43,0.06)'
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.borderColor = 'rgba(139, 30, 30, 0.45)';
-                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(26,29,43,0.1)';
+                      e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)';
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.06)';
+                      e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.6)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.08)';
-                      e.currentTarget.style.boxShadow = '0 4px 24px rgba(26,29,43,0.06)';
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
+                      e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)';
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1, minWidth: 0 }}>
@@ -1377,9 +1338,9 @@ export default function Notes() {
                         width: '38px',
                         height: '38px',
                         borderRadius: '50%',
-                        background: 'rgba(139, 30, 30, 0.08)',
-                        border: '1.5px solid #a72828',
-                        color: '#a72828',
+                        background: 'rgba(139, 30, 30, 0.15)',
+                        border: '1.5px solid #ef4444',
+                        color: '#ef4444',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -1387,7 +1348,7 @@ export default function Notes() {
                         fontWeight: '800',
                         fontSize: '1rem',
                         flexShrink: 0,
-                        boxShadow: '0 0 10px rgba(139, 30, 30, 0.1)'
+                        boxShadow: '0 0 10px rgba(239, 68, 68, 0.2)'
                       }}>
                         {topic.index + 1}
                       </div>
@@ -1403,7 +1364,7 @@ export default function Notes() {
                           fontFamily: "'Outfit', sans-serif",
                           fontSize: '1.25rem',
                           fontWeight: '800',
-                          color: '#1a1d2b',
+                          color: '#f8fafc',
                           margin: '0 0 0.25rem 0',
                           lineHeight: '1.3'
                         }}>
@@ -1411,7 +1372,7 @@ export default function Notes() {
                         </h3>
                         <p style={{
                           fontSize: '0.88rem',
-                          color: '#8890a4',
+                          color: '#94a3b8',
                           lineHeight: '1.4',
                           margin: 0,
                           whiteSpace: 'nowrap',
@@ -1426,12 +1387,12 @@ export default function Notes() {
                     {/* Right side: Chapters Count & Action arrow */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginLeft: '1.5rem', flexShrink: 0 }}>
                       <span style={{
-                        background: 'rgba(26, 29, 43, 0.02)',
-                        border: '1px solid rgba(26, 29, 43, 0.05)',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         padding: '0.4rem 0.85rem',
                         borderRadius: '12px',
                         fontSize: '0.75rem',
-                        color: '#5c6278',
+                        color: '#cbd5e1',
                         fontWeight: '700',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
@@ -1439,9 +1400,9 @@ export default function Notes() {
                         alignItems: 'center',
                         gap: '0.4rem'
                       }}>
-                        <BookIcon size={12} color="#5c6278" /> {topic.sections.length} Chapters
+                        <BookIcon size={12} color="#cbd5e1" /> {topic.sections.length} Chapters
                       </span>
-                      <span style={{ fontSize: '1.25rem', color: '#a72828', fontWeight: 'bold', lineHeight: 1 }}>
+                      <span style={{ fontSize: '1.25rem', color: '#ef4444', fontWeight: 'bold', lineHeight: 1 }}>
                         ➔
                       </span>
                     </div>
@@ -1469,10 +1430,10 @@ export default function Notes() {
                   setSearchQuery('');
                 }}
                 style={{
-                  background: 'rgba(26, 29, 43, 0.02)',
-                  border: '1px solid rgba(0, 0, 0, 0.12)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.12)',
                   borderRadius: '30px',
-                  color: '#1a1d2b',
+                  color: '#f8fafc',
                   padding: '0.6rem 1.25rem',
                   fontWeight: '700',
                   fontSize: '0.85rem',
@@ -1483,20 +1444,20 @@ export default function Notes() {
                   gap: '0.5rem'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(26, 29, 43, 0.06)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
                   e.currentTarget.style.transform = 'translateX(-4px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(26, 29, 43, 0.02)';
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
                   e.currentTarget.style.transform = 'translateX(0)';
                 }}
               >
-                <ArrowLeftIcon size={14} color="#1a1d2b" /> Back to Topics
+                <ArrowLeftIcon size={14} color="#f8fafc" /> Back to Topics
               </button>
 
               <div style={{ position: 'relative', width: '320px' }}>
                 <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>
-                  <SearchIcon size={14} color="#5c6278" />
+                  <SearchIcon size={14} color="#94a3b8" />
                 </span>
                 <input 
                   type="text"
@@ -1507,35 +1468,38 @@ export default function Notes() {
                     width: '100%',
                     padding: '0.55rem 1rem 0.55rem 2.25rem',
                     borderRadius: '20px',
-                    border: '1px solid rgba(0, 0, 0, 0.12)',
-                    background: 'rgba(26, 29, 43, 0.02)',
-                    color: '#1a1d2b',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    color: '#f8fafc',
                     fontSize: '0.88rem',
                     outline: 'none',
                     transition: 'all 0.2s ease'
                   }}
-                  onFocus={(e) => e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(0, 0, 0, 0.12)'}
+                  onFocus={(e) => e.target.style.borderColor = 'rgba(239, 68, 68, 0.6)'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.12)'}
                 />
               </div>
             </div>
 
             {/* Immersive Content Container */}
             <section style={{
-              background: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
+              background: 'rgba(255, 255, 255, 0.03)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
               borderRadius: '28px',
               padding: '3rem',
-              boxShadow: '0 8px 32px rgba(26, 29, 43, 0.06)'
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+              color: '#f8fafc'
             }}>
               
               {/* Immersive Header */}
-              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', borderBottom: '1px solid rgba(0, 0, 0, 0.08)', paddingBottom: '2rem', marginBottom: '2.5rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(139,30,30,0.08)', border: '1.5px solid rgba(139,30,30,0.2)', flexShrink: 0 }}>
+              <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', paddingBottom: '2rem', marginBottom: '2.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(239,68,68,0.12)', border: '1.5px solid rgba(239,68,68,0.3)', flexShrink: 0 }}>
                   {topics[selectedTopicIndex].icon}
                 </div>
                 <div>
-                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2rem', fontWeight: '800', margin: '0 0 0.35rem 0', lineHeight: '1.2', color: '#1a1d2b' }}>
+                  <h3 style={{ fontFamily: "'Outfit', sans-serif", fontSize: '2rem', fontWeight: '800', margin: '0 0 0.35rem 0', lineHeight: '1.2', color: '#f8fafc' }}>
                     {topics[selectedTopicIndex].title}
                   </h3>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>

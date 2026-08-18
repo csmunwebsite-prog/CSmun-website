@@ -61,12 +61,15 @@
       z-index: -1;
     }
 
-    /* Navbar overrides for clean look */
-    .navbar.scrolled {
-      background: rgba(255, 255, 255, 0.88) !important;
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--dark-05);
-      box-shadow: 0 1px 12px rgba(26, 29, 43, 0.06);
+    /* Global theme variables local override for dark theme compatibility */
+    :root {
+      --dark-05: rgba(255, 255, 255, 0.05);
+      --dark-10: rgba(255, 255, 255, 0.08);
+      --dark-20: rgba(255, 255, 255, 0.15);
+      --bg-primary: #0b0f19;
+      --text-primary: #f8fafc;
+      --text-secondary: #e2e8f0;
+      --text-muted: #94a3b8;
     }
 
     .resources-container {
@@ -121,8 +124,8 @@
       width: 100%;
       padding: 1.1rem 1.5rem 1.1rem 3.25rem;
       border-radius: 30px;
-      border: 1.5px solid var(--dark-10);
-      background: rgba(26, 29, 43, 0.02);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
       color: var(--text-primary);
       font-size: 1rem;
       outline: none;
@@ -131,9 +134,9 @@
     }
 
     .search-input:focus {
-      border-color: rgba(167, 40, 40, 0.6);
-      background: #ffffff;
-      box-shadow: 0 0 25px rgba(167, 40, 40, 0.12);
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 25px rgba(139, 30, 30, 0.2);
     }
 
     /* Filter Categories */
@@ -148,8 +151,8 @@
     .tag-btn {
       padding: 8px 18px;
       border-radius: 20px;
-      background: rgba(26, 29, 43, 0.02);
-      border: 1px solid var(--dark-10);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       color: var(--text-muted);
       font-size: 0.85rem;
       font-weight: 600;
@@ -158,9 +161,9 @@
     }
 
     .tag-btn:hover {
-      background: rgba(26, 29, 43, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       color: var(--text-primary);
-      border-color: var(--dark-20);
+      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .tag-btn.active {
@@ -180,8 +183,10 @@
     }
 
     .document-card {
-      background: #ffffff;
-      border: 1px solid var(--dark-10);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 20px;
       padding: 1.5rem 2rem;
       cursor: pointer;
@@ -191,14 +196,14 @@
       justify-content: space-between;
       position: relative;
       overflow: hidden;
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     }
 
     .document-card:hover {
       transform: translateY(-3px);
-      border-color: rgba(139, 30, 30, 0.45);
-      background: #ffffff;
-      box-shadow: var(--shadow-elevated);
+      border-color: rgba(239, 68, 68, 0.35);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 30, 30, 0.2);
     }
 
     .card-left {
@@ -344,11 +349,13 @@
     }
 
     .viewer-info-panel {
-      background: #ffffff;
-      border: 1px solid var(--dark-10);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 24px;
       padding: 2rem;
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     }
 
     .viewer-info-header {
@@ -445,11 +452,13 @@
 
     /* Embedded Iframe Container */
     .iframe-panel {
-      background: #ffffff;
-      border: 1px solid var(--dark-10);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 24px;
       padding: 1.5rem;
-      box-shadow: var(--shadow-card);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       position: relative;
     }
 

@@ -48,7 +48,7 @@
   <!-- ===== HERO ===== -->
   <section class="hero premium-hero" id="hero">
     <div class="hero-bg">
-      <img src="assets/hero_light.png" alt="United Nations Assembly Hall" />
+      <img src="assets/hero_csmun_opt.jpg" alt="CSMUN Students in Discussion" />
     </div>
     <div class="hero-overlay premium-overlay"></div>
 
@@ -68,7 +68,7 @@
   <section class="about" id="about">
     <div class="container">
       <div class="about-image-wrapper reveal reveal-left">
-        <img src="assets/hero.png" alt="CSMUN Conference" />
+        <img src="assets/image_opt.jpg" alt="CSMUN Conference" />
         <div class="about-image-overlay"></div>
         <div class="about-image-badge glass-light">Est. 2019</div>
       </div>
@@ -128,13 +128,17 @@
         <h2 class="section-title">Debate. Negotiate. <span class="accent-text">Resolve.</span></h2>
         <p class="section-subtitle">Choose from our carefully curated committees, each tackling some of the world's most
           significant challenges.</p>
+        <div class="committee-note" style="margin-top: 1.5rem; font-size: 0.95rem; color: var(--gold-500); font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; background: rgba(255, 255, 255, 0.02); padding: 0.5rem 1.25rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);">
+          <i data-lucide="info" style="width: 16px; height: 16px;"></i>
+          <span>Click the name of your committee to view background guides and details.</span>
+        </div>
       </div>
 
       <div class="committees-grid">
         <!-- Committee 1: UNEP -->
-        <div class="committee-card glass reveal reveal-left" id="committee-unep">
+        <div class="committee-card glass reveal reveal-left" id="committee-unep" onclick="window.location.href='committee-unep.html'">
           <div class="committee-icon icon-green"><i data-lucide="earth"></i></div>
-          <h3>UNEP</h3>
+          <h3><a href="committee-unep.html" class="committee-title-link">UNEP</a></h3>
           <div class="committee-full-name">United Nations Environment Programme</div>
           <p><strong>Grade 7</strong></p>
           <div class="committee-agenda">
@@ -150,9 +154,9 @@
         </div>
 
         <!-- Committee 2: DISEC -->
-        <div class="committee-card glass reveal reveal-zoom" id="committee-disec">
+        <div class="committee-card glass reveal reveal-zoom" id="committee-disec" onclick="window.location.href='committee-disec.html'">
           <div class="committee-icon icon-red"><i data-lucide="swords"></i></div>
-          <h3>DISEC</h3>
+          <h3><a href="committee-disec.html" class="committee-title-link">DISEC</a></h3>
           <div class="committee-full-name">Disarmament and International Security Committee</div>
           <p><strong>Grade 7</strong></p>
           <div class="committee-agenda">
@@ -168,9 +172,9 @@
         </div>
 
         <!-- Committee 3: HRC -->
-        <div class="committee-card glass reveal reveal-right" id="committee-hrc">
+        <div class="committee-card glass reveal reveal-right" id="committee-hrc" onclick="window.location.href='committee-hrc.html'">
           <div class="committee-icon icon-silver"><i data-lucide="scale"></i></div>
-          <h3>HRC</h3>
+          <h3><a href="committee-hrc.html" class="committee-title-link">HRC</a></h3>
           <div class="committee-full-name">United Nations Human Rights Council</div>
           <p><strong>Grades 7 and 8</strong></p>
           <div class="committee-agenda">
@@ -186,9 +190,9 @@
         </div>
 
         <!-- Committee 4: SOCHUM -->
-        <div class="committee-card glass reveal reveal-left" id="committee-sochum">
+        <div class="committee-card glass reveal reveal-left" id="committee-sochum" onclick="window.location.href='committee-sochum.html'">
           <div class="committee-icon icon-silver"><i data-lucide="users"></i></div>
-          <h3>SOCHUM</h3>
+          <h3><a href="committee-sochum.html" class="committee-title-link">SOCHUM</a></h3>
           <div class="committee-full-name">Social, Humanitarian & Cultural Committee</div>
           <p><strong>Grade 8</strong></p>
           <div class="committee-agenda">
@@ -204,9 +208,9 @@
         </div>
 
         <!-- Committee 6: UNEA I -->
-        <div class="committee-card glass reveal reveal-right" id="committee-unea-i">
+        <div class="committee-card glass reveal reveal-right" id="committee-unea-i" onclick="window.location.href='committee-unea-i.html'">
           <div class="committee-icon icon-green"><i data-lucide="leaf"></i></div>
-          <h3>UNEA I</h3>
+          <h3><a href="committee-unea-i.html" class="committee-title-link">UNEA I</a></h3>
           <div class="committee-full-name">United Nations Environment Assembly I</div>
           <p><strong>Grade 9</strong></p>
           <div class="committee-agenda">
@@ -222,9 +226,9 @@
         </div>
 
         <!-- Committee 7: UNEA II -->
-        <div class="committee-card glass reveal reveal-left" id="committee-unea-ii">
+        <div class="committee-card glass reveal reveal-left" id="committee-unea-ii" onclick="window.location.href='committee-unea-ii.html'">
           <div class="committee-icon icon-green"><i data-lucide="leaf"></i></div>
-          <h3>UNEA II</h3>
+          <h3><a href="committee-unea-ii.html" class="committee-title-link">UNEA II</a></h3>
           <div class="committee-full-name">United Nations Environment Assembly II</div>
           <p><strong>Grade 9</strong></p>
           <div class="committee-agenda">
@@ -240,9 +244,9 @@
         </div>
 
         <!-- Committee 8: WTO I -->
-        <div class="committee-card glass reveal reveal-zoom" id="committee-wto-i">
+        <div class="committee-card glass reveal reveal-zoom" id="committee-wto-i" onclick="window.location.href='committee-wto-i.html'">
           <div class="committee-icon icon-silver"><i data-lucide="briefcase"></i></div>
-          <h3>WTO I</h3>
+          <h3><a href="committee-wto-i.html" class="committee-title-link">WTO I</a></h3>
           <div class="committee-full-name">World Trade Organization I</div>
           <p><strong>Grades 11 and 12</strong></p>
           <div class="committee-agenda">
@@ -258,9 +262,9 @@
         </div>
 
         <!-- Committee 9: WTO II -->
-        <div class="committee-card glass reveal reveal-right" id="committee-wto-ii">
+        <div class="committee-card glass reveal reveal-right" id="committee-wto-ii" onclick="window.location.href='committee-wto-ii.html'">
           <div class="committee-icon icon-silver"><i data-lucide="briefcase"></i></div>
-          <h3>WTO II</h3>
+          <h3><a href="committee-wto-ii.html" class="committee-title-link">WTO II</a></h3>
           <div class="committee-full-name">World Trade Organization II</div>
           <p><strong>Grades 11 and 12</strong></p>
           <div class="committee-agenda">
@@ -276,9 +280,9 @@
         </div>
 
         <!-- Committee 10: SC -->
-        <div class="committee-card glass reveal reveal-left" id="committee-sc">
+        <div class="committee-card glass reveal reveal-left" id="committee-sc" onclick="window.location.href='committee-sc.html'">
           <div class="committee-icon icon-silver"><i data-lucide="shield"></i></div>
-          <h3>SC</h3>
+          <h3><a href="committee-sc.html" class="committee-title-link">SC</a></h3>
           <div class="committee-full-name">United Nations Security Council</div>
           <div class="committee-agenda">
             <div class="topic-item">
@@ -338,32 +342,52 @@
         </div>
       </div>
 
-      <!-- Timeline Seekbar with Controls, Question Markers, and Full Screen option -->
-      <div class="video-modal-controls">
-        <div class="video-modal-buttons-row">
-          <div class="video-controls-left">
-            <button id="videoModalPlayBtn" class="video-control-btn" title="Play/Pause">▶</button>
-            <button id="videoModalRewindBtn" class="video-control-btn" title="Rewind 10s">⏪ 10s</button>
-            <div class="video-time-display">
-              <span id="videoModalCurrentTime">0:00</span> / <span id="videoModalDuration">0:00</span>
-            </div>
+      <!-- Minimal Single-Row Player Controls Bar -->
+      <div class="video-modal-controls-bar">
+        <!-- 1. Play/Pause -->
+        <button id="videoModalPlayBtn" class="player-icon-btn" title="Play/Pause">
+          <svg id="videoModalPlayIcon" width="20" height="20" viewBox="0 0 24 24" fill="#334155"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+
+        <!-- 2. Rewind 10s -->
+        <button id="videoModalRewindBtn" class="player-icon-btn" title="Rewind 10s">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+        </button>
+
+        <!-- 3. Playback Speed -->
+        <button id="videoModalSpeedBtn" class="player-text-btn" title="Playback Speed">1x</button>
+
+        <!-- 4. Main Timeline Container -->
+        <div class="player-timeline-container" id="videoModalSeekbar">
+          <div class="player-time-labels">
+            <span id="videoModalCurrentTime">00:00</span>
+            <span id="videoModalDuration">00:00</span>
           </div>
-          <div class="video-controls-right">
-            <button id="videoModalFullscreenBtn" class="video-control-btn fullscreen-btn" title="Full Screen">⛶ Full Screen</button>
+          
+          <div class="player-seekbar-track">
+            <div class="player-seekbar-fill" id="videoModalSeekFill"></div>
+            <div class="player-seekbar-handle" id="videoModalHandle"></div>
           </div>
+
+          <div class="player-markers-track" id="videoModalMarkers"></div>
         </div>
 
-        <div class="video-modal-seekbar-wrapper" id="videoModalSeekbar">
-          <div class="video-modal-seekbar-bg">
-            <div class="video-modal-seekbar-fill" id="videoModalSeekFill"></div>
-          </div>
-          <div class="video-modal-markers-container" id="videoModalMarkers"></div>
-        </div>
+        <!-- 5. Mute/Unmute -->
+        <button id="videoModalMuteBtn" class="player-icon-btn" title="Mute/Unmute">
+          <svg id="videoModalMuteIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+
+        <!-- 6. Fullscreen -->
+        <button id="videoModalFullscreenBtn" class="player-icon-btn" title="Full Screen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+        </button>
       </div>
 
       <div class="video-modal-footer">
         <h3 id="videoModalTitle">Video Title</h3>
-        <p id="videoModalMeta" style="font-size: 0.9rem; color: #8890a4; margin-top: 0.25rem;">CSMUN Official Training Module — Interactive Checkpoints Enabled</p>
       </div>
     </div>
   </div>

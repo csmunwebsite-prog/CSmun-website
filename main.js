@@ -333,51 +333,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedOption = '';
 
     function formatTimeStr(seconds) {
-        if (!seconds || isNaN(seconds)) return '0:00';
+        if (!seconds || isNaN(seconds)) return '00:00';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    function loadYouTubeAPI() {
-        if (!window.YT) {
-            const tag = document.createElement('script');
-            tag.src = 'https://www.youtube.com/iframe_api';
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        }
-    }
-    loadYouTubeAPI();
-
-    function renderTimelineMarkers(video, duration) {
-        if (!videoModalMarkers) return;
-        videoModalMarkers.innerHTML = '';
-        const checkpoints = VIDEO_CHECKPOINTS[video.id] || [];
-        const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
-        const wrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
-
-        checkpoints.forEach((cp, idx) => {
-            const videoDuration = duration || 237;
-            const pct = Math.min(98, Math.max(2, (cp.timestamp / videoDuration) * 100));
-            const isCompleted = answered.includes(cp.id);
-            const isWrong = wrong.includes(cp.id);
-            const bg = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#f59e0b');
-
-            const badge = document.createElement('div');
-            badge.className = 'video-marker-badge';
-            badge.style.left = `${pct}%`;
-            badge.style.background = bg;
-            badge.style.boxShadow = `0 0 8px ${bg}`;
-            badge.title = `Question ${idx + 1} at ${cp.timestampLabel}: ${cp.question}`;
-            badge.innerHTML = `<span>Q${idx + 1} (${cp.timestampLabel})</span><span>📍</span>`;
-            badge.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (player && typeof player.seekTo === 'function') {
-                    player.seekTo(Math.max(0, cp.timestamp - 2));
-                }
-            });
-            videoModalMarkers.appendChild(badge);
-        });
+        const minsStr = mins < 10 ? `0${mins}` : `${mins}`;
+        const secsStr = secs < 10 ? `0${secs}` : `${secs}`;
+        return `${minsStr}:${secsStr}`;
     }
 
     function checkVideoTime() {
@@ -388,8 +349,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (videoModalCurrentTime) videoModalCurrentTime.textContent = formatTimeStr(currentTime);
         if (videoModalDuration) videoModalDuration.textContent = formatTimeStr(duration);
 
-        if (duration > 0 && videoModalSeekFill) {
-            videoModalSeekFill.style.width = `${(currentTime / duration) * 100}%`;
+        if (duration > 0) {
+            const pct = (currentTime / duration) * 100;
+            if (videoModalSeekFill) videoModalSeekFill.style.width = `${pct}%`;
+            const handle = document.getElementById('videoModalHandle');
+            if (handle) handle.style.left = `${pct}%`;
         }
 
         if (!currentVideo || activeCheckpoint) return;
@@ -406,91 +370,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function triggerQuizOverlay(cp) {
-        activeCheckpoint = cp;
-        selectedOption = '';
-        if (homeQuizQuestion) homeQuizQuestion.textContent = cp.question;
-        if (homeQuizAlert) homeQuizAlert.style.display = 'none';
-
-        if (homeQuizOptions) {
-            homeQuizOptions.innerHTML = '';
-            cp.options.forEach(opt => {
-                const btn = document.createElement('button');
-                btn.className = 'home-quiz-option-btn';
-                btn.textContent = opt;
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.home-quiz-option-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    selectedOption = opt;
-                });
-                homeQuizOptions.appendChild(btn);
-            });
-        }
-
-        if (homeQuizOverlay) homeQuizOverlay.style.display = 'flex';
-    }
-
-    if (homeQuizSubmitBtn) {
-        homeQuizSubmitBtn.addEventListener('click', () => {
-            if (!selectedOption) {
-                if (homeQuizAlert) {
-                    homeQuizAlert.className = 'home-quiz-alert error';
-                    homeQuizAlert.textContent = '⚠️ Please select an option first!';
-                    homeQuizAlert.style.display = 'block';
-                }
-                return;
-            }
-
-            if (selectedOption === activeCheckpoint.correct) {
-                if (homeQuizAlert) {
-                    homeQuizAlert.className = 'home-quiz-alert success';
-                    homeQuizAlert.textContent = '🎉 Correct answer! Continuing video...';
-                    homeQuizAlert.style.display = 'block';
-                }
-                const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
-                answered.push(activeCheckpoint.id);
-                localStorage.setItem('csmun_answered_checkpoints', JSON.stringify(answered));
-
-                setTimeout(() => {
-                    if (homeQuizOverlay) homeQuizOverlay.style.display = 'none';
-                    activeCheckpoint = null;
-                    selectedOption = '';
-                    if (currentVideo && player) {
-                        renderTimelineMarkers(currentVideo, player.getDuration());
-                    }
-                    if (player && typeof player.playVideo === 'function') {
-                        player.playVideo();
-                    }
-                }, 1200);
-            } else {
-                const wrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
-                wrong.push(activeCheckpoint.id);
-                localStorage.setItem('csmun_wrong_checkpoints', JSON.stringify(wrong));
-
-                if (homeQuizAlert) {
-                    homeQuizAlert.className = 'home-quiz-alert error';
-                    homeQuizAlert.textContent = '❌ Incorrect answer. Please select the correct option to continue.';
-                    homeQuizAlert.style.display = 'block';
-                }
-            }
-        });
-    }
-
-    if (videoModalSeekbar) {
-        videoModalSeekbar.addEventListener('click', (e) => {
-            if (!player || typeof player.getDuration !== 'function') return;
-            const duration = player.getDuration();
-            if (!duration) return;
-            const rect = videoModalSeekbar.getBoundingClientRect();
-            const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-            const targetTime = (clickX / rect.width) * duration;
-            player.seekTo(targetTime);
-        });
-    }
-
     const videoModalPlayBtn = document.getElementById('videoModalPlayBtn');
     const videoModalRewindBtn = document.getElementById('videoModalRewindBtn');
+    const videoModalSpeedBtn = document.getElementById('videoModalSpeedBtn');
+    const videoModalMuteBtn = document.getElementById('videoModalMuteBtn');
     const videoModalFullscreenBtn = document.getElementById('videoModalFullscreenBtn');
+
+    let currentSpeedIndex = 0;
+    const speeds = [1, 1.25, 1.5, 2];
+
+    function updatePlayIcon(isPlaying) {
+        const icon = document.getElementById('videoModalPlayIcon');
+        if (!icon) return;
+        if (isPlaying) {
+            icon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+        } else {
+            icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+        }
+    }
 
     if (videoModalPlayBtn) {
         videoModalPlayBtn.addEventListener('click', () => {
@@ -498,11 +395,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const state = player.getPlayerState();
             if (state === 1) { // playing -> pause
                 player.pauseVideo();
-                videoModalPlayBtn.textContent = '▶';
+                updatePlayIcon(false);
             } else {
                 if (activeCheckpoint) return;
                 player.playVideo();
-                videoModalPlayBtn.textContent = '⏸';
+                updatePlayIcon(true);
             }
         });
     }
@@ -515,17 +412,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (videoModalSpeedBtn) {
+        videoModalSpeedBtn.addEventListener('click', () => {
+            if (!player || typeof player.setPlaybackRate !== 'function') return;
+            currentSpeedIndex = (currentSpeedIndex + 1) % speeds.length;
+            const rate = speeds[currentSpeedIndex];
+            player.setPlaybackRate(rate);
+            videoModalSpeedBtn.textContent = `${rate}x`;
+        });
+    }
+
+    if (videoModalMuteBtn) {
+        videoModalMuteBtn.addEventListener('click', () => {
+            if (!player || typeof player.isMuted !== 'function') return;
+            const muteIcon = document.getElementById('videoModalMuteIcon');
+            if (player.isMuted()) {
+                player.unMute();
+                if (muteIcon) muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+            } else {
+                player.mute();
+                if (muteIcon) muteIcon.innerHTML = '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+            }
+        });
+    }
+
     if (videoModalFullscreenBtn) {
         videoModalFullscreenBtn.addEventListener('click', () => {
             const container = document.querySelector('.video-modal-container') || videoModal;
             if (!document.fullscreenElement) {
                 if (container.requestFullscreen) container.requestFullscreen();
                 else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
-                videoModalFullscreenBtn.textContent = '⛶ Exit Full Screen';
             } else {
                 if (document.exitFullscreen) document.exitFullscreen();
                 else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                videoModalFullscreenBtn.textContent = '⛶ Full Screen';
             }
         });
     }
@@ -535,7 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeCheckpoint = null;
         if (videoModalTitle) videoModalTitle.textContent = video.title;
         if (videoModal) videoModal.classList.add('open');
-        if (videoModalPlayBtn) videoModalPlayBtn.textContent = '⏸';
+        updatePlayIcon(true);
 
         const createPlayer = () => {
             if (player) {
@@ -577,6 +496,49 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             window.onYouTubeIframeAPIReady = createPlayer;
         }
+    }
+
+    function loadYouTubeAPI() {
+        if (!window.YT) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+    }
+    loadYouTubeAPI();
+
+    function renderTimelineMarkers(video, duration) {
+        if (!videoModalMarkers) return;
+        videoModalMarkers.innerHTML = '';
+        const checkpoints = VIDEO_CHECKPOINTS[video.id] || [];
+        const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
+        const wrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
+
+        checkpoints.forEach((cp, idx) => {
+            const videoDuration = duration || 237;
+            const pct = Math.min(98, Math.max(2, (cp.timestamp / videoDuration) * 100));
+            const isCompleted = answered.includes(cp.id);
+            const isWrong = wrong.includes(cp.id);
+            const fillColor = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#cbd5e1');
+
+            const marker = document.createElement('div');
+            marker.className = 'video-marker-droplet';
+            marker.style.left = `${pct}%`;
+            marker.title = `Question ${idx + 1}: ${cp.question}`;
+            marker.innerHTML = `
+                <svg width="12" height="14" viewBox="0 0 24 24" fill="${fillColor}" style="filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));">
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                </svg>
+            `;
+            marker.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (player && typeof player.seekTo === 'function') {
+                    player.seekTo(Math.max(0, cp.timestamp - 2));
+                }
+            });
+            videoModalMarkers.appendChild(marker);
+        });
     }
 
     function renderVideos(categoryFilter = 'all') {

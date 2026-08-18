@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SC — Committee Details | CSMUN 2026</title>
+  <meta name="description" content="View topics and download background guides for United Nations Security Council (SC) at CSMUN 2026." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" href="assets/logo.png" />
+</head>
+
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container-wide">
+      <a href="/" class="nav-brand">
+        <div class="nav-logo-wrapper">
+          <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        </div>
+        <span class="nav-brand-text">CS<span>MUN</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/#committees">Committees</a></li>
+        <li><a href="/#videos">Training Videos</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="/app/notes">Notes</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTAINER ===== -->
+  <main class="committee-detail-page">
+    <!-- Decorative Orbs -->
+    <div class="glow-orb silver" style="width: 450px; height: 450px; top: -50px; left: -100px;"></div>
+    <div class="glow-orb navy" style="width: 350px; height: 350px; bottom: 50px; right: -80px;"></div>
+
+    <div class="container">
+      <!-- Breadcrumb Link -->
+      <a href="/#committees" class="back-link">
+        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+        <span>Back to Committees</span>
+      </a>
+
+      <!-- Committee Hero Section -->
+      <div class="committee-hero">
+        <div class="committee-hero-badge">Grades 11 and 12</div>
+        <h1 class="committee-hero-title">SC</h1>
+        <div class="committee-hero-subtitle">United Nations Security Council</div>
+        <p class="committee-hero-desc">The Security Council has primary responsibility, under the UN Charter, for the maintenance of international peace and security, dealing with major disputes, security crises, and industrial conflicts.</p>
+        
+        <div class="committee-note" style="font-size: 0.95rem; color: var(--gold-500); font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.02); padding: 0.75rem 1.25rem; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); max-width: 100%;">
+          <i data-lucide="info" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+          <span>Click the buttons below to download or view the Background Study Guides for this committee.</span>
+        </div>
+      </div>
+
+      <!-- Topics Grid -->
+      <div class="committee-topics-grid" style="grid-template-columns: 1fr; max-width: 600px; margin: 0 auto;;">
+        
+        <div class="topic-card">
+          <div>
+            <div class="topic-card-badge">Background Guide</div>
+            <h3 class="topic-card-title">Managing Cross-border Supply Chains and Provincial Industrial Policy Under U.S. Trade Tensions</h3>
+            <p class="topic-card-desc">Examine the security and economic implications of decoupling supply chains, tariff conflicts, and national industrial policies on international stability.</p>
+          </div>
+          <div style="margin-top: 1.5rem;">
+            <a href="https://drive.google.com/file/d/1u1VBwd3cnTCqIR4-OfW7EnUpTFGm2jtj/view?usp=drive_link" target="_blank" rel="noopener noreferrer" class="btn-download-guide">
+              <i data-lucide="external-link" style="width: 18px; height: 18px;"></i>
+              <span>View Background Guide</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/csmunerode/" class="footer-social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+          </a>
+          <a href="mailto:csmun@csacademy.in" class="footer-social-link" aria-label="Email">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+
+</html>

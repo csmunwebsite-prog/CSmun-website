@@ -1832,18 +1832,18 @@ export default function DelegateDashboard() {
                       }} />
                     </div>
 
-                    {/* Glowing Question Markers directly on and below timeline */}
+                    {/* Sleek Droplet Checkpoint Markers sitting below seekbar */}
                     <div style={{ 
                       position: 'relative', 
                       width: '100%', 
-                      height: '20px', 
-                      marginTop: '-4px'
+                      height: '18px', 
+                      marginTop: '2px'
                     }}>
                       {(VIDEO_CHECKPOINTS[activeVideo.id] || []).map((cp, idx) => {
-                        const pct = (cp.timestamp / (duration || 237)) * 100;
+                        const pct = Math.min(98, Math.max(2, (cp.timestamp / (duration || 237)) * 100));
                         const isCompleted = answeredCheckpoints.includes(cp.id);
                         const isWrong = wrongCheckpoints.includes(cp.id);
-                        const bg = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#f59e0b');
+                        const fillColor = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#cbd5e1');
                         
                         return (
                           <div 
@@ -1851,30 +1851,24 @@ export default function DelegateDashboard() {
                             style={{
                               position: 'absolute',
                               left: `${pct}%`,
-                              top: '2px',
+                              top: '0',
                               transform: 'translateX(-50%)',
                               display: 'flex',
                               alignItems: 'center',
-                              gap: '2px',
-                              background: bg,
-                              color: '#ffffff',
-                              padding: '1px 6px',
-                              borderRadius: '10px',
-                              fontSize: '0.65rem',
-                              fontWeight: '800',
+                              justifyContent: 'center',
                               cursor: 'pointer',
                               zIndex: 15,
-                              boxShadow: `0 0 8px ${bg}`,
-                              border: '1px solid #ffffff'
+                              transition: 'transform 0.2s ease'
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSeek(cp.timestamp - 2);
                             }}
-                            title={`Question ${idx + 1}: ${cp.question} (${cp.timestampLabel})`}
+                            title={`Question ${idx + 1} (${cp.timestampLabel}): ${cp.question}`}
                           >
-                            <span>Q{idx + 1}</span>
-                            <span style={{ fontSize: '0.6rem' }}>❓</span>
+                            <svg width="12" height="14" viewBox="0 0 24 24" fill={fillColor} style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}>
+                              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                            </svg>
                           </div>
                         );
                       })}
