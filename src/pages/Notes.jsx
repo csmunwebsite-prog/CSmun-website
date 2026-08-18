@@ -1522,11 +1522,11 @@ export default function Notes() {
 
                 if (topicSections.length === 0) {
                   return (
-                    <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#5c6278' }}>
+                    <div style={{ textAlign: 'center', padding: '3rem 1rem', color: '#94a3b8' }}>
                       <span style={{ display: 'block', marginBottom: '0.75rem' }}>
-                        <SearchIcon size={36} color="rgba(0,0,0,0.2)" />
+                        <SearchIcon size={36} color="rgba(255,255,255,0.2)" />
                       </span>
-                      <h4 style={{ color: '#1a1d2b', margin: '0 0 0.25rem 0' }}>No chapters match your search</h4>
+                      <h4 style={{ color: '#f8fafc', margin: '0 0 0.25rem 0' }}>No chapters match your search</h4>
                       <p style={{ fontSize: '0.9rem' }}>Try clearing the search query or typing other keywords.</p>
                     </div>
                   );
@@ -1536,8 +1536,8 @@ export default function Notes() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
                     {topicSections.map((section, sIdx) => (
                       <div key={sIdx} style={{
-                        background: 'rgba(26, 29, 43, 0.01)',
-                        border: '1px solid rgba(26, 29, 43, 0.04)',
+                        background: 'rgba(255, 255, 255, 0.04)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
                         padding: '2.25rem',
                         borderRadius: '24px',
                         position: 'relative'
@@ -1548,11 +1548,11 @@ export default function Notes() {
                           top: '1.25rem',
                           right: '1.5rem',
                           fontSize: '0.75rem',
-                          color: '#8890a4',
+                          color: '#94a3b8',
                           fontWeight: '800',
                           textTransform: 'uppercase',
                           letterSpacing: '0.5px',
-                          opacity: 0.6
+                          opacity: 0.7
                         }}>
                           Chapter {sIdx + 1}
                         </div>
@@ -1562,7 +1562,7 @@ export default function Notes() {
                           fontFamily: "'Outfit', sans-serif",
                           fontSize: '1.35rem',
                           fontWeight: '800',
-                          color: '#1a1d2b',
+                          color: '#f8fafc',
                           margin: '0 0 1.5rem 0',
                           display: 'flex',
                           alignItems: 'center',
@@ -1572,7 +1572,7 @@ export default function Notes() {
                         </h4>
 
                         {/* Section Content */}
-                        <div style={{ color: '#3a3f52', fontSize: '0.98rem' }}>
+                        <div style={{ color: '#e2e8f0', fontSize: '0.98rem', lineHeight: '1.75' }}>
                           {section.content}
                         </div>
                       </div>
