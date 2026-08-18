@@ -214,15 +214,26 @@ export default function DelegateDashboard() {
   useEffect(() => {
     const fetchProgress = async () => {
       if (currentUser) {
-        const docRef = doc(db, 'delegateProgress', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setCompletedVideos(docSnap.data().completedVideos || []);
-          setAnsweredCheckpoints(docSnap.data().answeredCheckpoints || []);
-          setWrongCheckpoints(docSnap.data().wrongCheckpoints || []);
-        } else {
-          await setDoc(docRef, { completedVideos: [], answeredCheckpoints: [], wrongCheckpoints: [] });
+        try {
+          const docRef = doc(db, 'delegateProgress', currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setCompletedVideos(docSnap.data().completedVideos || []);
+            setAnsweredCheckpoints(docSnap.data().answeredCheckpoints || []);
+            setWrongCheckpoints(docSnap.data().wrongCheckpoints || []);
+          } else {
+            await setDoc(docRef, { completedVideos: [], answeredCheckpoints: [], wrongCheckpoints: [] });
+          }
+        } catch (err) {
+          console.error("Error fetching Firestore progress:", err);
         }
+      } else {
+        const localCompleted = JSON.parse(localStorage.getItem('csmun_completed_videos') || '[]');
+        const localAnswered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
+        const localWrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
+        setCompletedVideos(localCompleted);
+        setAnsweredCheckpoints(localAnswered);
+        setWrongCheckpoints(localWrong);
       }
     };
     fetchProgress();
@@ -475,10 +486,18 @@ export default function DelegateDashboard() {
     if (!completedVideos.includes(videoId)) {
       const newCompleted = [...completedVideos, videoId];
       setCompletedVideos(newCompleted);
-      const docRef = doc(db, 'delegateProgress', currentUser.uid);
-      await updateDoc(docRef, {
-        completedVideos: arrayUnion(videoId)
-      });
+      if (currentUser) {
+        try {
+          const docRef = doc(db, 'delegateProgress', currentUser.uid);
+          await updateDoc(docRef, {
+            completedVideos: arrayUnion(videoId)
+          });
+        } catch (e) {
+          console.error("Error updating completed videos:", e);
+        }
+      } else {
+        localStorage.setItem('csmun_completed_videos', JSON.stringify(newCompleted));
+      }
     }
   };
 
@@ -492,12 +511,18 @@ export default function DelegateDashboard() {
       setAnsweredCheckpoints(updatedAnswered);
       setWrongCheckpoints(updatedWrong);
 
-      const docRef = doc(db, 'delegateProgress', currentUser.uid);
-      await setDoc(docRef, {
-        completedVideos: updatedCompleted,
-        answeredCheckpoints: updatedAnswered,
-        wrongCheckpoints: updatedWrong
-      }, { merge: true });
+      if (currentUser) {
+        const docRef = doc(db, 'delegateProgress', currentUser.uid);
+        await setDoc(docRef, {
+          completedVideos: updatedCompleted,
+          answeredCheckpoints: updatedAnswered,
+          wrongCheckpoints: updatedWrong
+        }, { merge: true });
+      } else {
+        localStorage.setItem('csmun_completed_videos', JSON.stringify(updatedCompleted));
+        localStorage.setItem('csmun_answered_checkpoints', JSON.stringify(updatedAnswered));
+        localStorage.setItem('csmun_wrong_checkpoints', JSON.stringify(updatedWrong));
+      }
       
       if (activeVideo && activeVideo.id === videoId) {
         setActiveCheckpoint(null);
@@ -622,13 +647,21 @@ export default function DelegateDashboard() {
       setQuizError('');
       setQuizSuccess(true);
       
-      const newAnswered = [...answeredCheckpoints, activeCheckpoint.id];
+      const newAnswered = Array.from(new Set([...answeredCheckpoints, activeCheckpoint.id]));
       setAnsweredCheckpoints(newAnswered);
       
-      const docRef = doc(db, 'delegateProgress', currentUser.uid);
-      await updateDoc(docRef, {
-        answeredCheckpoints: arrayUnion(activeCheckpoint.id)
-      });
+      if (currentUser) {
+        try {
+          const docRef = doc(db, 'delegateProgress', currentUser.uid);
+          await updateDoc(docRef, {
+            answeredCheckpoints: arrayUnion(activeCheckpoint.id)
+          });
+        } catch (err) {
+          console.error("Error updating progress in Firestore:", err);
+        }
+      } else {
+        localStorage.setItem('csmun_answered_checkpoints', JSON.stringify(newAnswered));
+      }
 
       // Check if all checkpoints for this video are completed
       const allVideoCheckpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
@@ -650,63 +683,40 @@ export default function DelegateDashboard() {
         if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
           ytPlayer.playVideo();
         }
-      }, 1500);
+      }, 1200);
     } else {
-      // Mark as wrong answer in database (add to both answered and wrong)
-      const newAnswered = [...answeredCheckpoints, activeCheckpoint.id];
-      setAnsweredCheckpoints(newAnswered);
-      const newWrong = [...wrongCheckpoints, activeCheckpoint.id];
+      // Incorrect answer: Record wrong attempt but DO NOT allow video to continue until answered correctly
+      const newWrong = Array.from(new Set([...wrongCheckpoints, activeCheckpoint.id]));
       setWrongCheckpoints(newWrong);
       
-      const docRef = doc(db, 'delegateProgress', currentUser.uid);
-      await updateDoc(docRef, {
-        answeredCheckpoints: arrayUnion(activeCheckpoint.id),
-        wrongCheckpoints: arrayUnion(activeCheckpoint.id)
-      });
+      if (currentUser) {
+        try {
+          const docRef = doc(db, 'delegateProgress', currentUser.uid);
+          await updateDoc(docRef, {
+            wrongCheckpoints: arrayUnion(activeCheckpoint.id)
+          });
 
-      // Notify the mentor
-      try {
-        await addDoc(collection(db, 'notifications'), {
-          delegateId: currentUser.uid,
-          delegateName: userData?.name || currentUser?.displayName || 'Delegate',
-          committee: userData?.committee || '',
-          videoTitle: activeVideo.title,
-          question: activeCheckpoint.question,
-          selectedOption: selectedQuizOption,
-          correctOption: activeCheckpoint.correct,
-          type: 'wrong_answer',
-          createdAt: serverTimestamp(),
-          read: false
-        });
-      } catch (err) {
-        console.error("Error creating notification for mentor:", err);
+          await addDoc(collection(db, 'notifications'), {
+            delegateId: currentUser.uid,
+            delegateName: userData?.name || currentUser?.displayName || 'Delegate',
+            committee: userData?.committee || '',
+            videoTitle: activeVideo.title,
+            question: activeCheckpoint.question,
+            selectedOption: selectedQuizOption,
+            correctOption: activeCheckpoint.correct,
+            type: 'wrong_answer',
+            createdAt: serverTimestamp(),
+            read: false
+          });
+        } catch (err) {
+          console.error("Error updating wrong checkpoints in Firestore:", err);
+        }
+      } else {
+        localStorage.setItem('csmun_wrong_checkpoints', JSON.stringify(newWrong));
       }
 
-      // Check if all checkpoints for this video are completed
-      const allVideoCheckpoints = VIDEO_CHECKPOINTS[activeVideo.id] || [];
-      const hasUnfinished = allVideoCheckpoints.some(cp => !newAnswered.includes(cp.id));
-      
-      if (!hasUnfinished) {
-        await markCompleted(activeVideo.id);
-      }
-
-      // Show that they were wrong for 2.5 seconds
       setQuizSuccess(false);
-      setQuizError('❌ Incorrect answer! Moving to the next section...');
-
-      setTimeout(() => {
-        setQuizError('');
-        setSelectedQuizOption('');
-        setActiveCheckpoint(null);
-        
-        if (isFullScreenViewer || isFullscreen) {
-          setIsSidebarOpen(false);
-        }
-        
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-          ytPlayer.playVideo();
-        }
-      }, 2500);
+      setQuizError('❌ Incorrect answer! Please review the question and select the correct answer to continue.');
     }
   };
 
@@ -1106,16 +1116,7 @@ export default function DelegateDashboard() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '420px', overflowY: 'auto', paddingRight: '0.5rem' }}>
               {TRAINING_VIDEOS.map((video, idx) => {
-                const isUnlocked = (() => {
-                  if (idx === 0) return true;
-                  // Look back for the previous non-placeholder video
-                  for (let i = idx - 1; i >= 0; i--) {
-                    if (!TRAINING_VIDEOS[i].isPlaceholder) {
-                      return completedVideos.includes(TRAINING_VIDEOS[i].id);
-                    }
-                  }
-                  return true;
-                })();
+                const isUnlocked = true; // All videos unlocked for everyone
                 
                 return (
                   <div key={video.id} style={{ 
@@ -1127,10 +1128,10 @@ export default function DelegateDashboard() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1.25rem',
-                    cursor: video.isPlaceholder ? 'default' : (isUnlocked ? 'pointer' : 'not-allowed'),
-                    opacity: isUnlocked ? 1 : 0.55,
-                    filter: isUnlocked ? 'none' : 'grayscale(70%)',
-                    pointerEvents: isUnlocked ? 'auto' : 'none'
+                    cursor: video.isPlaceholder ? 'default' : 'pointer',
+                    opacity: 1,
+                    filter: 'none',
+                    pointerEvents: video.isPlaceholder ? 'none' : 'auto'
                   }}
                   onClick={() => {
                     if (isUnlocked && !video.isPlaceholder) setActiveVideo(video);
@@ -1831,18 +1832,18 @@ export default function DelegateDashboard() {
                       }} />
                     </div>
 
-                    {/* Droplet Markers sitting below */}
+                    {/* Glowing Question Markers directly on and below timeline */}
                     <div style={{ 
                       position: 'relative', 
                       width: '100%', 
-                      height: '16px', 
-                      marginTop: '-2px'
+                      height: '20px', 
+                      marginTop: '-4px'
                     }}>
                       {(VIDEO_CHECKPOINTS[activeVideo.id] || []).map((cp, idx) => {
                         const pct = (cp.timestamp / (duration || 237)) * 100;
                         const isCompleted = answeredCheckpoints.includes(cp.id);
                         const isWrong = wrongCheckpoints.includes(cp.id);
-                        const markerColor = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#94a3b8');
+                        const bg = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#f59e0b');
                         
                         return (
                           <div 
@@ -1850,24 +1851,30 @@ export default function DelegateDashboard() {
                             style={{
                               position: 'absolute',
                               left: `${pct}%`,
-                              top: '0',
+                              top: '2px',
                               transform: 'translateX(-50%)',
                               display: 'flex',
-                              flexDirection: 'column',
                               alignItems: 'center',
+                              gap: '2px',
+                              background: bg,
+                              color: '#ffffff',
+                              padding: '1px 6px',
+                              borderRadius: '10px',
+                              fontSize: '0.65rem',
+                              fontWeight: '800',
                               cursor: 'pointer',
-                              zIndex: 15
+                              zIndex: 15,
+                              boxShadow: `0 0 8px ${bg}`,
+                              border: '1px solid #ffffff'
                             }}
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSeek(cp.timestamp - 2);
                             }}
-                            title={`Checkpoint ${idx + 1} (${cp.timestampLabel})`}
+                            title={`Question ${idx + 1}: ${cp.question} (${cp.timestampLabel})`}
                           >
-                            {/* Water drop shape */}
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill={markerColor} style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.8))' }}>
-                              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                            </svg>
+                            <span>Q{idx + 1}</span>
+                            <span style={{ fontSize: '0.6rem' }}>❓</span>
                           </div>
                         );
                       })}

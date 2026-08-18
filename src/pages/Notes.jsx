@@ -1259,33 +1259,10 @@ export default function Notes() {
             <span className="nav-brand-text">CS<span>MUN</span></span>
           </a>
           <ul className="nav-links" id="navLinks">
-            <li><a href="/app">Dashboard</a></li>
             <li><a href="/index.html#committees">Committees</a></li>
+            <li><a href="/index.html#videos">Training Videos</a></li>
             <li><a href="/resources.html">Resources</a></li>
             <li><a href="/app/notes" className="active">Notes</a></li>
-            <li id="auth-nav-item">
-              {currentUser ? (
-                <a href="/app/profile" className="nav-profile-link" style={{ textDecoration: 'none' }}>
-                  <div className="nav-profile">
-                    <img 
-                      src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
-                      alt="Profile" 
-                      className="nav-avatar" 
-                    />
-                    <span className="nav-user-name">
-                      {(() => {
-                        const finalName = userData?.name || userData?.certificateName || currentUser.displayName || 'Account';
-                        const firstName = finalName.split(' ')[0];
-                        const gradeStr = userData?.grade ? ` (Gr. ${userData.grade})` : (userData?.role === 'mentor' ? ' (Mentor)' : '');
-                        return firstName + gradeStr;
-                      })()}
-                    </span>
-                  </div>
-                </a>
-              ) : (
-                <a href="/app" className="btn btn-primary nav-cta" id="registerBtn">Register Now</a>
-              )}
-            </li>
           </ul>
         </div>
       </nav>

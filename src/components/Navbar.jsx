@@ -27,31 +27,36 @@ export default function Navbar() {
     }
   };
 
-  if (!currentUser) return null;
-
   return (
     <nav className="app-navbar">
-      <div className="app-navbar-container">
-        <Link to="/app" className="app-nav-brand">
-          <img src="/assets/logo.png" alt="CSMUN Logo" className="app-nav-logo" />
-          <span className="app-nav-brand-text">CS<span>MUN</span> Portal</span>
+      <div className="app-navbar-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0.75rem 1.5rem' }}>
+        <Link to="/app" className="app-nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+          <img src="/assets/logo.png" alt="CSMUN Logo" className="app-nav-logo" style={{ height: '36px' }} />
+          <span className="app-nav-brand-text" style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a1d2b' }}>CS<span style={{ color: '#8b1e1e' }}>MUN</span> Portal</span>
         </Link>
 
-        <div className="app-nav-profile-container" ref={dropdownRef}>
-          <button 
-            className="app-nav-profile-trigger" 
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-            <img 
-              src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
-              alt="Profile" 
-              className="app-nav-avatar" 
-            />
-            <span className="app-nav-user-name">
-              {(userData?.name || userData?.certificateName || currentUser.displayName || 'Account').split(' ')[0]}
-            </span>
-            <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
-          </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <a href="/#committees" style={{ color: '#3a3f52', fontWeight: '600', textDecoration: 'none', fontSize: '0.95rem' }}>Committees</a>
+          <a href="/#videos" style={{ color: '#3a3f52', fontWeight: '600', textDecoration: 'none', fontSize: '0.95rem' }}>Training Videos</a>
+          <a href="/resources.html" style={{ color: '#3a3f52', fontWeight: '600', textDecoration: 'none', fontSize: '0.95rem' }}>Resources</a>
+          <Link to="/app/notes" style={{ color: '#3a3f52', fontWeight: '600', textDecoration: 'none', fontSize: '0.95rem' }}>Notes</Link>
+
+          {currentUser ? (
+            <div className="app-nav-profile-container" ref={dropdownRef} style={{ position: 'relative' }}>
+              <button 
+                className="app-nav-profile-trigger" 
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <img 
+                  src={currentUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || userData?.certificateName || currentUser.displayName || 'User')}`} 
+                  alt="Profile" 
+                  className="app-nav-avatar" 
+                />
+                <span className="app-nav-user-name">
+                  {(userData?.name || userData?.certificateName || currentUser.displayName || 'Account').split(' ')[0]}
+                </span>
+                <span className={`dropdown-arrow ${isDropdownOpen ? 'open' : ''}`}>▼</span>
+              </button>
 
           {isDropdownOpen && (
             <div className="app-profile-dropdown">

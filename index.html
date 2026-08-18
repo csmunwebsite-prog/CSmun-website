@@ -32,13 +32,10 @@
         <span class="nav-brand-text">CS<span>MUN</span></span>
       </a>
       <ul class="nav-links" id="navLinks">
-        <li><a href="/app">Dashboard</a></li>
         <li><a href="#committees">Committees</a></li>
+        <li><a href="#videos">Training Videos</a></li>
         <li><a href="resources.html">Resources</a></li>
         <li><a href="/app/notes">Notes</a></li>
-        <li id="auth-nav-item">
-          <a href="/app" class="btn btn-primary nav-cta" id="navRegisterBtn">Register Now</a>
-        </li>
       </ul>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
         <span></span>
@@ -296,6 +293,80 @@
 
     </div>
   </section>
+
+  <!-- ===== TRAINING VIDEOS SECTION ===== -->
+  <section class="training-videos-section" id="videos">
+    <div class="glow-orb red" style="width: 450px; height: 450px; top: 10%; right: -100px;"></div>
+    <div class="container">
+      <div class="committees-header reveal reveal-up">
+        <div class="section-label">MUN Academy</div>
+        <h2 class="section-title">Master Diplomacy & <span class="accent-text">Debate</span></h2>
+        <p class="section-subtitle">Access essential video modules on MUN procedures, research, position papers, and speech-making — available to everyone.</p>
+      </div>
+
+      <div class="video-categories-tabs reveal reveal-up">
+        <button class="video-tab-btn active" data-category="all">All Videos</button>
+        <button class="video-tab-btn" data-category="basics">Basics & Research</button>
+        <button class="video-tab-btn" data-category="procedure">Procedure & Rules</button>
+        <button class="video-tab-btn" data-category="resolutions">Speeches & Resolutions</button>
+      </div>
+
+      <div class="videos-grid reveal reveal-up" id="homepageVideosGrid">
+        <!-- Loaded dynamically by main.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== INTERACTIVE VIDEO PLAYER MODAL ===== -->
+  <div class="video-modal-backdrop" id="videoModal">
+    <div class="video-modal-container">
+      <button class="video-modal-close" id="closeVideoModal" aria-label="Close modal">&times;</button>
+      
+      <div class="video-modal-body">
+        <!-- Interactive YouTube Player container -->
+        <div id="videoModalPlayer" style="width: 100%; height: 100%;"></div>
+
+        <!-- Question Checkpoint Overlay Popup -->
+        <div id="homeQuizOverlay" class="home-quiz-overlay" style="display: none;">
+          <div class="home-quiz-card">
+            <div class="home-quiz-badge">💡 Mid-Video Question Checkpoint</div>
+            <h3 id="homeQuizQuestion" class="home-quiz-title">Question goes here...</h3>
+            <div id="homeQuizOptions" class="home-quiz-options"></div>
+            <div id="homeQuizAlert" class="home-quiz-alert" style="display: none;"></div>
+            <button id="homeQuizSubmitBtn" class="home-quiz-submit-btn">Submit Answer</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Seekbar with Controls, Question Markers, and Full Screen option -->
+      <div class="video-modal-controls">
+        <div class="video-modal-buttons-row">
+          <div class="video-controls-left">
+            <button id="videoModalPlayBtn" class="video-control-btn" title="Play/Pause">▶</button>
+            <button id="videoModalRewindBtn" class="video-control-btn" title="Rewind 10s">⏪ 10s</button>
+            <div class="video-time-display">
+              <span id="videoModalCurrentTime">0:00</span> / <span id="videoModalDuration">0:00</span>
+            </div>
+          </div>
+          <div class="video-controls-right">
+            <button id="videoModalFullscreenBtn" class="video-control-btn fullscreen-btn" title="Full Screen">⛶ Full Screen</button>
+          </div>
+        </div>
+
+        <div class="video-modal-seekbar-wrapper" id="videoModalSeekbar">
+          <div class="video-modal-seekbar-bg">
+            <div class="video-modal-seekbar-fill" id="videoModalSeekFill"></div>
+          </div>
+          <div class="video-modal-markers-container" id="videoModalMarkers"></div>
+        </div>
+      </div>
+
+      <div class="video-modal-footer">
+        <h3 id="videoModalTitle">Video Title</h3>
+        <p id="videoModalMeta" style="font-size: 0.9rem; color: #8890a4; margin-top: 0.25rem;">CSMUN Official Training Module — Interactive Checkpoints Enabled</p>
+      </div>
+    </div>
+  </div>
 
   <!-- ===== TIMELINE / SCHEDULE ===== -->
   <section class="timeline-section" id="schedule">

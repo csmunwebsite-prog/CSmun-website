@@ -47,27 +47,13 @@ class ErrorBoundary extends Component {
 }
 
 function AppRoutes() {
-  const { currentUser, userRole, profileComplete } = useAuth();
-
   return (
     <Routes>
-      {/* Default /app route: smart redirect based on auth & profile state */}
-      <Route
-        path="/app"
-        element={
-          !currentUser ? (
-            <Navigate to="/app/login" replace />
-          ) : !profileComplete ? (
-            <Navigate to="/app/complete-profile" replace />
-          ) : userRole === 'mentor' ? (
-            <Navigate to="/app/mentor" replace />
-          ) : (
-            <Navigate to="/app/delegate" replace />
-          )
-        }
-      />
+      {/* Default /app route: redirect directly to main learning & video dashboard */}
+      <Route path="/app" element={<Navigate to="/app/delegate" replace />} />
       <Route path="/app/login" element={<Login />} />
       <Route path="/app/notes" element={<Notes />} />
+      <Route path="/app/delegate" element={<DelegateDashboard />} />
       <Route
         path="/app/complete-profile"
         element={
@@ -84,23 +70,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/app/delegate"
-        element={
-          <ProtectedRoute allowedRoles={['delegate']}>
-            <DelegateDashboard />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/app/mentor"
-        element={
-          <ProtectedRoute allowedRoles={['mentor']}>
-            <MentorDashboard />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/app/mentor" element={<MentorDashboard />} />
       <Route path="/app/adminportal" element={<AdminPortal />} />
       {/* Catch-all: redirect to /app */}
       <Route path="*" element={<Navigate to="/app" replace />} />

@@ -1,4 +1,5 @@
 import { auth, db } from './src/firebase.js';
+import { VIDEO_CHECKPOINTS } from './src/constants/videos.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const mainRegBtn = document.getElementById('registerBtn');
 
         if (user) {
-            // 1. Render initial placeholder immediately using auth info
+            // Render profile in navbar if user is logged in
             let displayNameToShow = (user.displayName || 'Account').split(' ')[0];
             
             const renderProfile = (nameText) => {
@@ -34,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderProfile(displayNameToShow);
 
-            // 2. Fetch official name and grade from Firestore
             try {
                 const userDocRef = doc(db, 'users', user.uid);
                 const userSnap = await getDoc(userDocRef);
@@ -49,30 +49,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error("Error fetching user profile for homepage nav:", err);
             }
 
-            // 3. Re-render with beautiful user-entered details from Firestore
             renderProfile(displayNameToShow);
 
-            // Update other CTA buttons to "Go to Dashboard"
             if (heroBtn) {
-                heroBtn.textContent = 'Go to Dashboard →';
-                heroBtn.href = '/app';
+                heroBtn.textContent = 'Explore Training Videos →';
+                heroBtn.href = '#videos';
             }
             if (mainRegBtn) {
-                mainRegBtn.textContent = 'Go to Dashboard →';
-                mainRegBtn.href = '/app';
+                mainRegBtn.textContent = 'Training Videos →';
+                mainRegBtn.href = '#videos';
             }
         } else {
-            // Restore Register Buttons if logged out
-            if (authNavItem) {
-                authNavItem.innerHTML = `<a href="/app" class="btn btn-primary nav-cta" id="navRegisterBtn">Register Now</a>`;
-            }
             if (heroBtn) {
-                heroBtn.textContent = 'Register as Delegate';
-                heroBtn.href = '/app';
+                heroBtn.textContent = 'Explore Training Videos →';
+                heroBtn.href = '#videos';
             }
             if (mainRegBtn) {
-                mainRegBtn.textContent = 'Register Now →';
-                mainRegBtn.href = '/app';
+                mainRegBtn.textContent = 'Training Videos →';
+                mainRegBtn.href = '#videos';
             }
         }
     });
@@ -297,6 +291,358 @@ document.addEventListener('DOMContentLoaded', () => {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
         // Could display this somewhere if needed
     }
-    updateCountdown();
+    // ── Homepage Interactive Video Gallery & Player ──
+    const TRAINING_VIDEOS = [
+        { id: 'v1', title: 'Introduction to MUN', youtubeId: 'ChzKEFkv7Dg', category: 'basics' },
+        { id: 'v2', title: 'Research I', youtubeId: 'yPOr9Xg28AU', category: 'basics' },
+        { id: 'v3', title: 'Research II', youtubeId: 'KTr4sDnE2zE', category: 'basics' },
+        { id: 'v4', title: 'Research Part Live Demonstration', youtubeId: 'lnjpnhQPrRI', category: 'basics' },
+        { id: 'v5', title: 'Points I', youtubeId: '4nOiPrbcxyM', category: 'procedure' },
+        { id: 'v6', title: 'Points II', youtubeId: 'HCGKEtP3Rww', category: 'procedure' },
+        { id: 'v7', title: 'Motions I', youtubeId: 'GM_Dgj23ePs', category: 'procedure' },
+        { id: 'v8', title: 'Motions II', youtubeId: 'ddS9cCaxQiU', category: 'procedure' },
+        { id: 'v9', title: 'Roll Call', youtubeId: 'nCxGlgpafFk', category: 'procedure' },
+        { id: 'v11', title: 'Opening Speech', youtubeId: '-TmTYMbfWEs', category: 'resolutions' },
+        { id: 'v12', title: 'Draft Resolution - Introduction', youtubeId: 'JhRlyvPQvLQ', category: 'resolutions' },
+        { id: 'v13', title: 'Draft Resolution - Preambulatory', youtubeId: 'FaP76l7BbiQ', category: 'resolutions' },
+        { id: 'v14', title: 'Draft Resolution - Operatives', youtubeId: '5vPlnSKTruA', category: 'resolutions' },
+        { id: 'v15', title: 'Unmoderated Caucus', youtubeId: 'paF5ZmsvTUY', category: 'procedure' },
+        { id: 'v16', title: 'Moderated Caucus', youtubeId: 'U-M-3BBRe5o', category: 'procedure' },
+        { id: 'v17', title: 'Resolution Debate Procedure', youtubeId: 'EMuLbPUZblE', category: 'resolutions' }
+    ];
+
+    const homepageVideosGrid = document.getElementById('homepageVideosGrid');
+    const videoModal = document.getElementById('videoModal');
+    const videoModalTitle = document.getElementById('videoModalTitle');
+    const closeVideoModal = document.getElementById('closeVideoModal');
+    const homeQuizOverlay = document.getElementById('homeQuizOverlay');
+    const homeQuizQuestion = document.getElementById('homeQuizQuestion');
+    const homeQuizOptions = document.getElementById('homeQuizOptions');
+    const homeQuizAlert = document.getElementById('homeQuizAlert');
+    const homeQuizSubmitBtn = document.getElementById('homeQuizSubmitBtn');
+    const videoModalSeekFill = document.getElementById('videoModalSeekFill');
+    const videoModalMarkers = document.getElementById('videoModalMarkers');
+    const videoModalCurrentTime = document.getElementById('videoModalCurrentTime');
+    const videoModalDuration = document.getElementById('videoModalDuration');
+    const videoModalSeekbar = document.getElementById('videoModalSeekbar');
+
+    let player = null;
+    let timeMonitorInterval = null;
+    let currentVideo = null;
+    let activeCheckpoint = null;
+    let selectedOption = '';
+
+    function formatTimeStr(seconds) {
+        if (!seconds || isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    function loadYouTubeAPI() {
+        if (!window.YT) {
+            const tag = document.createElement('script');
+            tag.src = 'https://www.youtube.com/iframe_api';
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+    }
+    loadYouTubeAPI();
+
+    function renderTimelineMarkers(video, duration) {
+        if (!videoModalMarkers) return;
+        videoModalMarkers.innerHTML = '';
+        const checkpoints = VIDEO_CHECKPOINTS[video.id] || [];
+        const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
+        const wrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
+
+        checkpoints.forEach((cp, idx) => {
+            const videoDuration = duration || 237;
+            const pct = Math.min(98, Math.max(2, (cp.timestamp / videoDuration) * 100));
+            const isCompleted = answered.includes(cp.id);
+            const isWrong = wrong.includes(cp.id);
+            const bg = isWrong ? '#ef4444' : (isCompleted ? '#22c55e' : '#f59e0b');
+
+            const badge = document.createElement('div');
+            badge.className = 'video-marker-badge';
+            badge.style.left = `${pct}%`;
+            badge.style.background = bg;
+            badge.style.boxShadow = `0 0 8px ${bg}`;
+            badge.title = `Question ${idx + 1} at ${cp.timestampLabel}: ${cp.question}`;
+            badge.innerHTML = `<span>Q${idx + 1} (${cp.timestampLabel})</span><span>📍</span>`;
+            badge.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (player && typeof player.seekTo === 'function') {
+                    player.seekTo(Math.max(0, cp.timestamp - 2));
+                }
+            });
+            videoModalMarkers.appendChild(badge);
+        });
+    }
+
+    function checkVideoTime() {
+        if (!player || typeof player.getCurrentTime !== 'function') return;
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration() || 0;
+
+        if (videoModalCurrentTime) videoModalCurrentTime.textContent = formatTimeStr(currentTime);
+        if (videoModalDuration) videoModalDuration.textContent = formatTimeStr(duration);
+
+        if (duration > 0 && videoModalSeekFill) {
+            videoModalSeekFill.style.width = `${(currentTime / duration) * 100}%`;
+        }
+
+        if (!currentVideo || activeCheckpoint) return;
+
+        const checkpoints = VIDEO_CHECKPOINTS[currentVideo.id] || [];
+        const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
+
+        for (const cp of checkpoints) {
+            if (!answered.includes(cp.id) && currentTime >= cp.timestamp && currentTime <= cp.timestamp + 2) {
+                player.pauseVideo();
+                triggerQuizOverlay(cp);
+                break;
+            }
+        }
+    }
+
+    function triggerQuizOverlay(cp) {
+        activeCheckpoint = cp;
+        selectedOption = '';
+        if (homeQuizQuestion) homeQuizQuestion.textContent = cp.question;
+        if (homeQuizAlert) homeQuizAlert.style.display = 'none';
+
+        if (homeQuizOptions) {
+            homeQuizOptions.innerHTML = '';
+            cp.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'home-quiz-option-btn';
+                btn.textContent = opt;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.home-quiz-option-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedOption = opt;
+                });
+                homeQuizOptions.appendChild(btn);
+            });
+        }
+
+        if (homeQuizOverlay) homeQuizOverlay.style.display = 'flex';
+    }
+
+    if (homeQuizSubmitBtn) {
+        homeQuizSubmitBtn.addEventListener('click', () => {
+            if (!selectedOption) {
+                if (homeQuizAlert) {
+                    homeQuizAlert.className = 'home-quiz-alert error';
+                    homeQuizAlert.textContent = '⚠️ Please select an option first!';
+                    homeQuizAlert.style.display = 'block';
+                }
+                return;
+            }
+
+            if (selectedOption === activeCheckpoint.correct) {
+                if (homeQuizAlert) {
+                    homeQuizAlert.className = 'home-quiz-alert success';
+                    homeQuizAlert.textContent = '🎉 Correct answer! Continuing video...';
+                    homeQuizAlert.style.display = 'block';
+                }
+                const answered = JSON.parse(localStorage.getItem('csmun_answered_checkpoints') || '[]');
+                answered.push(activeCheckpoint.id);
+                localStorage.setItem('csmun_answered_checkpoints', JSON.stringify(answered));
+
+                setTimeout(() => {
+                    if (homeQuizOverlay) homeQuizOverlay.style.display = 'none';
+                    activeCheckpoint = null;
+                    selectedOption = '';
+                    if (currentVideo && player) {
+                        renderTimelineMarkers(currentVideo, player.getDuration());
+                    }
+                    if (player && typeof player.playVideo === 'function') {
+                        player.playVideo();
+                    }
+                }, 1200);
+            } else {
+                const wrong = JSON.parse(localStorage.getItem('csmun_wrong_checkpoints') || '[]');
+                wrong.push(activeCheckpoint.id);
+                localStorage.setItem('csmun_wrong_checkpoints', JSON.stringify(wrong));
+
+                if (homeQuizAlert) {
+                    homeQuizAlert.className = 'home-quiz-alert error';
+                    homeQuizAlert.textContent = '❌ Incorrect answer. Please select the correct option to continue.';
+                    homeQuizAlert.style.display = 'block';
+                }
+            }
+        });
+    }
+
+    if (videoModalSeekbar) {
+        videoModalSeekbar.addEventListener('click', (e) => {
+            if (!player || typeof player.getDuration !== 'function') return;
+            const duration = player.getDuration();
+            if (!duration) return;
+            const rect = videoModalSeekbar.getBoundingClientRect();
+            const clickX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+            const targetTime = (clickX / rect.width) * duration;
+            player.seekTo(targetTime);
+        });
+    }
+
+    const videoModalPlayBtn = document.getElementById('videoModalPlayBtn');
+    const videoModalRewindBtn = document.getElementById('videoModalRewindBtn');
+    const videoModalFullscreenBtn = document.getElementById('videoModalFullscreenBtn');
+
+    if (videoModalPlayBtn) {
+        videoModalPlayBtn.addEventListener('click', () => {
+            if (!player || typeof player.getPlayerState !== 'function') return;
+            const state = player.getPlayerState();
+            if (state === 1) { // playing -> pause
+                player.pauseVideo();
+                videoModalPlayBtn.textContent = '▶';
+            } else {
+                if (activeCheckpoint) return;
+                player.playVideo();
+                videoModalPlayBtn.textContent = '⏸';
+            }
+        });
+    }
+
+    if (videoModalRewindBtn) {
+        videoModalRewindBtn.addEventListener('click', () => {
+            if (!player || typeof player.getCurrentTime !== 'function') return;
+            const cur = player.getCurrentTime();
+            player.seekTo(Math.max(0, cur - 10));
+        });
+    }
+
+    if (videoModalFullscreenBtn) {
+        videoModalFullscreenBtn.addEventListener('click', () => {
+            const container = document.querySelector('.video-modal-container') || videoModal;
+            if (!document.fullscreenElement) {
+                if (container.requestFullscreen) container.requestFullscreen();
+                else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+                videoModalFullscreenBtn.textContent = '⛶ Exit Full Screen';
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                videoModalFullscreenBtn.textContent = '⛶ Full Screen';
+            }
+        });
+    }
+
+    function openInteractiveVideo(video) {
+        currentVideo = video;
+        activeCheckpoint = null;
+        if (videoModalTitle) videoModalTitle.textContent = video.title;
+        if (videoModal) videoModal.classList.add('open');
+        if (videoModalPlayBtn) videoModalPlayBtn.textContent = '⏸';
+
+        const createPlayer = () => {
+            if (player) {
+                player.loadVideoById(video.youtubeId);
+            } else {
+                player = new YT.Player('videoModalPlayer', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: video.youtubeId,
+                    playerVars: {
+                        autoplay: 1,
+                        controls: 0, // Hides YouTube internal duplicate timeline and controls!
+                        disablekb: 1,
+                        fs: 0,
+                        rel: 0,
+                        modestbranding: 1,
+                        iv_load_policy: 3
+                    },
+                    events: {
+                        onReady: (event) => {
+                            event.target.playVideo();
+                            renderTimelineMarkers(video, event.target.getDuration());
+                        },
+                        onStateChange: (event) => {
+                            if (videoModalPlayBtn) {
+                                videoModalPlayBtn.textContent = (event.data === 1) ? '⏸' : '▶';
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (timeMonitorInterval) clearInterval(timeMonitorInterval);
+            timeMonitorInterval = setInterval(checkVideoTime, 250);
+        };
+
+        if (window.YT && window.YT.Player) {
+            createPlayer();
+        } else {
+            window.onYouTubeIframeAPIReady = createPlayer;
+        }
+    }
+
+    function renderVideos(categoryFilter = 'all') {
+        if (!homepageVideosGrid) return;
+        homepageVideosGrid.innerHTML = '';
+
+        const filtered = categoryFilter === 'all' 
+            ? TRAINING_VIDEOS 
+            : TRAINING_VIDEOS.filter(v => v.category === categoryFilter);
+
+        filtered.forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'video-card-item';
+            card.innerHTML = `
+                <div class="video-thumb-wrapper">
+                    <img src="https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg" alt="${video.title}" class="video-thumb-img" />
+                    <div class="video-play-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    </div>
+                </div>
+                <div class="video-card-info">
+                    <h4 class="video-card-title">${video.title}</h4>
+                    <div class="video-card-meta">
+                        <span class="video-badge">Training Module</span>
+                        <span>Watch Now →</span>
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                openInteractiveVideo(video);
+            });
+            homepageVideosGrid.appendChild(card);
+        });
+    }
+
+    renderVideos('all');
+
+    document.querySelectorAll('.video-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.video-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const category = btn.getAttribute('data-category');
+            renderVideos(category);
+        });
+    });
+
+    function closeVideoModalHandler() {
+        if (videoModal) videoModal.classList.remove('open');
+        if (player && typeof player.pauseVideo === 'function') {
+            player.pauseVideo();
+        }
+        if (homeQuizOverlay) homeQuizOverlay.style.display = 'none';
+        if (timeMonitorInterval) clearInterval(timeMonitorInterval);
+        activeCheckpoint = null;
+    }
+
+    if (closeVideoModal) {
+        closeVideoModal.addEventListener('click', closeVideoModalHandler);
+    }
+
+    if (videoModal) {
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModalHandler();
+            }
+        });
+    }
 
 });

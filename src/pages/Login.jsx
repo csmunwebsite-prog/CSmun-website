@@ -17,23 +17,11 @@ export default function Login() {
   }, [currentUser, navigate]);
 
   async function handleGoogleLogin() {
-    const trimmedCode = mentorCode.trim();
-    if (!trimmedCode) {
-      setError(`${role === 'mentor' ? 'Mentor' : 'Delegate'} access code is required.`);
-      return;
-    }
-    const expectedCode = role === 'mentor' ? 'MENTOR_CSmunvi2026' : 'DELEGATE_CSmunvi2026';
-    if (trimmedCode !== expectedCode) {
-      setError(`Invalid ${role === 'mentor' ? 'Mentor' : 'Delegate'} access code. Access Denied.`);
-      return;
-    }
-
     try {
       setError('');
       setLoading(true);
       const { isProfileComplete } = await loginWithGoogle(role);
-      // Navigate to /app which will handle the smart redirect
-      navigate('/app', { replace: true });
+      navigate('/app/delegate', { replace: true });
     } catch (err) {
       setError('Failed to log in with Google: ' + err.message);
     }
@@ -152,45 +140,6 @@ export default function Login() {
               Mentor
             </button>
           </div>
-        </div>
-
-        <div style={{
-          marginBottom: '2rem',
-          animation: 'fadeIn 0.4s ease-out forwards',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.6rem'
-        }}>
-          <label style={{ display: 'block', fontWeight: '600', color: '#3a3f52', fontSize: '0.9rem', textAlign: 'left', paddingLeft: '0.5rem' }}>
-            🔑 {role === 'mentor' ? 'Mentor Access Code' : 'Delegate Access Code'}:
-          </label>
-          <input 
-            type="password"
-            placeholder={role === 'mentor' ? "Enter mentor code" : "Enter delegate code"}
-            value={mentorCode}
-            onChange={(e) => setMentorCode(e.target.value)}
-            style={{
-              width: '100%', 
-              padding: '0.85rem 1.2rem', 
-              borderRadius: '30px', 
-              border: '1px solid rgba(0,0,0,0.1)', 
-              background: 'rgba(0, 0, 0, 0.02)', 
-              color: '#1a1d2b',
-              fontSize: '0.95rem',
-              outline: 'none',
-              textAlign: 'center',
-              letterSpacing: '2px',
-              transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = 'rgba(167, 40, 40, 0.6)';
-              e.target.style.boxShadow = '0 0 10px rgba(167, 40, 40, 0.12)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = 'rgba(0,0,0,0.1)';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
         </div>
 
         <button 
