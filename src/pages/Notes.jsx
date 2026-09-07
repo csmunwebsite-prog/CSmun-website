@@ -1199,6 +1199,53 @@ export default function Notes() {
       {/* Decorative orbs */}
       <style dangerouslySetInnerHTML={{__html: `
         body { background: #0b0f19; }
+
+        /* ===== NOTES PAGE — MOBILE CARD LAYOUT ===== */
+        @media (max-width: 640px) {
+
+          /* Card: switch from single row to two-row layout */
+          .notes-topic-card {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 1.25rem 1.1rem !important;
+            gap: 0.85rem !important;
+          }
+
+          /* Top section: number + icon + title all in one row */
+          .notes-card-left {
+            flex: unset !important;
+            width: 100% !important;
+            gap: 0.75rem !important;
+            align-items: flex-start !important;
+          }
+
+          /* Title container: let it take full remaining width */
+          .notes-card-title-wrap {
+            flex: 1 !important;
+            min-width: 0 !important;
+          }
+
+          /* Allow the title to wrap naturally — no clipping */
+          .notes-card-title-wrap h3 {
+            font-size: 1rem !important;
+            line-height: 1.35 !important;
+            white-space: normal !important;
+          }
+
+          /* Description: single line ellipsis is fine on mobile */
+          .notes-card-title-wrap p {
+            font-size: 0.8rem !important;
+          }
+
+          /* Right section: chapters badge + arrow in a row at the bottom */
+          .notes-card-right {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            width: 100% !important;
+            justify-content: flex-start !important;
+            gap: 0.75rem !important;
+          }
+        }
       `}} />
 
       {/* Decorative Orbs */}
@@ -1299,6 +1346,7 @@ export default function Notes() {
               }}>
                 {filteredTopics.map((topic) => (
                   <div
+                    className="notes-topic-card"
                     onClick={() => {
                       setSelectedTopicIndex(topic.index);
                       setSearchQuery('');
@@ -1332,7 +1380,7 @@ export default function Notes() {
                       e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.4)';
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1, minWidth: 0 }}>
+                    <div className="notes-card-left" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flex: 1, minWidth: 0 }}>
                       {/* Explicit Numbering Badge */}
                       <div style={{
                         width: '38px',
@@ -1359,7 +1407,7 @@ export default function Notes() {
                       </div>
 
                       {/* Title & Description Container */}
-                      <div style={{ minWidth: 0, flex: 1 }}>
+                      <div className="notes-card-title-wrap" style={{ minWidth: 0, flex: 1 }}>
                         <h3 style={{
                           fontFamily: "'Outfit', sans-serif",
                           fontSize: '1.25rem',
@@ -1385,7 +1433,7 @@ export default function Notes() {
                     </div>
 
                     {/* Right side: Chapters Count & Action arrow */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginLeft: '1.5rem', flexShrink: 0 }}>
+                    <div className="notes-card-right" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginLeft: '1.5rem', flexShrink: 0 }}>
                       <span style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',

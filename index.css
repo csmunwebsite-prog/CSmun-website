@@ -87,6 +87,9 @@
 html {
     scroll-behavior: smooth;
     font-size: 16px;
+    /* Prevent any element from ever making the page wider than the viewport */
+    overflow-x: hidden;
+    max-width: 100%;
 }
 
 body {
@@ -623,6 +626,7 @@ ul {
 .committees {
     padding: var(--space-2xl) 0 var(--space-2xl) 0;
     position: relative;
+    overflow: hidden;
     background: linear-gradient(to bottom, var(--bg-primary) 0%, var(--bg-secondary) 10%, var(--bg-secondary) 90%, var(--bg-primary) 100%);
 }
 
@@ -1231,39 +1235,179 @@ ul {
 }
 
 @media (max-width: 768px) {
+
+    /* =========================================
+       MOBILE NAVBAR
+       ========================================= */
+
+    /* Always-visible dark bar */
+    .navbar {
+        background: rgba(11, 15, 25, 0.97) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0;
+        /* Guarantee it never overflows or gets cropped */
+        width: 100vw;
+        max-width: 100vw;
+        left: 0;
+        right: 0;
+        box-sizing: border-box;
+    }
+
+    /* Inner row: brand left | hamburger right */
+    .navbar .container-wide {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+    }
+
+    .nav-brand-text {
+        font-size: 1.1rem;
+    }
+
+    /* ── Hamburger button ──
+       Use position:fixed so it is ALWAYS anchored to the
+       top-right corner of the screen, regardless of any
+       document overflow that might exist. */
+    .nav-toggle {
+        display: flex !important;
+        flex-direction: column;
+        gap: 5px;
+        position: fixed;
+        top: 14px;
+        right: 16px;
+        z-index: 1060;   /* above everything */
+        padding: 8px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .nav-toggle span {
+        display: block;
+        width: 24px;
+        height: 2.5px;
+        background: #f8fafc;
+        border-radius: 3px;
+        transition: transform 0.25s ease, opacity 0.2s ease;
+        transform-origin: center;
+    }
+
+    /* Hamburger → X when .active */
+    .nav-toggle.active span:nth-child(1) {
+        transform: translateY(7.5px) rotate(45deg);
+    }
+    .nav-toggle.active span:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+    }
+    .nav-toggle.active span:nth-child(3) {
+        transform: translateY(-7.5px) rotate(-45deg);
+    }
+
+    /* ── Full-screen nav menu ──
+       Hidden by default (display:none keeps it out of layout).
+       JS adds .active to make it display:flex. */
     .nav-links {
         display: none;
         position: fixed;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.97);
-        backdrop-filter: blur(20px);
+        width: 100vw;
+        height: 100vh;
+        background: rgba(11, 15, 25, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
         flex-direction: column;
         justify-content: center;
-        gap: var(--space-2xl);
-        z-index: 999;
+        align-items: center;
+        gap: 2rem;
+        z-index: 1050;   /* above navbar (1000), below toggle (1060) */
+        box-sizing: border-box;
+        padding: 2rem 1.5rem;
+        margin: 0;
     }
 
     .nav-links.active {
         display: flex;
+        animation: mobileMenuIn 0.25s ease both;
+    }
+
+    @keyframes mobileMenuIn {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    .nav-links li {
+        text-align: center;
+        width: 100%;
+        list-style: none;
     }
 
     .nav-links a {
-        font-size: 1.1rem;
-        color: var(--text-primary);
+        font-family: var(--ff-heading);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #f8fafc;
+        display: block;
+        padding: 0.55rem 1.5rem;
+        border-radius: 10px;
+        text-transform: none;
+        letter-spacing: 0;
+        text-decoration: none;
+        transition: color 0.2s ease, background 0.2s ease;
     }
 
-    .nav-toggle {
-        display: flex;
-        z-index: 1001;
+    .nav-links a::after {
+        display: none;
     }
 
+    .nav-links a:active,
+    .nav-links a:hover {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.09);
+    }
+
+    /* =========================================
+       PAGE LAYOUT FIXES
+       ========================================= */
+
+    /* Stop glow-orbs / hero transforms from making sections wider than 100vw */
+    section,
+    .training-videos-section {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    /* Committees grid — single column */
     .committees-grid {
         grid-template-columns: 1fr;
     }
 
+    /* Committee detail: stack topic cards
+       !important overrides the inline style on the HTML pages */
+    .committee-topics-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem;
+    }
+
+    .committee-detail-page {
+        padding-top: 5.5rem;
+        padding-bottom: 3rem;
+    }
+
+    .committee-hero-title {
+        font-size: 2rem;
+    }
+
+    /* Misc layout */
     .hero-stats {
         flex-direction: column;
         gap: var(--space-lg);
