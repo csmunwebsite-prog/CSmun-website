@@ -313,8 +313,7 @@ export default function CompleteProfile() {
               <option value="SOCHUM">SOCHUM (Social, Humanitarian & Cultural Committee)</option>
               <option value="UNEA I">UNEA I (United Nations Environment Assembly I)</option>
               <option value="UNEA II">UNEA II (United Nations Environment Assembly II)</option>
-              <option value="WTO I">WTO I (World Trade Organization I)</option>
-              <option value="WTO II">WTO II (World Trade Organization II)</option>
+              <option value="WTO">WTO (World Trade Organization)</option>
               <option value="SC">SC (United Nations Security Council)</option>
             </select>
           </div>

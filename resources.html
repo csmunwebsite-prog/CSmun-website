@@ -301,6 +301,44 @@
       transform: translateX(4px);
     }
 
+    /* ===== MOBILE: Stop cards squishing the title ===== */
+    @media (max-width: 640px) {
+
+      /* Card: two-row layout instead of one cramped row */
+      .document-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.1rem;
+        gap: 0.85rem;
+      }
+
+      /* Left section stretches full width */
+      .card-left {
+        width: 100%;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+
+      /* Title wraps naturally, no ellipsis clipping */
+      .meta-content h3 {
+        font-size: 1rem;
+        white-space: normal;
+        line-height: 1.35;
+      }
+
+      .meta-content p {
+        font-size: 0.8rem;
+      }
+
+      /* Right section: badge + arrow on its own row, left-aligned */
+      .card-right {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.75rem;
+      }
+    }
+
     /* Immersive Document Viewer Focus State */
     .viewer-section {
       display: none;
