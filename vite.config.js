@@ -29,6 +29,7 @@ export default defineConfig({
         main: path.resolve(__dirname, 'index.html'),
         app: path.resolve(__dirname, 'app.html'),
         resources: path.resolve(__dirname, 'resources.html'),
+        schedule: path.resolve(__dirname, 'schedule.html'),
         unep: path.resolve(__dirname, 'committee-unep.html'),
         disec: path.resolve(__dirname, 'committee-disec.html'),
         hrc: path.resolve(__dirname, 'committee-hrc.html'),

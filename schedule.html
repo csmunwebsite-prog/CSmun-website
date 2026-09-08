@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule — Conference Itinerary | CSMUN 2026</title>
+  <meta name="description" content="View the complete Day 1 and Day 2 schedule for CSMUN 2026. Check timings for committee sessions, breaks, opening and closing ceremonies." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Playfair+Display:wght@400;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="index.css" />
+  <link rel="icon" href="assets/logo.png" />
+
+  <style>
+    .schedule-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .schedule-tabs-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .schedule-tab-btn {
+      padding: 0.85rem 2rem;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.7);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .schedule-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .schedule-tab-btn.active {
+      background: linear-gradient(135deg, var(--gold-500, #c5a059) 0%, #a88238 100%);
+      color: #000000;
+      border-color: var(--gold-500, #c5a059);
+      box-shadow: 0 4px 20px rgba(197, 160, 89, 0.35);
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 992px) {
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .schedule-card {
+      background: rgba(18, 18, 24, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 1.75rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .schedule-card:hover {
+      border-color: rgba(197, 160, 89, 0.4);
+      transform: translateY(-4px);
+    }
+
+    .schedule-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .schedule-day-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .schedule-date-badge {
+      background: rgba(197, 160, 89, 0.15);
+      color: var(--gold-500, #c5a059);
+      border: 1px solid rgba(197, 160, 89, 0.3);
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .schedule-image-container {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 1.5rem;
+      cursor: pointer;
+    }
+
+    .schedule-image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .schedule-image-container:hover img {
+      transform: scale(1.02);
+    }
+
+    .image-overlay-hint {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .schedule-image-container:hover .image-overlay-hint {
+      opacity: 1;
+    }
+
+    .schedule-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn-schedule-action {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-schedule-action:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-schedule-action.primary {
+      background: linear-gradient(135deg, rgba(139, 30, 30, 0.8) 0%, rgba(90, 20, 20, 0.8) 100%);
+      border-color: rgba(220, 50, 50, 0.4);
+    }
+
+    .btn-schedule-action.primary:hover {
+      background: linear-gradient(135deg, rgba(160, 35, 35, 0.9) 0%, rgba(110, 25, 25, 0.9) 100%);
+      box-shadow: 0 4px 15px rgba(139, 30, 30, 0.4);
+    }
+
+    /* Modal / Lightbox Styles */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      position: relative;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -2.5rem;
+      right: 0;
+      background: none;
+      border: none;
+      color: #ffffff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Outfit', sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="container-wide">
+      <a href="/" class="nav-brand">
+        <div class="nav-logo-wrapper">
+          <img src="assets/logo.png" alt="CSMUN Logo" class="nav-logo" />
+        </div>
+        <span class="nav-brand-text">CS<span>MUN</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/#committees">Committees</a></li>
+        <li><a href="schedule.html" class="active">Schedule</a></li>
+        <li><a href="/#videos">Training Videos</a></li>
+        <li><a href="resources.html">Resources</a></li>
+        <li><a href="/app/notes">Notes</a></li>
+      </ul>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTAINER ===== -->
+  <main class="committee-detail-page" style="padding-top: 130px; padding-bottom: 80px;">
+    <!-- Decorative Orbs -->
+    <div class="glow-orb gold" style="width: 450px; height: 450px; top: -50px; left: -100px;"></div>
+    <div class="glow-orb red" style="width: 400px; height: 400px; top: 400px; right: -100px;"></div>
+    <div class="glow-orb navy" style="width: 350px; height: 350px; bottom: 50px; left: 10%;"></div>
+
+    <div class="container">
+      <!-- Breadcrumb Link -->
+      <a href="/" class="back-link">
+        <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+        <span>Back to Home</span>
+      </a>
+
+      <!-- Page Header -->
+      <div class="schedule-header">
+        <div class="committee-hero-badge" style="margin: 0 auto 1rem auto; display: inline-flex;">CSMUN VI Official Schedule</div>
+        <h1 class="section-title" style="font-size: 2.75rem; margin-bottom: 0.75rem;">Conference <span class="accent-text">Schedule</span></h1>
+        <p class="section-subtitle" style="max-width: 650px; margin: 0 auto;">Plan your conference days seamlessly. Review the official schedule for Day 1 (Saturday, Sept 12) & Day 2 (Sunday, Sept 13).</p>
+      </div>
+
+      <!-- Schedule Cards Grid -->
+      <div class="schedule-grid">
+
+        <!-- Day 1 Card -->
+        <div class="schedule-card" id="day1">
+          <div class="schedule-card-header">
+            <h2 class="schedule-day-title">
+              <i data-lucide="calendar" style="width: 22px; height: 22px; color: var(--gold-500);"></i>
+              <span>Day 1</span>
+            </h2>
+            <span class="schedule-date-badge">Saturday, Sept 12th</span>
+          </div>
+
+          <div class="schedule-image-container" onclick="openLightbox('assets/schedule-day1.png', 'Day 1 Schedule — Saturday, September 12th')">
+            <img src="assets/schedule-day1.png" alt="CSMUN VI Day 1 Schedule - September 12th, Saturday" />
+            <div class="image-overlay-hint">
+              <i data-lucide="maximize-2" style="width: 20px; height: 20px;"></i>
+              <span>Click to Expand Image</span>
+            </div>
+          </div>
+
+          <div class="schedule-actions">
+            <button class="btn-schedule-action primary" onclick="openLightbox('assets/schedule-day1.png', 'Day 1 Schedule — Saturday, September 12th')">
+              <i data-lucide="zoom-in" style="width: 16px; height: 16px;"></i>
+              <span>View Full Screen</span>
+            </button>
+            <a href="assets/schedule-day1.png" download="CSMUN_VI_Day1_Schedule.png" class="btn-schedule-action">
+              <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Day 2 Card -->
+        <div class="schedule-card" id="day2">
+          <div class="schedule-card-header">
+            <h2 class="schedule-day-title">
+              <i data-lucide="calendar" style="width: 22px; height: 22px; color: var(--gold-500);"></i>
+              <span>Day 2</span>
+            </h2>
+            <span class="schedule-date-badge">Sunday, Sept 13th</span>
+          </div>
+
+          <div class="schedule-image-container" onclick="openLightbox('assets/schedule-day2.png', 'Day 2 Schedule — Sunday, September 13th')">
+            <img src="assets/schedule-day2.png" alt="CSMUN VI Day 2 Schedule - September 13th, Sunday" />
+            <div class="image-overlay-hint">
+              <i data-lucide="maximize-2" style="width: 20px; height: 20px;"></i>
+              <span>Click to Expand Image</span>
+            </div>
+          </div>
+
+          <div class="schedule-actions">
+            <button class="btn-schedule-action primary" onclick="openLightbox('assets/schedule-day2.png', 'Day 2 Schedule — Sunday, September 13th')">
+              <i data-lucide="zoom-in" style="width: 16px; height: 16px;"></i>
+              <span>View Full Screen</span>
+            </button>
+            <a href="assets/schedule-day2.png" download="CSMUN_VI_Day2_Schedule.png" class="btn-schedule-action">
+              <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== LIGHTBOX MODAL ===== -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox(event)">
+        <span>Close</span>
+        <i data-lucide="x" style="width: 24px; height: 24px;"></i>
+      </button>
+      <img id="lightboxImg" class="lightbox-img" src="" alt="Enlarged Schedule" />
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p class="footer-copy">© 2026 CSMUN. All rights reserved. Built with purpose.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/csmunerode/" class="footer-social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+          </a>
+          <a href="mailto:csmun@csacademy.in" class="footer-social-link" aria-label="Email">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPTS ===== -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script type="module" src="main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    });
+
+    function openLightbox(src, alt) {
+      const modal = document.getElementById('lightboxModal');
+      const img = document.getElementById('lightboxImg');
+      img.src = src;
+      img.alt = alt;
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e.target.id === 'lightboxModal' || e.target.closest('.lightbox-close')) {
+        const modal = document.getElementById('lightboxModal');
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+  </script>
+</body>
+
+</html>

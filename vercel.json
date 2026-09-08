@@ -5,6 +5,10 @@
       "destination": "/app.html"
     },
     {
+      "source": "/schedule",
+      "destination": "/schedule.html"
+    },
+    {
       "source": "/app/(.*)",
       "destination": "/app.html"
     },

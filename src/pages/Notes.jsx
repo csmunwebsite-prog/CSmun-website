@@ -1263,6 +1263,7 @@ export default function Notes() {
           </a>
           <ul className="nav-links" id="navLinks">
             <li><a href="/index.html#committees">Committees</a></li>
+            <li><a href="/schedule.html">Schedule</a></li>
             <li><a href="/index.html#videos">Training Videos</a></li>
             <li><a href="/resources.html">Resources</a></li>
             <li><a href="/app/notes" className="active">Notes</a></li>

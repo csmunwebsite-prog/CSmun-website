@@ -438,6 +438,7 @@ export default function Home() {
           <ul className="nav-links" style={{ alignItems: 'center' }}>
             <li><a href="#about">About</a></li>
             <li><a href="#committees">Committees</a></li>
+            <li><a href="/schedule.html">Schedule</a></li>
             <li><a href="#secretariat">Secretariat</a></li>
             <li>
               <Link 
